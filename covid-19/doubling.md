@@ -316,10 +316,11 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.usa, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE, ## ylim = c(NA, 20),
+       data = devolution, type = "o", pch = 16, grid = TRUE,
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
        scales = list(alternating = 3, x = list(rot = 45)),
-       abline = list(v = as.Date("2020-01-23"), col = "grey50", lwd = 2, lty = 3))
+       abline = list(v = as.Date("2020-01-23"),
+                     col = "grey50", lwd = 2, lty = 3))
 ```
 
 ![plot of chunk unnamed-chunk-10](figures/doubling-unnamed-chunk-10-1.png)

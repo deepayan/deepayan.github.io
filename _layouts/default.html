@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="">
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <meta name="author" content="Deepayan Sarkar" />
   <title>{{ page.title }}</title>
@@ -12,13 +11,8 @@
 	integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
 	crossorigin="anonymous">
 
-  <link rel="stylesheet" href="/assets/styles/rouge.css">
-
-  <style>
-    !h1.title { text-align: center; }
-    !p.author { text-align: center; }
-    img { display: block; margin-left: auto; margin-right: auto; width: 100%; }
-  </style>
+  <link rel="stylesheet" href="/assets/styles/rouge.css">  <!-- syntax highlighting -->
+  <link rel="stylesheet" href="/assets/styles/custom.css"> <!-- custom styles -->
 </head>
 
 <body>
@@ -28,10 +22,12 @@
 	<nav>
 	  <a href="/">Home</a>
 	</nav>
+	<hr class="hr-primary"/>
 	<header>
 	  <h1 class="title">{{ page.title }}</h1>
 	  <p class="author">{{ page.author }}</p>
 	</header>
+	<hr class="hr-primary"/>
 
 	{{ content }}
 
