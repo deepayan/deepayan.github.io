@@ -1,1 +1,4 @@
-theme: jekyll-theme-merlot
+## Jekyll build settings
+theme: minima
+markdown: GFM
+

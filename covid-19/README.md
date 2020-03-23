@@ -2,7 +2,6 @@
 layout: post
 title: 'Doubling times of COVID-19 cases'
 author: Deepayan Sarkar
-markdown: GFM
 ---
 
 
