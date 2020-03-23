@@ -2,7 +2,6 @@
 theme: minima
 markdown: GFM
 exclude:
-  - *.rmd
-  - covid-19/*.rmd
+  - covid-19/doubling.rmd
 
 
