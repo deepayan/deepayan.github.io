@@ -3,6 +3,6 @@ theme: minima
 markdown: GFM
 exclude:
   - *.rmd
-  - */*.rmd
+  - covid-19/*.rmd
 
 
