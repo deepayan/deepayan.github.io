@@ -122,7 +122,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb1-2" title="2"><span class="cf">if</span> (<span class="op">!</span><span class="kw">file.exists</span>(TARGET))</a>
 <a class="sourceLine" id="cb1-3" title="3">    <span class="kw">download.file</span>(<span class="st">&quot;https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv&quot;</span>,</a>
 <a class="sourceLine" id="cb1-4" title="4">                  <span class="dt">destfile =</span> TARGET)</a></code></pre></div>
-<p>This version was last updated using data downloaded on 2020-03-22.</p>
+<p>This version was last updated using data downloaded on 2020-03-23.</p>
 <p>Next, read in data:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">covid &lt;-<span class="st"> </span><span class="kw">read.csv</span>(TARGET, <span class="dt">check.names =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb2-2" title="2">                  <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
@@ -236,7 +236,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <a class="sourceLine" id="cb9-8" title="8">       <span class="dt">data =</span> devolution, <span class="dt">type =</span> <span class="st">&quot;o&quot;</span>, <span class="dt">pch =</span> <span class="dv">16</span>, <span class="dt">grid =</span> <span class="ot">TRUE</span>, <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="ot">NA</span>, <span class="dv">20</span>),</a>
 <a class="sourceLine" id="cb9-9" title="9">       <span class="dt">layout =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">20</span>), <span class="dt">as.table =</span> <span class="ot">TRUE</span>, <span class="dt">between =</span> <span class="kw">list</span>(<span class="dt">x =</span> <span class="fl">0.5</span>, <span class="dt">y =</span> <span class="fl">0.5</span>),</a>
 <a class="sourceLine" id="cb9-10" title="10">       <span class="dt">abline =</span> <span class="kw">list</span>(<span class="dt">v =</span> <span class="kw">as.Date</span>(<span class="st">&quot;2020-01-23&quot;</span>), <span class="dt">col =</span> <span class="st">&quot;grey50&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="dv">3</span>))</a></code></pre></div>
-<p><img src="figures/doubling-unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9" /><img src="figures/doubling-unnamed-chunk-9-2.png" alt="plot of chunk unnamed-chunk-9" /><img src="figures/doubling-unnamed-chunk-9-3.png" alt="plot of chunk unnamed-chunk-9" /><br />
+<p><img src="figures/doubling-unnamed-chunk-9-1.png" alt="plot of chunk unnamed-chunk-9" /><img src="figures/doubling-unnamed-chunk-9-2.png" alt="plot of chunk unnamed-chunk-9" /><img src="figures/doubling-unnamed-chunk-9-3.png" alt="plot of chunk unnamed-chunk-9" /><img src="figures/doubling-unnamed-chunk-9-4.png" alt="plot of chunk unnamed-chunk-9" /><br />
 </p>
 <p>It is too early to say how things will go for these countries, as the effect of social distancing measures will not be reflected before a couple of weeks.</p>
 <h3 id="usa">USA</h3>
