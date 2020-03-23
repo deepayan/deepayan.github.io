@@ -1,4 +1,8 @@
 ## Jekyll build settings
 theme: minima
 markdown: GFM
+exclude:
+  - README.md
+  - *.rmd
+
 
