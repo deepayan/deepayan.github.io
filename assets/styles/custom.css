@@ -1,6 +1,6 @@
 
-h1.title { text-align: center; }
-p.author { text-align: center; }
+h1.title { text-align: left; }
+p.author { text-align: left; }
 
 img
 {
@@ -17,17 +17,19 @@ pre.highlight
     font-size: 90%;
 }
 
+h1, h2, h3
+{
+    font-family: 'Noto Serif TC';
+}
+h3 { font-style: italic; }
+
+
 @media screen {
     body
     {
 	font-family: 'Noto Sans TC';
     }
-    h1, h2, h3
-    {
-	font-family: 'Noto Serif TC';
-    }
 }
-
 
 @media print {
     body

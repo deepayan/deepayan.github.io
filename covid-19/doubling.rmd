@@ -53,7 +53,7 @@ and
 
 ## Preparatory steps
 
-First, download the data if not done already (to download the latest
+First, we download the data if not done already (to download the latest
 version, delete the file and run again):
 
 ```{r}
