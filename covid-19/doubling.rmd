@@ -41,7 +41,7 @@ will have 50,000 cases in around 3 weeks from today, and a million
 cases in one and a half months. Unless the doubling time increases
 soon.
 
-For more substantial data-driven analysis, see
+For more substantive data-driven analysis, see
 [here](https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca)
 and
 [here](https://medium.com/@tomaspueyo/coronavirus-the-hammer-and-the-dance-be9337092b56).

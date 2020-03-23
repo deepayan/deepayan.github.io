@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: default
 title: 'Doubling times of COVID-19 cases'
 author: Deepayan Sarkar
 ---
@@ -9,7 +9,7 @@ author: Deepayan Sarkar
 
 Is "social distancing" working in your country? How is it doing
 compared to other countries? How long will it take for the number of
-cases to reach 50,000? Or 100,000?
+cases to reach 50,000? Or 100,000? Or a million?
 
 This is an attempt to summarize how successfully various countries /
 regions are containing the spread COVID-19, based on a very simple
@@ -30,10 +30,10 @@ to experiment with it.
 Executive summary: In most countries, the number of cases double every
 3 to 5 days. This means that if you have, say, 1000 cases today, you
 will have 50,000 cases in around 3 weeks from today, and a million
-cases in one and a half months. Unless the doubling increases time
+cases in one and a half months. Unless the doubling time increases
 soon.
 
-For more substantial data-driven analysis, see
+For more substantive data-driven analysis, see
 [here](https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca)
 and
 [here](https://medium.com/@tomaspueyo/coronavirus-the-hammer-and-the-dance-be9337092b56).
@@ -52,7 +52,7 @@ if (!file.exists(TARGET))
                   destfile = TARGET)
 ```
 
-This version was last updated using data downloaded on 2020-03-23.
+This version was last updated using data downloaded on 2020-03-22.
 
 
 Next, read in data:
