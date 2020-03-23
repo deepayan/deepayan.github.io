@@ -2,7 +2,7 @@
 theme: minima
 markdown: GFM
 exclude:
-  - README.md
   - *.rmd
+  - */*.rmd
 
 
