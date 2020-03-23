@@ -1,8 +1,8 @@
 ---
+layout: post
 title: 'Doubling times of COVID-19 cases'
 author: Deepayan Sarkar
 ---
-
 
 
 
@@ -26,6 +26,17 @@ _proportion_ of true cases being detected remains more or less stable.
 
 Here is the [source](doubling.rmd) of this analysis, in case you want
 to experiment with it.
+
+Executive summary: In most countries, the number of cases double every
+3 to 5 days. This means that if you have, say, 1000 cases today, you
+will have 50,000 cases in around 3 weeks from today, and a million
+cases in one and a half months. Unless the doubling increases time
+soon.
+
+For more substantial data-driven analysis, see
+[here](https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca)
+and
+[here](https://medium.com/@tomaspueyo/coronavirus-the-hammer-and-the-dance-be9337092b56).
 
 
 ## Preparatory steps
@@ -90,7 +101,7 @@ extractCasesTS <- function(d)
 {
     x <- t(data.matrix(d[, -c(1:4)]))
     colnames(x) <-
-        with(d, ifelse(`Province/State` == "",
+        with(d, ifelse(`Province/State` == "" | `Province/State` == `Country/Region`,
                        `Country/Region`,
                        paste(`Country/Region`, `Province/State`,
                              sep = "/")))
@@ -109,14 +120,13 @@ terms of the latest absolute numbers so far?
 
 ```r
 total.row <- sort(apply(xcovid.row, 2, tail, 1))
-dotplot(total.row[ total.row > 199 ],
+dotplot(tail(total.row, 60),
         xlab = "Total cases (NOTE: log scale)",
         scales = list(x = list(alternating = 3, log = TRUE,
                                equispaced.log = FALSE)))
 ```
 
 ![plot of chunk unnamed-chunk-5](figures/doubling-unnamed-chunk-5-1.png)
-\
 
 
 
@@ -203,12 +213,12 @@ devolution <-
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       scales = list(alternating = 3, x = list(rot = 45)),
        abline = list(v = as.Date("2020-01-23"),
                      col = "grey50", lwd = 2, lty = 3))
 ```
 
 ![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)
-\
 
 
 As of March 22, the doubling time in Hong Kong had stabilized (at
@@ -236,11 +246,11 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
+       scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
 ![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)
-\
 
 
 Unfortunately, most of these countries do not show systematic increase
@@ -267,25 +277,25 @@ Norway, and to a lesser extent Iran and even Italy.
 ### Countries with less widespread infections
 
 Next, we look at countries (excluding USA) where the count is at least
-100 but less than 1000.
+200 but less than 1000.
 
 
 
 ```r
 total.row <- apply(xcovid.row, 2, tail, 1)
 regions <-  # between 100 and 1000 cases
-    names(which(total.row > 99 & total.row < 1000))
+    names(which(total.row > 199 & total.row < 1000))
 devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE, ylim = c(NA, 20),
-       layout = c(0, 20), as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       scales = list(alternating = 3, x = list(rot = 45)),
        abline = list(v = as.Date("2020-01-23"), col = "grey50", lwd = 2, lty = 3))
 ```
 
-![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-3.png)![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-4.png)
-\
+![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-2.png)
 
 
 It is too early to say how things will go for these countries, as the
@@ -295,7 +305,7 @@ couple of weeks.
 
 ### USA
 
-Finally, we look US states where the count is at least 100.
+Finally, we look at US states where the count is at least 100.
 
 
 
@@ -308,16 +318,16 @@ devolution <-
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE, ## ylim = c(NA, 20),
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       scales = list(alternating = 3, x = list(rot = 45)),
        abline = list(v = as.Date("2020-01-23"), col = "grey50", lwd = 2, lty = 3))
 ```
 
 ![plot of chunk unnamed-chunk-10](figures/doubling-unnamed-chunk-10-1.png)
-\
 
 
-Again, it is too early to say much. The initial steep climb is
-probably due to delay in starting to test, but generally things don't
-look good, with the doubling time at around 5 days or less everywhere
-as of now.
+Again, it is too early to say much. The initial steep climb in several
+states is probably due to delay in starting to test, but generally
+things don't look good, with the doubling time at around 5 days or
+less everywhere as of now.
 
 
