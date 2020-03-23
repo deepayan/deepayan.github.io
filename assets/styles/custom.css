@@ -14,7 +14,7 @@ pre.highlight
 {
     padding: 0.5em;
     font-weight: normal;
-    font-size: 95%;
+    font-size: 90%;
 }
 
 @media screen {
@@ -22,7 +22,7 @@ pre.highlight
     {
 	font-family: 'Noto Sans TC';
     }
-    h1, h2
+    h1, h2, h3
     {
 	font-family: 'Noto Serif TC';
     }
