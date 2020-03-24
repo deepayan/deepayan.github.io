@@ -1,5 +1,5 @@
 ## Jekyll build settings
-markdown: GFM
+markdown: kramdown
 exclude:
   - covid-19/doubling.rmd
 
