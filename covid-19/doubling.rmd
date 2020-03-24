@@ -19,31 +19,41 @@ ct$strip.background$col <- "grey90"
 lattice.options(default.theme = ct)
 ```
 
+
 Is "social distancing" working in your country? How is it doing
 compared to other countries? How long will it take for the number of
 cases to reach 50,000? Or 100,000? Or a million?
 
-This is an attempt to summarize how successfully various countries /
-regions are containing the spread COVID-19, based on a very simple
-summary statistic: how long it is taking to double the number of
-cases, and how this "doubling time" changes over time.
+This is an attempt to summarize, on an ongong basis, how successfully
+various countries / regions are containing the spread COVID-19, based
+on a very simple summary statistic: how long it is taking to double
+the number of cases, and how this "doubling time" changes over time.
 
 The analysis is based on the official number of _confirmed_ cases,
 based on data provided by [JHU
 CSSE](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series)
-on Github. Not all countries are testing equally aggressively (e.g.,
-India), so these numbers may not reflect the actual number of
-cases. In the long run though, that does not matter as long as the
-_proportion_ of true cases being detected remains more or less stable.
+on Github. Not all countries are testing equally aggressively, for
+various reasons. For example, India is testing (as on [March
+20](https://www.mohfw.gov.in/pdf/ICMRrevisedtestingstrategyforCOVID.pdf))
+only symptomatic individuals who are international travelers, contacts
+of positive cases, health care workers, and unlinked symptomatic
+patients serious enough to be hospitalized.  So, these numbers may not
+reflect the actual number of cases. In the long run though, that does
+not matter as long as the _proportion_ of true cases being detected
+remains more or less stable (even this proportion may change as the
+testing poicy is refined).
 
 Here is the [source](doubling.rmd) of this analysis, in case you want
-to experiment with it.
+to experiment with it. The analysis is done using R, click 
+<a href="#" data-toggle="collapse" data-target="div.sourceCode" aria-expanded="true">here</a>
+to show / hide the R code.
 
-Executive summary: In most countries, the number of cases double every
-3 to 5 days. This means that if you have, say, 1000 cases today, you
-will have 50,000 cases in around 3 weeks from today, and a million
-cases in one and a half months. Unless the doubling time increases
-soon.
+## Executive summary
+
+In most countries, the number of cases are doubling every 3 to 5
+days. This means that if you have, say, 1000 cases today, you will
+have 50,000 cases in around 3 weeks from today, and a million cases in
+one and a half months. Unless the doubling time increases soon.
 
 For more substantive data-driven analysis, see
 [here](https://medium.com/@tomaspueyo/coronavirus-act-today-or-people-will-die-f4d3d9cd99ca)
@@ -53,30 +63,26 @@ and
 
 ## Preparatory steps
 
-First, we download the data if not done already (to download the latest
-version, delete the file and run again):
+First, we download the data and read it in.
 
 ```{r}
 TARGET <- "time_series_19-covid-Confirmed.csv"
+## To download the latest version, delete the file and run again
 if (!file.exists(TARGET))
     download.file("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
                   destfile = TARGET)
-```
-
-This version was last updated using data downloaded on `r {as.Date(file.mtime("time_series_19-covid-Confirmed.csv"))}`.
-
-
-Next, read in data:
-
-```{r}
 covid <- read.csv(TARGET, check.names = FALSE,
                   stringsAsFactors = FALSE)
 ```
 
+This version was last updated using data downloaded on 
+`r {as.Date(file.mtime("time_series_19-covid-Confirmed.csv"))}`.
+
+
 Many of the high numbers are provinces in China, where spread is now
-more or less controlled. We consider them separately. Data for the US
-is also available separately by state, and we consider them separately
-as well. We exclude cases on cruise ships, which represent small
+more or less controlled. We consider them separately. Data for the
+USA, available separately by state, is considered separately as
+well. We exclude cases on cruise ships, which represent small
 populations.
 
 
@@ -163,11 +169,11 @@ exponential growth, we expect the doubling time to remain constant. If
 measures are being effective, we should see the doubling time
 increasing.
 
-To estimate the doubling times, we use `approxfun()` to do linear
-interpolation with day as function of number, and then use it to
-evaluate the "day" at which the number was half of the current count.
-To see how the doubling time has evolved over time, we compute the
-doubling time using data upto a given timepoint, but only starting
+To estimate the doubling times, we use the R function `approxfun()` to
+do linear interpolation with day as function of number, and then use
+it to evaluate the "day" at which the number was half of the current
+count.  To see how the doubling time has evolved over time, we compute
+the doubling time using data upto a given timepoint, but only starting
 from days when the total count has exceeded 50, so that the estimates
 are not meaningless.
 
@@ -254,22 +260,21 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 Unfortunately, most of these countries do not show systematic increase
 in the doubling time, which in most cases hovers around a value less
 than five days. This indicates uncontrolled exponential growth; at the
-current rates (as on March 21), for example,
+current rates as on March 21, for example,
 
-- Germany will reach 50,000 cases by March 25
+- Germany was on its way to reach 50,000 cases by March 25
 
-- Spain will reach 50,000 cases by March 27
+- Spain would have reached 50,000 cases by March 27
 
-- France will reach 50,000 cases by March 31
+- France would have reached 50,000 cases by March 31
 
-- UK will reach 50,000 cases between March 31 and April 8
-
-- Austria (currently less than 2500) may reach 50,000 cases by April 10
-
-- Portugal (currently around 1000) may actually reach 50,000 cases sooner
+But all three have been showing steady improvement since then. Not so
+(yet) for the UK, which is on track to reach 50,000 cases between
+March 31 and April 8.
 
 The countries that seem to be doing well are Denmark, Sweden, and
 Norway, and to a lesser extent Iran and even Italy.
+
 
 
 ### Countries with less widespread infections
@@ -322,5 +327,18 @@ Again, it is too early to say much. The initial steep climb in several
 states is probably due to delay in starting to test, but generally
 things don't look good, with the doubling time at around 5 days or
 less everywhere as of now.
+
+
+
+<script type="text/javascript">
+$(document).ready(
+  function() {
+    $( "div.highlighter-rouge" ).addClass( "sourceCode" );
+    $( "div.sourceCode" ).addClass( "collapse" );
+  }
+);
+</script>
+
+ 
 
 

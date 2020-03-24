@@ -11,7 +11,7 @@ all: doubling.html
 
 %.html: %.md bsheader.html.in bsbefore.html.in bsbefore.html.in
 	pandoc -s -t html --mathjax -H bsheader.html.in	 	\
-	-B bsbefore.html.in -A bsbefore.html.in -o '$@' '$<'
+	-B bsbefore.html.in -A bsafter.html.in -o '$@' '$<'
 
 
 web: all

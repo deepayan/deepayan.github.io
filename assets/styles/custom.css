@@ -1,3 +1,20 @@
+@media screen {
+    body
+    {
+	font-family: 'Noto Sans TC';
+    }
+}
+
+@media print {
+    body
+    {
+	font-family: 'Noto Serif TC';
+    }
+}
+
+
+
+
 
 h1.title { text-align: left; }
 p.author { text-align: left; }
@@ -23,19 +40,5 @@ h1, h2, h3
 }
 h3 { font-style: italic; }
 
-
-@media screen {
-    body
-    {
-	font-family: 'Noto Sans TC';
-    }
-}
-
-@media print {
-    body
-    {
-	font-family: 'Noto Serif TC';
-    }
-}
 
 
