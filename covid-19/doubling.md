@@ -338,6 +338,8 @@ less everywhere as of now.
 
 
 <script type="text/javascript">
+// Javascript to set up hiding and toggling of code blocks
+
 $(document).ready(
   function() {
     $( "div.highlighter-rouge" ).addClass( "sourceCode" );
@@ -346,6 +348,6 @@ $(document).ready(
 );
 </script>
 
- 
+
 
 
