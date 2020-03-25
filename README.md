@@ -10,4 +10,4 @@ Useful resources for making pages using jekyll:
 
 - Google web fonts: <https://www.w3schools.com/howto/howto_google_fonts.asp>
 
-
+- Github-flavoured markdown: <https://github.github.com/gfm/> - see about tagfilter
