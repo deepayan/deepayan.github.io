@@ -17,6 +17,8 @@ library(latticeExtra)
 bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
 ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
 ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
 lattice.options(default.theme = ct)
 ```
 
