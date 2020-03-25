@@ -8,6 +8,6 @@ Useful resources for making pages using jekyll:
 
 - Github site data: <https://jekyll.github.io/github-metadata/site.github/>
 
-- Google web fonts: <https://www.w3schools.com/howto/howto_google_fonts.asp>
+- Google web fonts: <https://www.w3schools.com/howto/howto_google_fonts.asp> / <https://fonts.google.com/>
 
 - Github-flavoured markdown: <https://github.github.com/gfm/> - see about tagfilter
