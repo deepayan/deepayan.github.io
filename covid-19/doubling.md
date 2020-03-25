@@ -8,6 +8,7 @@ author: Deepayan Sarkar
 
 
 
+
 Is "social distancing" working in your country? How is it doing
 compared to other countries? How long will it take for the number of
 cases to reach 50,000? Or 100,000? Or a million?
@@ -33,8 +34,8 @@ testing poicy is refined).
 
 Here is the [source](doubling.rmd) of this analysis, in case you want
 to experiment with it. The analysis is done using R, click 
-<a href="#" data-toggle="collapse" data-target="div.sourceCode" aria-expanded="true">here</a>
-to show / hide the R code.
+<a href="#" data-toggle="collapse" data-target="div.sourceCode"
+   aria-expanded="true">here</a> to show / hide the R code.
 
 ## Executive summary
 
@@ -65,7 +66,7 @@ covid <- read.csv(TARGET, check.names = FALSE,
 ```
 
 This version was last updated using data downloaded on 
-2020-03-24.
+2020-03-25.
 
 
 Many of the high numbers are provinces in China, where spread is now

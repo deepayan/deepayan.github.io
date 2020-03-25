@@ -5,6 +5,7 @@ author: Deepayan Sarkar
 ---
 
 
+
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
 opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRUE,
                comment = "", warning = TRUE, message = TRUE,
@@ -13,7 +14,7 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRU
                fig.width = 12, fig.height = 18, dpi = 120, fig.path='figures/doubling-')
 library(lattice)
 library(latticeExtra)
-bpaired <- brewer.pal(n = 12, name = "Paired")
+bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
 ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
 ct$strip.background$col <- "grey90"
 lattice.options(default.theme = ct)
@@ -45,8 +46,8 @@ testing poicy is refined).
 
 Here is the [source](doubling.rmd) of this analysis, in case you want
 to experiment with it. The analysis is done using R, click 
-<a href="#" data-toggle="collapse" data-target="div.sourceCode" aria-expanded="true">here</a>
-to show / hide the R code.
+<a href="#" data-toggle="collapse" data-target="div.sourceCode"
+   aria-expanded="true">here</a> to show / hide the R code.
 
 ## Executive summary
 
