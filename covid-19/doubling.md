@@ -61,12 +61,36 @@ TARGET <- "time_series_19-covid-Confirmed.csv"
 if (!file.exists(TARGET))
     download.file("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",
                   destfile = TARGET)
+```
+
+```
+Warning in download.file("https://github.com/CSSEGISandData/COVID-19/raw/
+master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-
+Confirmed.csv", : cannot open URL 'https://github.com/CSSEGISandData/
+COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/
+time_series_19-covid-Confirmed.csv': HTTP status was '404 Not Found'
+```
+
+```
+Error in download.file("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv", : cannot open URL 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv'
+```
+
+```r
 covid <- read.csv(TARGET, check.names = FALSE,
                   stringsAsFactors = FALSE)
 ```
 
+```
+Warning in file(file, "rt"): cannot open file 'time_series_19-covid-
+Confirmed.csv': No such file or directory
+```
+
+```
+Error in file(file, "rt"): cannot open the connection
+```
+
 This version was last updated using data downloaded on 
-2020-03-25.
+NA.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -79,9 +103,27 @@ populations.
 
 ```r
 covid.china <- subset(covid, `Country/Region` == "China")
+```
+
+```
+Error in subset(covid, `Country/Region` == "China"): object 'covid' not found
+```
+
+```r
 covid.usa <- subset(covid, `Country/Region` == "US")
+```
+
+```
+Error in subset(covid, `Country/Region` == "US"): object 'covid' not found
+```
+
+```r
 covid.row <- subset(covid, !(`Country/Region` %in%
                              c("China", "US", "Cruise Ship")))
+```
+
+```
+Error in subset(covid, !(`Country/Region` %in% c("China", "US", "Cruise Ship"))): object 'covid' not found
 ```
 
 Next, we extract the time series data of each subset as a data matrix,
@@ -116,8 +158,26 @@ extractCasesTS <- function(d)
     apply(x, 2, correctLag)
 }
 xcovid.china <- extractCasesTS(covid.china)
+```
+
+```
+Error in is.data.frame(frame): object 'covid.china' not found
+```
+
+```r
 xcovid.usa <- extractCasesTS(covid.usa)
+```
+
+```
+Error in is.data.frame(frame): object 'covid.usa' not found
+```
+
+```r
 xcovid.row <- extractCasesTS(covid.row)
+```
+
+```
+Error in is.data.frame(frame): object 'covid.row' not found
 ```
 
 Outside the US and China, which countries are the worst affected in
@@ -126,13 +186,22 @@ terms of the latest absolute numbers so far?
 
 ```r
 total.row <- sort(apply(xcovid.row, 2, tail, 1))
+```
+
+```
+Error in apply(xcovid.row, 2, tail, 1): object 'xcovid.row' not found
+```
+
+```r
 dotplot(tail(total.row, 60),
         xlab = "Total cases (NOTE: log scale)",
         scales = list(x = list(alternating = 3, log = TRUE,
                                equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/doubling-unnamed-chunk-4-1.png)
+```
+Error in tail(total.row, 60): object 'total.row' not found
+```
 
 
 
@@ -212,10 +281,24 @@ doubling time has systematically increased after the lockdown
 ```r
 regions <- # at least 200 cases
     names(which(apply(xcovid.china, 2, tail, 1) > 199)) 
+```
+
+```
+Error in apply(xcovid.china, 2, tail, 1): object 'xcovid.china' not found
+```
+
+```r
 devolution <-
     droplevels(na.omit(do.call(rbind,
                                lapply(regions, doubling.ts,
                                       d = xcovid.china, min = 50))))
+```
+
+```
+Error in lapply(regions, doubling.ts, d = xcovid.china, min = 50): object 'regions' not found
+```
+
+```r
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -224,7 +307,9 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
                      col = "grey50", lwd = 2, lty = 3))
 ```
 
-![plot of chunk unnamed-chunk-6](figures/doubling-unnamed-chunk-6-1.png)
+```
+Error in eval(substitute(groups), data, environment(x)): object 'devolution' not found
+```
 
 
 As of March 22, the doubling time in Hong Kong had stabilized (at
@@ -247,16 +332,32 @@ by total cases.
 ```r
 regions <-  # at least 1000 cases
     names(which(apply(xcovid.row, 2, tail, 1) > 999))
+```
+
+```
+Error in apply(xcovid.row, 2, tail, 1): object 'xcovid.row' not found
+```
+
+```r
 devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
+```
+
+```
+Error in lapply(regions, doubling.ts, d = xcovid.row, min = 50): object 'regions' not found
+```
+
+```r
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
-![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)
+```
+Error in eval(substitute(groups), data, environment(x)): object 'devolution' not found
+```
 
 
 Unfortunately, most of these countries do not show systematic increase
@@ -288,11 +389,32 @@ Next, we look at countries (excluding USA) where the count is at least
 
 ```r
 total.row <- apply(xcovid.row, 2, tail, 1)
+```
+
+```
+Error in apply(xcovid.row, 2, tail, 1): object 'xcovid.row' not found
+```
+
+```r
 regions <-  # between 100 and 1000 cases
     names(which(total.row > 199 & total.row < 1000))
+```
+
+```
+Error in which(total.row > 199 & total.row < 1000): object 'total.row' not found
+```
+
+```r
 devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
+```
+
+```
+Error in lapply(regions, doubling.ts, d = xcovid.row, min = 50): object 'regions' not found
+```
+
+```r
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE, ylim = c(NA, 20),
        layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -300,7 +422,9 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        abline = list(v = as.Date("2020-01-23"), col = "grey50", lwd = 2, lty = 3))
 ```
 
-![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-2.png)
+```
+Error in eval(substitute(groups), data, environment(x)): object 'devolution' not found
+```
 
 
 It is too early to say how things will go for these countries, as the
@@ -316,10 +440,31 @@ Finally, we look at US states where the count is at least 100.
 
 ```r
 total.usa <- apply(xcovid.usa, 2, tail, 1)
+```
+
+```
+Error in apply(xcovid.usa, 2, tail, 1): object 'xcovid.usa' not found
+```
+
+```r
 regions <- names(which(total.usa > 99))
+```
+
+```
+Error in which(total.usa > 99): object 'total.usa' not found
+```
+
+```r
 devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.usa, min = 50))))
+```
+
+```
+Error in lapply(regions, doubling.ts, d = xcovid.usa, min = 50): object 'regions' not found
+```
+
+```r
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -328,7 +473,9 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
                      col = "grey50", lwd = 2, lty = 3))
 ```
 
-![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-1.png)
+```
+Error in eval(substitute(groups), data, environment(x)): object 'devolution' not found
+```
 
 
 Again, it is too early to say much. The initial steep climb in several
