@@ -263,7 +263,7 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 
 Unfortunately, many of these countries do not show systematic increase
 in the doubling time, which in most cases hovers around a value less
-than five days. With uncontrolled exponential growth; at the current
+than five days. With uncontrolled exponential growth, at the current
 rates as on March 21, for example,
 
 - Germany was on its way to reach 50,000 cases by March 25
