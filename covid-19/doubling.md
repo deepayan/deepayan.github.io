@@ -216,8 +216,9 @@ devolution <-
                                       d = xcovid.china, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
-       as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
+       as.table = TRUE, between = list(x = 0.5, y = 0.5),
        abline = list(v = as.Date("2020-01-23"),
                      col = "grey50", lwd = 2, lty = 3))
 ```
@@ -250,6 +251,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
+       xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -257,10 +259,10 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 ![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)
 
 
-Unfortunately, most of these countries do not show systematic increase
+Unfortunately, many of these countries do not show systematic increase
 in the doubling time, which in most cases hovers around a value less
-than five days. This indicates uncontrolled exponential growth; at the
-current rates as on March 21, for example,
+than five days. With uncontrolled exponential growth; at the current
+rates as on March 21, for example,
 
 - Germany was on its way to reach 50,000 cases by March 25
 
@@ -268,9 +270,11 @@ current rates as on March 21, for example,
 
 - France would have reached 50,000 cases by March 31
 
-But all three have been showing steady improvement since then. Not so
-(yet) for the UK, which is on track to reach 50,000 cases between
-March 31 and April 8.
+While Germany has shown some improvement since then, Spain appears set
+to meet this deadline. France is showing some borderline improvement,
+but not enough yet.  The UK, which has 9529 cases as on March 26, is
+showing some improvement in the last three days, but is still on track
+to reach 50,000 cases between April 4 and April 10.
 
 The countries that seem to be doing well are Denmark, Sweden, and
 Norway, and to a lesser extent Iran and even Italy.
@@ -293,9 +297,9 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE, ylim = c(NA, 20),
-       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5),
+       xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       abline = list(v = as.Date("2020-01-23"), col = "grey50", lwd = 2, lty = 3))
+       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
 ![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-2.png)
