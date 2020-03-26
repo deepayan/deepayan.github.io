@@ -63,6 +63,7 @@ if (!file.exists(TARGET))
                   destfile = TARGET)
 covid <- read.csv(TARGET, check.names = FALSE,
                   stringsAsFactors = FALSE)
+covid <- subset(covid, `Country/Region` != "Diamond Princess")
 ```
 
 This version was last updated using data downloaded on 
@@ -79,9 +80,7 @@ populations.
 
 ```r
 covid.china <- subset(covid, `Country/Region` == "China")
-covid.usa <- subset(covid, `Country/Region` == "US")
-covid.row <- subset(covid, !(`Country/Region` %in%
-                             c("China", "US", "Cruise Ship")))
+covid.row <- subset(covid, `Country/Region` != "China")
 ```
 
 Next, we extract the time series data of each subset as a data matrix,
@@ -106,9 +105,9 @@ correctLag <- function(x)
 extractCasesTS <- function(d)
 {
     x <- t(data.matrix(d[, -c(1:4)]))
+    x[x == -1] <- NA
     colnames(x) <-
-        with(d, ifelse(`Province/State` == "" | `Province/State` == `Country/Region`,
-                       `Country/Region`,
+        with(d, ifelse(`Province/State` == "", `Country/Region`,
                        paste(`Country/Region`, `Province/State`,
                              sep = "/")))
     ## Update labels to include current total cases
@@ -116,12 +115,7 @@ extractCasesTS <- function(d)
     apply(x, 2, correctLag)
 }
 xcovid.china <- extractCasesTS(covid.china)
-xcovid.usa <- extractCasesTS(covid.usa)
 xcovid.row <- extractCasesTS(covid.row)
-```
-
-```
-Warning in sqrt(x[i - 1] * x[i + 1]): NaNs produced
 ```
 
 Outside the US and China, which countries are the worst affected in
@@ -310,35 +304,6 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 It is too early to say how things will go for these countries, as the
 effect of social distancing measures will not be reflected before a
 couple of weeks.
-
-
-### USA
-
-Finally, we look at US states where the count is at least 100.
-
-
-
-```r
-total.usa <- apply(xcovid.usa, 2, tail, 1)
-regions <- names(which(total.usa > 99))
-devolution <-
-    droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
-                                             d = xcovid.usa, min = 50))))
-xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
-       as.table = TRUE, between = list(x = 0.5, y = 0.5),
-       scales = list(alternating = 3, x = list(rot = 45)),
-       abline = list(v = as.Date("2020-01-23"),
-                     col = "grey50", lwd = 2, lty = 3))
-```
-
-![plot of chunk unnamed-chunk-9](figures/doubling-unnamed-chunk-9-1.png)
-
-
-Again, it is too early to say much. The initial steep climb in several
-states is probably due to delay in starting to test, but generally
-things don't look good, with the doubling time at around 5 days or
-less everywhere as of now.
 
 
 
