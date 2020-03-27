@@ -10,7 +10,7 @@ all: doubling.html
 	Rscript -e "library(knitr); knit('$<')"
 
 %.html: %.md bsheader.html.in bsbefore.html.in bsbefore.html.in
-	pandoc -s -t html --mathjax -H bsheader.html.in	 	\
+	pandoc -s -t html+smart --mathjax -H bsheader.html.in	 	\
 	-B bsbefore.html.in -A bsafter.html.in -o '$@' '$<'
 
 
