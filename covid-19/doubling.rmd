@@ -35,7 +35,7 @@ the number of cases, and how this "doubling time" changes over time.
 
 The analysis is based on the official number of _confirmed_ cases,
 based on data provided by [JHU
-CSSE](https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv)
+CSSE](https://github.com/CSSEGISandData/COVID-19/)
 on Github. Not all countries are testing equally aggressively, for
 various reasons. For example, India is testing (as on [March
 20](https://www.mohfw.gov.in/pdf/ICMRrevisedtestingstrategyforCOVID.pdf))
