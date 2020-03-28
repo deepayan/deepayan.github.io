@@ -311,5 +311,21 @@ couple of weeks.
 
 
 
+## The doubling time of death rates
+
+A similar analysis can be done for death rates (code
+[here](deaths.rmd)). We only consider countries / regions with at
+least 100 deaths:
+
+![total deaths](figures/deaths-tdeath-1.png)
+
+
+The following plot gives the doubling time for deaths in these
+countries, along with the corresponding doubling times for total cases
+in grey. Generally speaking, the doubling times are comparable within
+each country / region (possibly with a slight lag).
+
+
+![doubling time for deaths](figures/deaths-ddeath-1.png)
 
 
