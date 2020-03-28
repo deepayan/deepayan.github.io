@@ -67,7 +67,7 @@ covid <- subset(covid, `Country/Region` != "Diamond Princess")
 ```
 
 This version was last updated using data downloaded on 
-2020-03-27.
+2020-03-28.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -232,6 +232,7 @@ is likely due to already infected travelers returning, and is also
 happening in Singapore and Taiwan.
 
 
+
 ## The situation elsewhere
 
 ### Countries with already widespread infections
@@ -251,7 +252,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
-       xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -296,13 +297,13 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE, ylim = c(NA, 20),
-       xlab = "Date", ylab = "Doubling time (days)",
+       data = devolution, type = "o", pch = 16, grid = TRUE,
+       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
-![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-2.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-3.png)
+![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-2.png)
 
 
 It is too early to say how things will go for these countries, as the

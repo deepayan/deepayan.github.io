@@ -237,6 +237,7 @@ is likely due to already infected travelers returning, and is also
 happening in Singapore and Taiwan.
 
 
+
 ## The situation elsewhere
 
 ### Countries with already widespread infections
@@ -255,7 +256,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
-       xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -297,8 +298,8 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE, ylim = c(NA, 20),
-       xlab = "Date", ylab = "Doubling time (days)",
+       data = devolution, type = "o", pch = 16, grid = TRUE,
+       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
