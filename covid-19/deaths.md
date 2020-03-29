@@ -30,7 +30,7 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-03-28. Here is the
+2020-03-29. Here is the
 [source](deaths.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -128,6 +128,7 @@ total.cases <- apply(xcovid.deaths, 2, tail, 1)
 ```r
 porder <- rev(order(total.deaths))
 death.rate <- 100 * (xcovid.deaths / xcovid.cases)
+dr.naive.latest <- tail(death.rate, 1)
 start.date <- as.Date("2020-01-22")
 xat <- pretty(start.date + c(0, nrow(death.rate)-1))
 (dr.naive <-
@@ -168,11 +169,12 @@ the naive death rate.
 ```r
 LAG <- 7 # lowest lag for which Hubei estimates flatten out
 death.rate <- 100 * tail(xcovid.deaths, -LAG) / head(xcovid.cases, -LAG)
+dr.adjusted.latest <- tail(death.rate, 1)
 start.date <- as.Date("2020-01-22") + LAG
 xat <- pretty(start.date + c(0, nrow(death.rate)-1))
 dr.adjusted <- 
      xyplot(ts(death.rate[, porder], start = start.date),
-            type = "o", grid = TRUE, layout = c(4, NA),
+            type = "o", layout = c(4, NA),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
             col = ct$superpose.symbol$col[2],
             scales = list(alternating = 3,
@@ -180,7 +182,7 @@ dr.adjusted <-
                           y = list(relation = "same")),
             xlab = NULL, ylab = "Death rate (per cent)",
             as.table = TRUE, between = list(x = 0.5, y = 0.5),
-            ylim = extendrange(range(tail(death.rate, 10))))
+            ylim = c(0, 30))
 update(dr.adjusted + dr.naive,
        auto.key = list(lines = TRUE, points = FALSE, columns = 2, type = "o",
                        text = c("Naive estimate", "One week lag-adjusted estimate")))
@@ -198,6 +200,51 @@ rate among all _infected_ individuals, but rather only among all
 _identified_ individuals. In countries where possibly infected
 patients are not tested if their symptoms are mild, then the estimated
 death rate will be artificially high.
+
+
+A useful, but not unexpected, proxy for how efficiently a country is
+testing turns out to be its GDP. The following plot shows, only for
+European countries (which should be otherwise more or less
+homogeneous), the relationship between per capita GDP and adjusted
+mortality rate.
+
+
+
+```r
+data(UN, package = "carData")
+latest.dr <- as.data.frame(t(rbind(dr.naive.latest,
+                                   dr.adjusted.latest,
+                                   tail(xcovid.deaths, 1))))
+names(latest.dr) <- c("naive", "adjusted", "tdeaths")
+## adjust some names to match
+mapNames <- function(s)
+{
+    s[s == "US"] <- "United States"
+    s[s == "Korea, South"] <- "Republic of Korea"
+    s[substring(s, 1, 5) == "China"] <- "China"
+    s
+}
+latest.dr <- cbind(latest.dr,
+                   country = rownames(latest.dr),
+                   UN[mapNames(rownames(latest.dr)), ])
+with(subset(latest.dr, region == "Europe"),
+     xyplot(adjusted ~ ppgdp, pch = 16, cex = 1.5,
+            xlab = "GDP per capita (USD) in 2011",
+            ylab = "Adjusted COVID-19 mortality rate (per cent)",
+            xlim = extendrange(range(ppgdp), f = 0.1),
+            panel = function(x, y, ...) {
+                panel.abline(lm(y ~ x, weights = tdeaths), col.line = "grey90", lwd = 3)
+                panel.xyplot(x, y, ...)
+                panel.text(x, y, labels = country, pos = 2, srt = 10)
+            }))
+```
+
+![plot of chunk unnamed-chunk-5](figures/deaths-unnamed-chunk-5-1.png)
+
+These GDP numbers are from 2011 (the latest available from the UN
+website). I will try to update these to more recent numbers when I
+can.
+
 
 
 

@@ -67,7 +67,7 @@ covid <- subset(covid, `Country/Region` != "Diamond Princess")
 ```
 
 This version was last updated using data downloaded on 
-2020-03-28.
+2020-03-29.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -323,7 +323,9 @@ least 100 deaths:
 
 The following plot gives the doubling time for deaths in these
 countries, along with the corresponding doubling times for total cases
-in grey.
+in grey. Generally speaking, the doubling times are comparable within
+each country / region (possibly with a slight lag).
+
 
 ![doubling time for deaths](figures/deaths-ddeath-1.png)
 
