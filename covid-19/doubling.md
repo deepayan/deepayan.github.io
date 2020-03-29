@@ -118,29 +118,41 @@ xcovid.china <- extractCasesTS(covid.china)
 xcovid.row <- extractCasesTS(covid.row)
 ```
 
-Outside the US and China, which countries are the worst affected in
-terms of the latest absolute numbers so far?
+Outside China, which countries are the worst affected in terms of the
+latest absolute numbers so far? The following plot shows the latest
+counts, and also shows how much the counts have increased in the last
+week. These are on a logarithmic scale, which means that the one-week
+increase is a measure of the percentage increase; larger means faster
+rate of growth.
+
 
 
 ```r
-total.row <- sort(apply(xcovid.row, 2, tail, 1))
-dotplot(tail(total.row, 60),
+total.row <- apply(xcovid.row, 2, tail, 1)
+total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
+torder <- tail(order(total.row), 60)
+dotplot(total.row[torder], total.1weekago = total.row.1weekago[torder],
         xlab = "Total cases (NOTE: log scale)",
-        scales = list(x = list(alternating = 3, log = TRUE,
+        panel = function(x, y, ..., total.1weekago) {
+            panel.segments(x, y, log10(total.1weekago), y,
+                           col = trellis.par.get("plot.line")$col, lwd = 2)
+            panel.dotplot(x, y, ...)
+        },
+        scales = list(x = list(alternating = 3, log = 10,
                                equispaced.log = FALSE)))
 ```
 
 ![plot of chunk unnamed-chunk-4](figures/doubling-unnamed-chunk-4-1.png)
 
 
-
-Unfortunately, the latest numbers don't tell the whole
-story. Different countries are at different stages of the pandemic,
-and just because the numbers are low _now_ does not mean they will
-remain low. We should be more concerned about what is _going_ to
-happen, and that depends on what measures various countries / regions
-are taking. How can we compare countries at various stages of spread
-in terms of something that is actually comparable?
+The latest numbers don't tell the whole story however, even combined
+with the one-week increase. Different countries are at different
+stages of the pandemic, and just because the numbers are low _now_
+does not mean they will remain low. We should be more concerned about
+what is _going_ to happen, and that depends on what measures various
+countries / regions are taking. How can we compare countries at
+various stages of spread in terms of something that is actually
+comparable?
 
 ## The doubling time
 

@@ -85,15 +85,19 @@ _recovered_ patients by date is available, but that is not enough).
 
 The plot below shows how the naive death rates (proportion of deaths
 over number of confirmed cases), on any given day, have changed over
-time for countries with at least 100 deaths.^[As [before](doubling),
-we apply a crude "smoothing" to account for lags in updating data: If
-two consecutive days have the same total count followed by a large
-increase on the following day, then the most likely explanation is
-that data was not updated on the second day. In such cases, the count
-of the middle day is replaced by the geometric mean of its
-neighbours.] Although the estimate is eventually (asymptotically)
-supposed to stabilize (as the fraction of "active" cases decreases),
-this has clearly not happened yet for most countries.
+time for countries with at least 100 deaths.[^1] Although the estimate
+is eventually (asymptotically) supposed to stabilize (as the fraction
+of "active" cases decreases), this has clearly not happened yet for
+most countries.
+
+
+[^1]: As [before](doubling), we apply a crude "smoothing" to account
+for lags in updating data: If two consecutive days have the same total
+count followed by a large increase on the following day, then the most
+likely explanation is that data was not updated on the second day. In
+such cases, the count of the middle day is replaced by the geometric
+mean of its neighbours.
+
 
 
 
@@ -177,13 +181,9 @@ dr.adjusted <-
             type = "o", layout = c(4, NA),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
             col = ct$superpose.symbol$col[2],
-            scales = list(alternating = 3,
-                          x = list(at = xat, labels = format(xat, format = "%d %b")),
-                          y = list(relation = "same")),
-            xlab = NULL, ylab = "Death rate (per cent)",
             as.table = TRUE, between = list(x = 0.5, y = 0.5),
             ylim = c(0, 30))
-update(dr.adjusted + dr.naive,
+update(dr.naive + dr.adjusted, ylim = c(0, 30),
        auto.key = list(lines = TRUE, points = FALSE, columns = 2, type = "o",
                        text = c("Naive estimate", "One week lag-adjusted estimate")))
 ```
