@@ -92,11 +92,11 @@ most countries.
 
 
 [^1]: As [before](doubling), we apply a crude "smoothing" to account
-for lags in updating data: If two consecutive days have the same total
-count followed by a large increase on the following day, then the most
-likely explanation is that data was not updated on the second day. In
-such cases, the count of the middle day is replaced by the geometric
-mean of its neighbours.
+    for lags in updating data: If two consecutive days have the same
+    total count followed by a large increase on the following day,
+    then the most likely explanation is that data was not updated on
+    the second day. In such cases, the count of the middle day is
+    replaced by the geometric mean of its neighbours.
 
 
 
