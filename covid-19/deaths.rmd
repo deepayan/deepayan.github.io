@@ -200,57 +200,66 @@ update(dr.adjusted + dr.naive,
 The adjusted death rates have less systematic trends than the naive
 estimate, but clearly there is still a lot of instability.
 
+
 Why are the rates so different across countries? That is difficult to
-answer. It possibly depends on how overwhelmed the health-care system
-is, but it is also important to remember that this is not the death
-rate among all _infected_ individuals, but rather only among all
-_identified_ individuals. In countries where possibly infected
-patients are not tested if their symptoms are mild, then the estimated
-death rate will be artificially high.
+answer at this point. It possibly depends on how overwhelmed the
+health-care system is, but it is also important to remember that this
+is not the death rate among all _infected_ individuals, but rather
+only among all _identified_ individuals. In countries where possibly
+infected patients are not tested if their symptoms are mild, then the
+estimated death rate will be artificially high. Countries may also not
+be consistent in which deaths they are attributing to COVID-19.
 
 
-A useful, but not unexpected, proxy for how efficiently a country is
+A useful, but not surprising, proxy for how efficiently a country is
 testing turns out to be its GDP. The following plot shows, only for
 European countries (which should be otherwise more or less
-homogeneous), the relationship between per capita GDP and adjusted
+homogeneous), the relationship between per capita GDP as of 2018
+(source: [World Bank](https://data.worldbank.org/)) and adjusted
 mortality rate.
 
 
-```{r}
+```{r, fig.height=8}
+ppgdp <- read.csv("PPGDP_2018.csv") # world bank data
 data(UN, package = "carData")
 latest.dr <- as.data.frame(t(rbind(dr.naive.latest,
                                    dr.adjusted.latest,
                                    tail(xcovid.deaths, 1))))
 names(latest.dr) <- c("naive", "adjusted", "tdeaths")
 ## adjust some names to match
-mapNames <- function(s)
+mapNamesUN <- function(s)
 {
     s[s == "US"] <- "United States"
     s[s == "Korea, South"] <- "Republic of Korea"
     s[substring(s, 1, 5) == "China"] <- "China"
     s
 }
+mapNamesWB <- function(s)
+{
+    s[s == "US"] <- "United States"
+    s[s == "Iran"] <- "Iran, Islamic Rep."
+    s[s == "Korea, South"] <- "Korea, Rep."
+    s[substring(s, 1, 5) == "China"] <- "China"
+    s
+}
 latest.dr <- cbind(latest.dr,
                    country = rownames(latest.dr),
-                   UN[mapNames(rownames(latest.dr)), ])
+                   ppgdp[mapNamesWB(rownames(latest.dr)), , drop = FALSE],
+                   UN[mapNamesUN(rownames(latest.dr)), , drop = FALSE])
 with(subset(latest.dr, region == "Europe"),
-     xyplot(adjusted ~ ppgdp, pch = 16, cex = 1.5,
-            xlab = "GDP per capita (USD) in 2011",
-            ylab = "Adjusted COVID-19 mortality rate (per cent)",
-            xlim = extendrange(range(ppgdp), f = 0.1),
+     xyplot(adjusted ~ (PPGDP_2018/1000), pch = 16, cex = 1.5, aspect = 0.75,
+            xlab = "GDP per capita (x 1000 USD) in 2018",
+            ylab = "One week lag-adjusted COVID-19 mortality rate (per cent)",
+            xlim = extendrange(range(PPGDP_2018/1000), f = 0.15),
             panel = function(x, y, ...) {
                 panel.abline(lm(y ~ x, weights = tdeaths), col.line = "grey90", lwd = 3)
                 panel.xyplot(x, y, ...)
-                panel.text(x, y, labels = country, pos = 2, srt = 10)
+                panel.text(x, y, labels = country, pos = 2, srt = 0)
             }))
 ```
 
-These GDP numbers are from 2011 (the latest available from the UN
-website). I will try to update these to more recent numbers when I
-can.
-
-
-
+The grey line is a weighted linear regression line fit with the number
+of deaths as weights.
 
 
 
