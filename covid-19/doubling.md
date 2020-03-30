@@ -249,10 +249,10 @@ happening in Singapore and Taiwan.
 
 ### Countries with already widespread infections
 
-Next, let's look at similar plots for other countries (excluding USA)
-where the count is at least 1000. Again, the countries / regions are
-sorted by how long ago the number of cases first exceeded 50, and not
-by total cases.
+Next, let's look at similar plots for other countries where the count
+is at least 1000. Again, the countries / regions are sorted by how
+long ago the number of cases first exceeded 50, and not by total
+cases.
 
 
 
@@ -266,10 +266,10 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = 16, grid = TRUE,
        ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       as.table = TRUE, between = list(x = 0.5, y = 0.5))
+       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
-![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-2.png)
 
 
 Unfortunately, many of these countries do not show systematic increase
@@ -291,6 +291,7 @@ to reach 50,000 cases between April 4 and April 10.
 
 The countries that seem to be doing well are Denmark, Sweden, and
 Norway, and to a lesser extent Iran and even Italy.
+
 
 
 
