@@ -121,25 +121,29 @@ xcovid.row <- extractCasesTS(covid.row)
 Outside China, which countries are the worst affected in terms of the
 latest absolute numbers so far? The following plot shows the latest
 counts, and also shows how much the counts have increased in the last
-week. These are on a logarithmic scale, which means that the one-week
-increase is a measure of the percentage increase; larger means faster
-rate of growth.
+week, and the week before that. These are on a logarithmic scale,
+which means that the one-week increases are a measure of the
+percentage increase; larger means faster rate of growth.
 
 
 
 ```r
 total.row <- apply(xcovid.row, 2, tail, 1)
 total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
+total.row.2weekago <- apply(xcovid.row, 2, function(x) tail(x, 15)[1])
 torder <- tail(order(total.row), 60)
-dotplot(total.row[torder], total.1weekago = total.row.1weekago[torder],
+dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total.row.2weekago[torder],
         xlab = "Total cases (NOTE: log scale)",
-        panel = function(x, y, ..., total.1weekago) {
-            panel.segments(x, y, log10(total.1weekago), y,
-                           col = trellis.par.get("plot.line")$col, lwd = 2)
-            panel.dotplot(x, y, ...)
+        xlim = c(10, NA),
+        panel = function(x, y, ..., total.1, total.2, col) {
+            col <- trellis.par.get("superpose.line")$col
+            dot.line <- trellis.par.get("dot.line")
+            panel.abline(h = unique(y), col = dot.line$col, lwd = dot.line$lwd)
+            panel.segments(log10(total.2), y, log10(total.1), y, col = col[3], lwd = 2)
+            panel.segments(log10(total.1), y, x, y, col = col[2], lwd = 3)
+            panel.points(x, y, pch = 16, col = col[1])
         },
-        scales = list(x = list(alternating = 3, log = 10,
-                               equispaced.log = FALSE)))
+        scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
 ```
 
 ![plot of chunk unnamed-chunk-4](figures/doubling-unnamed-chunk-4-1.png)
