@@ -1,0 +1,118 @@
+---
+layout: default
+title: 'Predicting COVID-19 cases'
+author: Deepayan Sarkar
+---
+
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+			   ## dev.args = list(pointsize = 12),
+               fig.width = 12, fig.height = 18, dpi = 120, fig.path='figures/prediction-')
+library(lattice)
+library(RColorBrewer)
+library(latticeExtra)
+bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
+ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
+lattice.options(default.theme = ct)
+```
+
+
+Prediction is of course difficult, especially about the future.
+
+
+First, we download the data and read it in.
+
+```{r}
+TARGET <- "time_series_covid19_confirmed_global.csv"
+## To download the latest version, delete the file and run again
+if (!file.exists(TARGET))
+    download.file("https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
+                  destfile = TARGET)
+covid <- read.csv(TARGET, check.names = FALSE,
+                  stringsAsFactors = FALSE)
+covid <- subset(covid, `Country/Region` != "Diamond Princess")
+```
+
+This version was last updated using data downloaded on 
+`r {as.Date(file.mtime(TARGET))}`.
+
+
+We only consider countries / regions outside China.
+
+
+```{r}
+covid.china <- subset(covid, `Country/Region` == "China")
+covid.row <- subset(covid, `Country/Region` != "China")
+```
+
+Next, we extract the time series data of each subset as a data matrix,
+with a crude "smoothing" to account for lags in updating data: If two
+consecutive days have the same total count followed by a large
+increase on the following day, then the most likely explanation is
+that data was not updated on the second day. In such cases, the count
+of the middle day is replaced by the geometric mean of its neighbours.
+
+
+```{r, warning=FALSE}
+correctLag <- function(x)
+{
+    n <- length(x)
+    stopifnot(n > 2)
+    for (i in seq(2, n-1))
+        if (x[i] == x[i-1])
+            x[i] <- sqrt(x[i-1] * x[i+1])
+    x
+}
+extractCasesTS <- function(d)
+{
+    x <- t(data.matrix(d[, -c(1:4)]))
+    x[x == -1] <- NA
+    colnames(x) <-
+        with(d, ifelse(`Province/State` == "", `Country/Region`,
+                       paste(`Country/Region`, `Province/State`,
+                             sep = "/")))
+    ## Update labels to include current total cases
+    colnames(x) <-  sprintf("%s (%g)", colnames(x), x[nrow(x), ])
+    apply(x, 2, correctLag)
+}
+xcovid.china <- extractCasesTS(covid.china)
+xcovid.row <- extractCasesTS(covid.row)
+```
+
+Outside China, which countries are the worst affected in terms of the
+latest absolute numbers so far? The following plot shows the latest
+counts, and also shows how much the counts have increased in the last
+week, and the week before that. These are on a logarithmic scale,
+which means that the one-week increases are a measure of the
+percentage increase; larger means faster rate of growth.
+
+
+```{r, fig.height=15}
+total.row <- apply(xcovid.row, 2, tail, 1)
+total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
+total.row.2weekago <- apply(xcovid.row, 2, function(x) tail(x, 15)[1])
+torder <- tail(order(total.row), 60)
+dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total.row.2weekago[torder],
+        xlab = "Total cases (NOTE: log scale)",
+        xlim = c(10, NA),
+        panel = function(x, y, ..., total.1, total.2, col) {
+            col <- trellis.par.get("superpose.line")$col
+            dot.line <- trellis.par.get("dot.line")
+            panel.abline(h = unique(y), col = dot.line$col, lwd = dot.line$lwd)
+            panel.segments(log10(total.2), y, log10(total.1), y, col = col[3], lwd = 2)
+            panel.segments(log10(total.1), y, x, y, col = col[2], lwd = 3)
+            panel.points(x, y, pch = 16, col = col[1])
+        },
+        scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
+```
+
+We can use this for a crude prediction of the number of cases one week
+later, assuming that on the log scale, the "increase" changes
+(hopefully decreases) linearly.
