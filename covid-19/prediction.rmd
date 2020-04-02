@@ -23,13 +23,7 @@ ct$axis.line$col <- "grey50"
 lattice.options(default.theme = ct)
 ```
 
-
-Prediction is of course difficult, especially about the future.
-
-
-First, we download the data and read it in.
-
-```{r}
+```{r, echo=FALSE, results="hide"}
 TARGET <- "time_series_covid19_confirmed_global.csv"
 ## To download the latest version, delete the file and run again
 if (!file.exists(TARGET))
@@ -38,29 +32,7 @@ if (!file.exists(TARGET))
 covid <- read.csv(TARGET, check.names = FALSE,
                   stringsAsFactors = FALSE)
 covid <- subset(covid, `Country/Region` != "Diamond Princess")
-```
-
-This version was last updated using data downloaded on 
-`r {as.Date(file.mtime(TARGET))}`.
-
-
-We only consider countries / regions outside China.
-
-
-```{r}
-covid.china <- subset(covid, `Country/Region` == "China")
 covid.row <- subset(covid, `Country/Region` != "China")
-```
-
-Next, we extract the time series data of each subset as a data matrix,
-with a crude "smoothing" to account for lags in updating data: If two
-consecutive days have the same total count followed by a large
-increase on the following day, then the most likely explanation is
-that data was not updated on the second day. In such cases, the count
-of the middle day is replaced by the geometric mean of its neighbours.
-
-
-```{r, warning=FALSE}
 correctLag <- function(x)
 {
     n <- length(x)
@@ -82,26 +54,39 @@ extractCasesTS <- function(d)
     colnames(x) <-  sprintf("%s (%g)", colnames(x), x[nrow(x), ])
     apply(x, 2, correctLag)
 }
-xcovid.china <- extractCasesTS(covid.china)
 xcovid.row <- extractCasesTS(covid.row)
 ```
 
-Outside China, which countries are the worst affected in terms of the
-latest absolute numbers so far? The following plot shows the latest
-counts, and also shows how much the counts have increased in the last
-week, and the week before that. These are on a logarithmic scale,
-which means that the one-week increases are a measure of the
-percentage increase; larger means faster rate of growth.
+
+[This note was last updated using data downloaded on 
+`r {as.Date(file.mtime(TARGET))}`. Here is the
+[source](prediction.rmd) of this analysis. Click <a href="#"
+data-toggle="collapse" data-target="div.sourceCode"
+aria-expanded="true">here</a> to show / hide the R code used. ]
+
+
+Prediction is of course
+[difficult](https://quoteinvestigator.com/2013/10/20/no-predict/),
+especially about the future.
+
+As we see [here](doubling.html), a plot of the case counts today, one
+week ago, and two weeks ago gives us a good sense of how different
+countries are managing the spread of COVID-19. The following plot is
+similar, showing the latest counts, and also shows how much the counts
+have increased in the last 4 days, and the 4 days before that. These
+are on a logarithmic scale, which means that the 4-day increases are a
+measure of the percentage increase; larger means faster rate of
+growth.
 
 
 ```{r, fig.height=15}
 total.row <- apply(xcovid.row, 2, tail, 1)
-total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
-total.row.2weekago <- apply(xcovid.row, 2, function(x) tail(x, 15)[1])
+total.row.1 <- apply(xcovid.row, 2, function(x) tail(x, 5)[1])
+total.row.2 <- apply(xcovid.row, 2, function(x) tail(x, 9)[1])
 torder <- tail(order(total.row), 60)
-dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total.row.2weekago[torder],
+dotplot(total.row[torder], total.1 = total.row.1[torder], total.2 = total.row.2[torder],
         xlab = "Total cases (NOTE: log scale)",
-        xlim = c(10, NA),
+        xlim = c(100, NA),
         panel = function(x, y, ..., total.1, total.2, col) {
             col <- trellis.par.get("superpose.line")$col
             dot.line <- trellis.par.get("dot.line")
@@ -113,6 +98,86 @@ dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total
         scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
 ```
 
-We can use this for a crude prediction of the number of cases one week
-later, assuming that on the log scale, the "increase" changes
-(hopefully decreases) linearly.
+We can use this for a crude prediction of the number of cases 4 days
+further on, by assuming that on the log scale, the "increase" changes
+(actually decreases, one hopes) in a geometric progression. The
+countries are sorted according to their case counts 4 days ago. 
+
+```{r}
+predictCases <- function(x, days = 7, go.back = TRUE)
+    ## go.back = TRUE: use -days, -2*days to predict current
+    ## go.back = FALSE: use -days, current to predict +days
+{
+    u <- if (go.back) head(x, -days) else x # used for prediction
+    N <- nrow(u)
+    if (N - 2 * days > nrow(x)) stop("Not enough data")
+    if (any(u[N - 2 * days, ] == 0))
+    {
+        warning("dropping zero counts at %g days for %s", N - 2 * days)
+        keep <- u[N - 2 * days, ] > 0
+        u <- u[, keep, drop = FALSE]
+        x <- x[, keep, drop = FALSE]
+    }
+    total.0 <- u[N, , drop = TRUE]
+    total.1 <- u[N - days, , drop = TRUE]
+    total.2 <- u[N - 2 * days, , drop = TRUE]
+    ## predict assuming linear change in diff(log(count))
+    d2 <- log(total.1) - log(total.2)
+    d1 <- log(total.0) - log(total.1)
+    ## assume these are in geometric progression
+    ## d0 <- d1 * d1 / d2
+    ## or assume these are in arithmetic progression (can go negative)
+    d0 <- 2 * d1 - d2
+    total.predict <- exp(log(total.0) + d0)
+    total.observed <- if (go.back) x[N + days, , drop = TRUE] else NA
+    data.frame(region = colnames(x),
+               total2 = total.2,
+               total1 = total.1,
+               total0 = total.0,
+               predicted = total.predict,
+               observed = total.observed)
+}
+```
+
+This is how well these predictions performed when applied on data from
+4 days ago to predict the current counts (for the 30 countries with
+highest current count). The predictions are sometimes bad when counts
+are low (not surprisingly), but generally reasonable.
+
+
+```{r, fig.height = 12}
+torder <- tail(order(total.row), 30)
+pred.past <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = TRUE)
+dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
+        xlab = "Predicted current number of cases based on data four days ago",
+        par.settings = simpleTheme(pch = 16, col = c(1, 2)), auto.key = list(columns = 2),
+        scales = list(x = list(log = TRUE, equispaced.log = FALSE)))
+```
+
+Here are the predictions 4 days into the future (
+`r {as.Date(file.mtime(TARGET)) + 4}`
+) using current data.
+
+```{r}
+torder <- tail(order(total.row), 60)
+pred.current <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = FALSE)
+plot.col <- trellis.par.get("plot.symbol")$col
+with(pred.current,
+     dotplot(reorder(region, predicted) ~ total0,
+             predicted = predicted,
+             xlab = sprintf("Predicted number of cases as on %s",
+                            as.Date(file.mtime(TARGET)) + 4),
+             xlim = c(NA, exp(1.07 * max(log(predicted)))),
+             par.settings = simpleTheme(pch = c(16, 1), col = plot.col), 
+             panel = function(x, y, ..., predicted) {
+                 dot.line <- trellis.par.get("dot.line")
+                 panel.abline(h = unique(y), col = dot.line$col, lwd = dot.line$lwd)
+                 panel.points(x, y, ...)
+                 panel.points(log10(predicted), y, pch = 1, ...)
+                 panel.text(current.panel.limits()$xlim[2],
+                            y, labels = round(predicted), pos = 2)
+             },
+             auto.key = list(columns = 2, text = c("current", "predicted")),
+             scales = list(x = list(log = 10, equispaced.log = FALSE))))
+```
+
