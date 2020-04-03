@@ -1,0 +1,146 @@
+---
+layout: default
+title: 'A Simulated Infection Model'
+author: Deepayan Sarkar
+---
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+			   ## dev.args = list(pointsize = 12),
+               fig.width = 12, fig.height = 12, dpi = 120, fig.path='figures/deaths-')
+library(lattice)
+library(RColorBrewer)
+library(latticeExtra)
+bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
+ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
+lattice.options(default.theme = ct)
+```
+
+This is a very simple infection model developed with Krishanu Maulik.
+
+A population initially consists of $n$ individuals, who live on a $M
+\times N$ grid. Each individual has some attributes that are fixed and
+some that evolve over time in a Markovian way:
+
+- Fixed attributes:
+
+	- home: $(u, v)$ where $1 \leq u \leq M, 1 \leq v \leq N$. Home
+      coordinates (starting point)
+
+	- type: constrained | mobile
+
+	- radius: Integer. How far a constrained individual can move from
+      home (Manhattan distance). Infinity for mobile individuals.
+	
+	- will_die: TRUE | FALSE. whether the person will die if infected (otherwise cured)
+	
+	- iduration: Integer. Number of days the individual
+      remains contagious since infection.
+
+
+- Time-varying attributes:
+
+	- location $(x, y)$ where $1 \leq x \leq M, 1 \leq y \leq N$
+
+	- status: susceptible | infected | cured | dead
+
+	- days_infected: number of days since infection
+
+	- static: TRUE | FALSE (a static person doesn't move)
+
+
+Generally a non-static person tries to move like simple symmetric
+random walk (north / south / east / west with equal
+probability). However, moves that violate location constraints are not
+allowed (the individual remains where they are).
+
+Optionally, individuals can switch between static and non-static
+states, with some probability. A static person does not move. This
+allows mobile persons to move a long way, but then wait in a specific
+location for a while.
+
+Some persons are initially infected. An infected person infects
+another (susceptible) person if they are in the same location at the
+same time (with some probability?)
+
+
+## Setup
+
+```{r}
+M <- 5000
+N <- 5000
+n <- 10000
+ninitial <- 10
+pconstrained <- 0.9
+pdeath <- 0.02
+mean_iduration <- 20
+lsample <- function(n, p) sample(c(TRUE, FALSE), n, replace = TRUE, prob = c(p, 1-p))
+state <-
+    data.frame(u = sample(M, n, replace = TRUE),
+               v = sample(N, n, replace = TRUE),
+               constrained = lsample(n, pconstrained),
+               will_die = lsample(n, pdeath),
+               iduration = rpois(n, lambda = mean_iduration-1) + 1,
+               static = FALSE,
+               status = "susceptible",
+               days_infected = 0)
+```
+
+
+## Initialize
+
+```{r}
+initial <- sample(n, ninitial)
+state <- within(state,
+{
+    radius <- ifelse(constrained, 10, Inf)
+    status[initial] <- "infected"
+    days_infected[initial] <- 1
+    x <- u
+    y <- v
+})
+```
+
+## Evolution rule
+
+
+```{r}
+allowed_move <- function(x, y, u, v, radius)
+{
+    (abs(x - u) <= radius) & (abs(y - v) <= radius) & 
+        (x >= 1) & (x <= M) & (y >= 1) & (y <= N)
+}
+evolve <- function(s)
+{
+    within(s,
+    {
+        dx <- sample(c(-1, 1), n, replace = TRUE)
+        dy <- sample(c(-1, 1), n, replace = TRUE)
+        allowed <- allowed_move(x + dx, y + dy, u, v, radius)
+        x[allowed] <- x + dx
+        y[allowed] <- y + dy
+        rm(allowed)
+        ## susceptible
+        ## loop through infected individuals. Any other way?
+        ## infected: first increase number days since infection
+        which.infected <- status == "infected"
+        days_infected[which.infected] <- days_infected[which.infected] + 1
+        status[which.infected] <- # FIXME: check
+            ifelse(days_infected[which.infected] >= iduration[which.infected],
+                   ifelse(will_die[which.infected], "dead", "cured"), "infected")
+    })
+}
+```
+
+## Simulation
+
+
+
+
+
