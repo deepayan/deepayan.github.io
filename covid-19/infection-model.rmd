@@ -14,12 +14,13 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRU
 library(lattice)
 library(RColorBrewer)
 library(latticeExtra)
-bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
-ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
-ct$strip.background$col <- "grey90"
-ct$strip.border$col <- "grey50"
-ct$axis.line$col <- "grey50"
-lattice.options(default.theme = ct)
+options(stringsAsFactors = FALSE)
+## bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")[-1]
+## ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+## ct$strip.background$col <- "grey90"
+## ct$strip.border$col <- "grey50"
+## ct$axis.line$col <- "grey50"
+## lattice.options(default.theme = ct)
 ```
 
 This is a very simple infection model developed with Krishanu Maulik.
@@ -63,7 +64,7 @@ allowed (the individual remains where they are).
 Optionally, individuals can switch between static and non-static
 states, with some probability. A static person does not move. This
 allows mobile persons to move a long way, but then wait in a specific
-location for a while.
+location for a while. (Not implemented yet.)
 
 Some persons are initially infected. An infected person infects
 another (susceptible) person if they are in the same location at the
@@ -73,13 +74,13 @@ same time (with some probability?)
 ## Setup
 
 ```{r}
-M <- 5000
-N <- 5000
-n <- 10000
-ninitial <- 10
-pconstrained <- 0.9
+M <- 500
+N <- 500
+n <- 5000
+ninitial <- 50 # number initially infected
+pconstrained <- 0.6
 pdeath <- 0.02
-mean_iduration <- 20
+mean_iduration <- 20 * 24 # 20 days
 lsample <- function(n, p) sample(c(TRUE, FALSE), n, replace = TRUE, prob = c(p, 1-p))
 state <-
     data.frame(u = sample(M, n, replace = TRUE),
@@ -99,7 +100,7 @@ state <-
 initial <- sample(n, ninitial)
 state <- within(state,
 {
-    radius <- ifelse(constrained, 10, Inf)
+    radius <- ifelse(constrained, 50, Inf)
     status[initial] <- "infected"
     days_infected[initial] <- 1
     x <- u
@@ -123,17 +124,25 @@ evolve <- function(s)
         dx <- sample(c(-1, 1), n, replace = TRUE)
         dy <- sample(c(-1, 1), n, replace = TRUE)
         allowed <- allowed_move(x + dx, y + dy, u, v, radius)
-        x[allowed] <- x + dx
-        y[allowed] <- y + dy
-        rm(allowed)
-        ## susceptible
-        ## loop through infected individuals. Any other way?
-        ## infected: first increase number days since infection
-        which.infected <- status == "infected"
+        x <- x + allowed * dx
+        y <- y + allowed * dy
+        rm(dx, dy, allowed)
+        ## susceptible -> infected
+        which.infected <- which(status == "infected")
+        ## loop through infected individuals and mark others in same location
+        for (i in which.infected)
+        {
+            status[ (x == x[i]) & (y == y[i]) & (status == "susceptible") ] <- "infected"
+        }
+        rm(i)
+        ## infected -> dead / cured
+        ## First, increase number days since infection
         days_infected[which.infected] <- days_infected[which.infected] + 1
         status[which.infected] <- # FIXME: check
             ifelse(days_infected[which.infected] >= iduration[which.infected],
                    ifelse(will_die[which.infected], "dead", "cured"), "infected")
+        rm(which.infected)
+
     })
 }
 ```
@@ -141,6 +150,26 @@ evolve <- function(s)
 ## Simulation
 
 
+```{r}
+for (i in 1:(100 * 24))
+{
+    state <- evolve(state)
+    if (i %% 24 == 0)
+    {
+        print(xyplot(y ~ x, state, groups = status,
+                     main = as.character(i / 24),
+                     auto.key = list(columns = 2)))
+        print(sum(state$status != "susceptible"))
+    }
+}
+```
 
-
-
+```{r}
+cases <- c(72 , 86 , 104 , 116 , 137 , 161 , 188 , 208 , 233 , 265 ,
+           292 , 322 , 360 , 392 , 441 , 485 , 527 , 566 , 619 , 679 ,
+           722 , 768 , 821 , 888 , 938 , 993 , 1047 , 1119 , 1180 ,
+           1236 , 1299 , 1366 , 1436 , 1505 , 1567 , 1634 , 1696 ,
+           1775 , 1845 , 1908 , 1990 , 2068 , 2136 , 2203 , 2273 ,
+           2349 , 2427 , 2489 , 2544 , 2601 , 2652)
+plot(cases, type = "o", pch = 16)
+```
