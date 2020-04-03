@@ -37,7 +37,7 @@ covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FA
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(dimnames(covid.cases), dimnames(covid.deaths)))
     stop("Cases and death data have different structure... check versions.")
-keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 99 deaths
+keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 50 deaths
 covid.cases <- covid.cases[keep, ]
 covid.deaths <- covid.deaths[keep, ]
 ```
@@ -99,7 +99,7 @@ _recovered_ patients by date is available, but that is not enough).
 
 The plot below shows how the naive death rates (proportion of deaths
 over number of confirmed cases), on any given day, have changed over
-time for countries with at least 100 deaths.[^1] Although the estimate
+time for countries with at least 50 deaths.[^1] Although the estimate
 is eventually (asymptotically) supposed to stabilize (as the fraction
 of "active" cases decreases), this has clearly not happened yet for
 most countries.
