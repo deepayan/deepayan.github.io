@@ -25,6 +25,68 @@ Source: Aloka Sarkar
 
 
 
+# মুসুর ডাল / মুগ ডাল
+
+- Moong Dal - dry roast in pan under medium heat (be careful not to
+  burn). Maybe a little for Masoor Dal as well (doesn't seem to harm).
+  
+- Add water and salt and boil till done, try to mash a bit. Keep aside
+  (or start next steps when almost done, a little extra boiling is
+  fine).
+
+- Heat 2 tbsp oil, heat, and add (in sequence)
+
+	- 1 tsp cumin seeds as ফোড়ন. other seeds seem OK too (few seconds)
+	- 2 tsp ginger garlic paste (10--15 seconds)
+	- 1 whole red chilli
+	- 1/4 -- 1/2 tsp turmeric powder, red chilli powder, garam masala powder + hing (30 seconds)
+	- chopped tomato (a few minutes, until soft)
+	- thinly sliced karela (or something else, depending on how
+      adventurous you are feeling)
+	
+- Add boiled dal, mix well, add water and salt as desired, cook (at
+  least 15 minutes if using karela).
+
+- Optional: Add 1 tsp kasuri methi and simmer for one minute
+
+- Optional: Add chopped coriander leaves at the end
+
+
+
+# Boiled eggs
+
+This is semi-trivial, but it is not always easy to avoid the shells
+breaking too early.
+
+- Place eggs in a pan and cover them with cool water (up to 1 inch
+  over if possible)
+
+- Cover the pan and bring water to a rolling boil over high heat
+
+- Once water is boiling, boil on medium heat for 7 minutes more (for
+  hard boiled eggs)
+
+
+
+# Sooji pie
+
+- Take sooji in a bowl and add enough water to just cover
+  it. Optionally add a little ragi aata (and / or besan?). Cover and
+  leave aside for at least half an hour
+
+- Add yoghurt, leave aside for at least half an hour more
+
+- Mix in 
+
+	- one egg
+	- chopped onion, 
+	- tomato
+	- water as desired
+	- maybe a little crushed garlic (haven't tried)
+	- salt, other spices (oregano etc.)
+	- whatever else you wish: sausage / chicken bits / ...
+
+
 # Chicken stew
 
 Source: [genius kitchen](http://www.geniuskitchen.com/recipe/chicken-stew-22127)
