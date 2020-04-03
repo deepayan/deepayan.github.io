@@ -276,33 +276,34 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 ![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-3.png)
 
 
-Unfortunately, many of these countries do not show systematic increase
-in the doubling time, which in most cases hovers around a value less
-than five days. With uncontrolled exponential growth, at the current
-rates as on March 21, for example,
+Many of these countries were not showing systematic increase in the
+doubling time till recently. With uncontrolled exponential growth at
+the then current rates as on March 21, for example,
 
-- Germany was on its way to reach 50,000 cases by March 25
+- Germany was on its way to reach 50,000 cases by March 25 
 
 - Spain would have reached 50,000 cases by March 27
 
 - France would have reached 50,000 cases by March 31
 
-While Germany has shown some improvement since then, Spain appears set
-to meet this deadline. France is showing some borderline improvement,
-but not enough yet.  The UK, which has 9529 cases as on March 26, is
-showing some improvement in the last three days, but is still on track
-to reach 50,000 cases between April 4 and April 10.
+Germany has shown steady improvement since then (it actually reached
+50,000 cases on March 27). Spain did not improve immediately, and
+reached 50,000 cases on March 26, but has been improving steadily
+since then. France, which reached 50,000 cases on March 31, is showing
+some improvement, but not a lot yet.
+
+The UK, which has 9529 cases as on March 26, is showing some recent
+improvement, but is still on track to reach 50,000 cases between April
+4 and April 10.
 
 The countries that seem to be doing well are Denmark, Sweden, and
 Norway, and to a lesser extent Iran and even Italy.
 
 
-
-
 ### Countries with less widespread infections
 
-Next, we look at countries (excluding USA) where the count is at least
-200 but less than 1000.
+Next, we look at countries where the count is at least 200 but less
+than 1000.
 
 
 
@@ -333,7 +334,8 @@ couple of weeks.
 
 A similar analysis can be done for death rates (code
 [here](deaths.rmd)). We only consider countries / regions with at
-least 100 deaths:
+least 100 deaths. The following plot shows the current number of
+deaths and compares it with the number one week ago (on a log scale).
 
 ![total deaths](figures/deaths-tdeath-1.png)
 

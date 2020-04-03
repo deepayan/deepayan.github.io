@@ -1,6 +1,6 @@
 ---
 layout: default
-title: 'Estimating the Mortality Rate of COVID-19'
+title: 'Analysis of COVID-19 Mortality'
 author: Deepayan Sarkar
 ---
 
@@ -23,7 +23,7 @@ covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FA
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(dimnames(covid.cases), dimnames(covid.deaths)))
     stop("Cases and death data have different structure... check versions.")
-keep <- covid.deaths[[length(covid.deaths)]] > 99 # at least 99 deaths
+keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 99 deaths
 covid.cases <- covid.cases[keep, ]
 covid.deaths <- covid.deaths[keep, ]
 ```
@@ -123,8 +123,8 @@ extractCasesTS <- function(d)
 }
 xcovid.cases <- extractCasesTS(covid.cases)
 xcovid.deaths <- extractCasesTS(covid.deaths)
-total.deaths <- apply(xcovid.deaths, 2, tail, 1)
-total.cases <- apply(xcovid.deaths, 2, tail, 1)
+D <- nrow(xcovid.deaths)
+total.deaths <- xcovid.deaths[D, , drop = TRUE]
 ```
 
 
@@ -132,14 +132,14 @@ total.cases <- apply(xcovid.deaths, 2, tail, 1)
 ```r
 porder <- rev(order(total.deaths))
 death.rate <- 100 * (xcovid.deaths / xcovid.cases)
-dr.naive.latest <- tail(death.rate, 1)
+dr.naive.latest <- death.rate[D, , drop = TRUE]
 start.date <- as.Date("2020-01-22")
-xat <- pretty(start.date + c(0, nrow(death.rate)-1))
+xat <- pretty(start.date + c(0, D-1))
 (dr.naive <-
      xyplot(ts(death.rate[, porder], start = start.date),
-            type = "o", grid = TRUE, layout = c(4, NA),
+            type = "o", grid = TRUE, layout = c(6, NA),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
-            scales = list(alternating = 3,
+            scales = list(alternating = 3, rot = 45,
                           x = list(at = xat, labels = format(xat, format = "%d %b")),
                           y = list(relation = "same")),
             xlab = NULL, ylab = "Death rate (per cent)",
@@ -178,7 +178,7 @@ start.date <- as.Date("2020-01-22") + LAG
 xat <- pretty(start.date + c(0, nrow(death.rate)-1))
 dr.adjusted <- 
      xyplot(ts(death.rate[, porder], start = start.date),
-            type = "o", layout = c(4, NA),
+            type = "o", layout = c(6, NA),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
             col = ct$superpose.symbol$col[2],
             as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -273,6 +273,66 @@ represents the corresponding doubling time of the number of cases.
 
 -->
 
+
+
+
+
+
+
+## How fast are deaths increasing?
+
+The number of deaths is a better measure of how serious the COVID-19
+epidemic is in a country, compared to the number of detected cases,
+because deaths are less likely to be missed. The following plot,
+inspired by the very nice visualizations in the [Financial
+Times](https://www.ft.com/coronavirus-latest), shows the growth in the
+number of deaths, starting from the day the count exceeded 10, for
+countries with at least 2000 deaths.
+
+
+
+```r
+deathsSince10 <- function(region)
+{
+    x <- xcovid.deaths[, region, drop = TRUE]
+    x <- x[x > 10]
+    data.frame(region = region, day = seq_along(x),
+               deaths = x, total = tail(x, 1))
+}
+deaths.10 <- do.call(rbind, lapply(colnames(xcovid.deaths), deathsSince10))
+panel.glabel <- function(x, y, group.value, col.symbol, ...) # x,y vectors; group.value scalar
+{
+    n <- length(x)
+    panel.text(x[n], y[n], label = group.value, pos = 4, col = col.symbol, srt = 40)
+}
+xyplot(deaths ~ day, data = subset(deaths.10, total >= 2000), grid = TRUE,
+       scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+       xlab = "Days since number of deaths exceeded 10",
+       groups = region, type = "o") +
+    glayer_(panel.glabel(x, y, group.value = group.value, ...))
+```
+
+![plot of chunk unnamed-chunk-6](figures/deaths-unnamed-chunk-6-1.png)
+
+
+Compare these with other countries:
+
+
+
+```r
+bg <- xyplot(deaths ~ day, data = subset(deaths.10, total >= 2000), grid = TRUE,
+             col = "grey", groups = region, type = "l",
+             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)))
+fg <- 
+    xyplot(deaths ~ day | reorder(region, -total), data = subset(deaths.10, total < 2000),
+           xlab = "Days since number of deaths exceeded 10", pch = 16,
+           scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5),
+           type = "o", ylim = c(NA, 12500))
+fg + as.layer(bg, under = TRUE)
+```
+
+![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)
 
 
 
