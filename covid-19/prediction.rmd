@@ -181,3 +181,104 @@ with(pred.current,
              scales = list(x = list(log = 10, equispaced.log = FALSE))))
 ```
 
+
+## Prediction using doubling time
+
+[TODO]
+
+A slightly more sophisticated method could be to predict the [doubling
+time](doubling.html), and use it to predict growth. Although the
+initial growth is often erratic, most countries seem to be settling
+down into a pattern of linear growth of the doubling time. If we
+assume that doubling time will continue to grow linearly, that gives
+us a predicted doubling time every day into the future, and that can
+be turned into a predicted number of cases (or new cases, etc.).
+
+```{r}
+DAYS.USED <- 5
+```
+
+We use a naive method to estimate how the doubling time will change
+linearly: we look at the change in doubling time over the last 
+`r {DAYS.USED}` days, and use the minimum and maximum as possible
+limits.
+
+
+
+```{r}
+tdouble <- function(n, x, min = 50)
+{
+    if (x[n] < min) return (NA_real_)
+    x <- head(x, n)
+    x <- c(0, x[x > 0])
+    i <- seq_along(x)
+    f <- approxfun(x, i)
+    diff(f(max(x) * c(0.5, 1)))
+}
+doubling.last <- function(x, min = 50, days = DAYS.USED)
+{
+    sapply(rev(seq(length(x), by = -1, length.out = days)),
+           tdouble, x = x, min = min)
+}
+panel.predict <-
+    function(x, y, drop.days = 0, pred.days = DAYS.USED, new.days = 20,
+             cumulative = TRUE, fill = "grey50", alpha = 0.5)
+        ## daily new cases (diff) if cumulative = FALSE
+{
+    print(drop.days)
+    if (drop.days > 0)
+    {
+        x <- head(x, -drop.days)
+        y <- head(y, -drop.days)
+    }
+    N <- length(x)
+    dt <- doubling.last(y, min = 50, days = pred.days)
+    print(drange <- range(diff(dt)))
+    ## prediction for lower and upper end: next 'new.days' days
+    dt.lower <- dt[length(dt)] + drange[1] * seq_len(new.days)
+    dt.upper <- dt[length(dt)] + drange[2] * seq_len(new.days)
+    str(list(dt.lower, dt.upper))
+    ## translate into growth: current * exp(gamma), where gamma = log(2) / doubling.time
+    rate.lower <- log(2) / dt.lower
+    rate.upper <- log(2) / dt.upper
+    y.lower <- y[N] * exp(c(0, cumsum(rate.lower)))
+    y.upper <- y[N] * exp(c(0, cumsum(rate.upper)))
+    x.new <- seq(x[N], by = 1, length.out = new.days + 1)
+    ## str(list(N = N, ystart = y[N], x = x.new, yl = y.lower, yu = y.upper))
+    if (cumulative)
+        panel.polygon(x.new, y.lower, rev(x.new), rev(y.upper),
+                      col = fill, alpha = alpha, border = "transparent")
+    else
+        panel.polygon(x.new[-1], diff(y.lower), rev(x.new[-1]), rev(diff(y.upper)),
+                      col = fill, alpha = alpha, border = "transparent")
+}
+my.prepanel <- function(x, y, ..., new.days, cumulative = TRUE)
+{
+    list(xlim = range(x) + c(0, new.days),
+         ylim = if (cumulative) range(y) else range(diff(y)))
+}
+my.panel <- function(x, y, ..., new.days, cumulative)
+{
+    panel.predict(x, y, ...,
+                  new.days = new.days,
+                  cumulative = cumulative, alpha = 0.5)
+    if (cumulative)
+        panel.xyplot(x, y, ..., type = "o")
+    else
+        panel.xyplot(x[-1], diff(y), ..., type = "o")
+}
+```
+
+
+
+```{r}
+regions <-  # at least 1000 cases
+    names(which(apply(xcovid.row, 2, tail, 1) > 999))
+t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(xcovid.row))
+
+xyplot(xcovid.row[, regions[49]] ~ t, new.days = 30, cumulative = T,
+       drop.days = DAYS.USED, pred.days = DAYS.USED,
+       prepanel = my.prepanel, panel = my.panel)
+```
+
+
