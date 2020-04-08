@@ -11,7 +11,9 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRU
                comment = "", warning = TRUE, message = TRUE,
                knitr.table.format = "html",
 			   ## dev.args = list(pointsize = 12),
+               dev = "svglite",
                fig.width = 12, fig.height = 18, dpi = 120, fig.path='figures/prediction-')
+library(svglite)
 library(lattice)
 library(RColorBrewer)
 library(latticeExtra)
@@ -205,6 +207,45 @@ limits.
 
 
 
+```{Rcpp, cache=TRUE}
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+double interpolate_value(NumericVector x, double thalf)
+{
+    int lo, hi;
+    // should be error if thalf < 0; but just return 0
+    if (thalf < 0) return 0.0;
+    lo = (int) thalf;
+    hi = lo + 1;
+    return x[lo] * (hi-thalf) + x[hi] * (thalf-lo);
+}
+
+
+// [[Rcpp::export]]
+NumericVector extend_linear_doubling(NumericVector x, int nnew,
+				     double dcurrent, double dchange)
+{
+    int j, n = x.size();
+    double thalf;
+    NumericVector ex(n + nnew);
+    for (int j = 0; j < n; j++) {
+		ex[j] = x[j];
+    }
+    for (int j = n; j < n + nnew; j++) {
+		dcurrent += dchange;
+		thalf = j - dcurrent;
+		ex[j] = 2 * interpolate_value(ex, thalf);
+    }
+    return ex;
+}
+```
+
+
+
+
+
 ```{r}
 tdouble <- function(n, x, min = 50)
 {
@@ -222,10 +263,10 @@ doubling.last <- function(x, min = 50, days = DAYS.USED)
 }
 panel.predict <-
     function(x, y, drop.days = 0, pred.days = DAYS.USED, new.days = 20,
-             cumulative = TRUE, fill = "grey50", alpha = 0.5)
+             cumulative = TRUE, fill = "grey50", alpha = 0.5,
+             prepanel = FALSE)
         ## daily new cases (diff) if cumulative = FALSE
 {
-    print(drop.days)
     if (drop.days > 0)
     {
         x <- head(x, -drop.days)
@@ -233,29 +274,38 @@ panel.predict <-
     }
     N <- length(x)
     dt <- doubling.last(y, min = 50, days = pred.days)
-    print(drange <- range(diff(dt)))
+    drange <- range(diff(dt))
     ## prediction for lower and upper end: next 'new.days' days
-    dt.lower <- dt[length(dt)] + drange[1] * seq_len(new.days)
-    dt.upper <- dt[length(dt)] + drange[2] * seq_len(new.days)
-    str(list(dt.lower, dt.upper))
-    ## translate into growth: current * exp(gamma), where gamma = log(2) / doubling.time
-    rate.lower <- log(2) / dt.lower
-    rate.upper <- log(2) / dt.upper
-    y.lower <- y[N] * exp(c(0, cumsum(rate.lower)))
-    y.upper <- y[N] * exp(c(0, cumsum(rate.upper)))
+    y.lower <-
+        tail(extend_linear_doubling(y, new.days, dt[length(dt)], max(0, drange[1])),
+             new.days + 1)
+    y.upper <-
+        tail(extend_linear_doubling(y, new.days, dt[length(dt)], drange[2]),
+             new.days + 1)
     x.new <- seq(x[N], by = 1, length.out = new.days + 1)
     ## str(list(N = N, ystart = y[N], x = x.new, yl = y.lower, yu = y.upper))
-    if (cumulative)
-        panel.polygon(x.new, y.lower, rev(x.new), rev(y.upper),
-                      col = fill, alpha = alpha, border = "transparent")
+    if (prepanel)
+    {
+        if (cumulative) list(xlim = range(x) + c(0, new.days),
+                             ylim = c(NA, max(y.lower, y.upper)))
+        else list(xlim = range(x) + c(0, new.days),
+                  ylim = c(NA, max(diff(y.lower), diff(y.upper))))
+    }
     else
-        panel.polygon(x.new[-1], diff(y.lower), rev(x.new[-1]), rev(diff(y.upper)),
-                      col = fill, alpha = alpha, border = "transparent")
+    {
+        if (cumulative)
+            panel.polygon(c(x.new, rev(x.new)), c(y.lower, rev(y.upper)),
+                          col = fill, alpha = alpha, border = "transparent")
+        else
+            panel.polygon(x.new[-1], diff(y.lower), rev(x.new[-1]), rev(diff(y.upper)),
+                          col = fill, alpha = alpha, border = "transparent")
+    }
 }
 my.prepanel <- function(x, y, ..., new.days, cumulative = TRUE)
 {
-    list(xlim = range(x) + c(0, new.days),
-         ylim = if (cumulative) range(y) else range(diff(y)))
+    panel.predict(x, y, ...,
+                  new.days = new.days,
+                  cumulative = cumulative, prepanel = TRUE)
 }
 my.panel <- function(x, y, ..., new.days, cumulative)
 {
@@ -271,12 +321,12 @@ my.panel <- function(x, y, ..., new.days, cumulative)
 
 
 
-```{r}
+
+```{r, fig.height=8,warning=FALSE}
 regions <-  # at least 1000 cases
     names(which(apply(xcovid.row, 2, tail, 1) > 999))
 t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(xcovid.row))
-
-xyplot(xcovid.row[, regions[49]] ~ t, new.days = 30, cumulative = T,
+xyplot(xcovid.row[, regions[27]] ~ t, new.days = 30, cumulative = FALSE,
        drop.days = DAYS.USED, pred.days = DAYS.USED,
        prepanel = my.prepanel, panel = my.panel)
 ```

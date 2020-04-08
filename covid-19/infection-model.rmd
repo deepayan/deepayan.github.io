@@ -74,9 +74,10 @@ same time (with some probability?)
 ## Setup
 
 ```{r}
-M <- 500
-N <- 500
-n <- 5000
+M <- 5000
+N <- 5000
+n <- 50000
+RADIUS <- 50
 ninitial <- 50 # number initially infected
 pconstrained <- 0.6
 pdeath <- 0.02
@@ -100,7 +101,7 @@ state <-
 initial <- sample(n, ninitial)
 state <- within(state,
 {
-    radius <- ifelse(constrained, 50, Inf)
+    radius <- ifelse(constrained, RADIUS, Inf)
     status[initial] <- "infected"
     days_infected[initial] <- 1
     x <- u

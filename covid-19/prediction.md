@@ -52,7 +52,7 @@ dotplot(total.row[torder], total.1 = total.row.1[torder], total.2 = total.row.2[
         scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-2](figures/prediction-unnamed-chunk-2-1.png)
+![plot of chunk unnamed-chunk-2](figures/prediction-unnamed-chunk-2-1.svg)
 
 We can use this for a crude prediction of the number of cases 4 days
 further on, by assuming that on the log scale, the "increase" changes
@@ -112,7 +112,7 @@ dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
         scales = list(x = list(log = TRUE, equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.svg)
 
 Here are the predictions 4 days into the future (
 2020-04-12
@@ -142,7 +142,7 @@ with(pred.current,
              scales = list(x = list(log = 10, equispaced.log = FALSE))))
 ```
 
-![plot of chunk unnamed-chunk-5](figures/prediction-unnamed-chunk-5-1.png)
+![plot of chunk unnamed-chunk-5](figures/prediction-unnamed-chunk-5-1.svg)
 
 
 ## Prediction using doubling time
@@ -170,6 +170,46 @@ limits.
 
 
 
+```cpp
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+double interpolate_value(NumericVector x, double thalf)
+{
+    int lo, hi;
+    // should be error if thalf < 0; but just return 0
+    if (thalf < 0) return 0.0;
+    lo = (int) thalf;
+    hi = lo + 1;
+    return x[lo] * (hi-thalf) + x[hi] * (thalf-lo);
+}
+
+
+// [[Rcpp::export]]
+NumericVector extend_linear_doubling(NumericVector x, int nnew,
+				     double dcurrent, double dchange)
+{
+    int j, n = x.size();
+    double thalf;
+    NumericVector ex(n + nnew);
+    for (int j = 0; j < n; j++) {
+		ex[j] = x[j];
+    }
+    for (int j = n; j < n + nnew; j++) {
+		dcurrent += dchange;
+		thalf = j - dcurrent;
+		ex[j] = 2 * interpolate_value(ex, thalf);
+    }
+    return ex;
+}
+```
+
+
+
+
+
+
 ```r
 tdouble <- function(n, x, min = 50)
 {
@@ -187,10 +227,10 @@ doubling.last <- function(x, min = 50, days = DAYS.USED)
 }
 panel.predict <-
     function(x, y, drop.days = 0, pred.days = DAYS.USED, new.days = 20,
-             cumulative = TRUE, fill = "grey50", alpha = 0.5)
+             cumulative = TRUE, fill = "grey50", alpha = 0.5,
+             prepanel = FALSE)
         ## daily new cases (diff) if cumulative = FALSE
 {
-    print(drop.days)
     if (drop.days > 0)
     {
         x <- head(x, -drop.days)
@@ -198,29 +238,38 @@ panel.predict <-
     }
     N <- length(x)
     dt <- doubling.last(y, min = 50, days = pred.days)
-    print(drange <- range(diff(dt)))
+    drange <- range(diff(dt))
     ## prediction for lower and upper end: next 'new.days' days
-    dt.lower <- dt[length(dt)] + drange[1] * seq_len(new.days)
-    dt.upper <- dt[length(dt)] + drange[2] * seq_len(new.days)
-    str(list(dt.lower, dt.upper))
-    ## translate into growth: current * exp(gamma), where gamma = log(2) / doubling.time
-    rate.lower <- log(2) / dt.lower
-    rate.upper <- log(2) / dt.upper
-    y.lower <- y[N] * exp(c(0, cumsum(rate.lower)))
-    y.upper <- y[N] * exp(c(0, cumsum(rate.upper)))
+    y.lower <-
+        tail(extend_linear_doubling(y, new.days, dt[length(dt)], max(0, drange[1])),
+             new.days + 1)
+    y.upper <-
+        tail(extend_linear_doubling(y, new.days, dt[length(dt)], drange[2]),
+             new.days + 1)
     x.new <- seq(x[N], by = 1, length.out = new.days + 1)
     ## str(list(N = N, ystart = y[N], x = x.new, yl = y.lower, yu = y.upper))
-    if (cumulative)
-        panel.polygon(x.new, y.lower, rev(x.new), rev(y.upper),
-                      col = fill, alpha = alpha, border = "transparent")
+    if (prepanel)
+    {
+        if (cumulative) list(xlim = range(x) + c(0, new.days),
+                             ylim = c(NA, max(y.lower, y.upper)))
+        else list(xlim = range(x) + c(0, new.days),
+                  ylim = c(NA, max(diff(y.lower), diff(y.upper))))
+    }
     else
-        panel.polygon(x.new[-1], diff(y.lower), rev(x.new[-1]), rev(diff(y.upper)),
-                      col = fill, alpha = alpha, border = "transparent")
+    {
+        if (cumulative)
+            panel.polygon(c(x.new, rev(x.new)), c(y.lower, rev(y.upper)),
+                          col = fill, alpha = alpha, border = "transparent")
+        else
+            panel.polygon(x.new[-1], diff(y.lower), rev(x.new[-1]), rev(diff(y.upper)),
+                          col = fill, alpha = alpha, border = "transparent")
+    }
 }
 my.prepanel <- function(x, y, ..., new.days, cumulative = TRUE)
 {
-    list(xlim = range(x) + c(0, new.days),
-         ylim = if (cumulative) range(y) else range(diff(y)))
+    panel.predict(x, y, ...,
+                  new.days = new.days,
+                  cumulative = cumulative, prepanel = TRUE)
 }
 my.panel <- function(x, y, ..., new.days, cumulative)
 {
@@ -237,44 +286,16 @@ my.panel <- function(x, y, ..., new.days, cumulative)
 
 
 
+
 ```r
 regions <-  # at least 1000 cases
     names(which(apply(xcovid.row, 2, tail, 1) > 999))
 t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(xcovid.row))
-
-xyplot(xcovid.row[, regions[49]] ~ t, new.days = 30, cumulative = T,
+xyplot(xcovid.row[, regions[27]] ~ t, new.days = 30, cumulative = FALSE,
        drop.days = DAYS.USED, pred.days = DAYS.USED,
        prepanel = my.prepanel, panel = my.panel)
 ```
 
-```
-[1] 5
-```
-
-```
-Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-collapsing to unique 'x' values
-
-Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-collapsing to unique 'x' values
-
-Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-collapsing to unique 'x' values
-
-Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-collapsing to unique 'x' values
-
-Warning in regularize.values(x, y, ties, missing(ties), na.rm = na.rm):
-collapsing to unique 'x' values
-```
-
-![plot of chunk unnamed-chunk-8](figures/prediction-unnamed-chunk-8-1.png)
-
-```
-[1] -3.974880  0.401727
-List of 2
- $ : num [1:30] 8.616 4.641 0.666 -3.309 -7.283 ...
- $ : num [1:30] 13 13.4 13.8 14.2 14.6 ...
-```
+![plot of chunk unnamed-chunk-9](figures/prediction-unnamed-chunk-9-1.svg)
 
 
