@@ -12,7 +12,7 @@ author: Deepayan Sarkar
 
 
 [This note was last updated using data downloaded on 
-2020-04-05. Here is the
+2020-04-08. Here is the
 [source](prediction.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -115,7 +115,7 @@ dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
 ![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.png)
 
 Here are the predictions 4 days into the future (
-2020-04-09
+2020-04-12
 ) using current data.
 
 
@@ -271,10 +271,10 @@ collapsing to unique 'x' values
 ![plot of chunk unnamed-chunk-8](figures/prediction-unnamed-chunk-8-1.png)
 
 ```
-[1] -1.0864198  0.5898702
+[1] -3.974880  0.401727
 List of 2
- $ : num [1:30] 3.67 2.584 1.497 0.411 -0.676 ...
- $ : num [1:30] 5.35 5.94 6.53 7.12 7.71 ...
+ $ : num [1:30] 8.616 4.641 0.666 -3.309 -7.283 ...
+ $ : num [1:30] 13 13.4 13.8 14.2 14.6 ...
 ```
 
 
