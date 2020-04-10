@@ -1,5 +1,5 @@
 
-all: doubling.html deaths.html prediction.html
+all: doubling.html deaths.html prediction.html pooled-testing.html
 
 .PRECIOUS: %.md
 
