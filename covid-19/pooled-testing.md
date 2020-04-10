@@ -56,12 +56,12 @@ $$
 Assuming that the test is perfect (no false positives or false
 negatives), the total number $T$ of positive tests has a Binomial
 distribution:
-\[
+\\[
 T \sim Bin(m, q)
-\]
+\\]
 The obvious point estimates then are
 
-- \(\hat{q} = T / m\)
+- \\(\hat{q} = T / m\\)
 
 - $\hat{p} = 1 - (1-\hat{q})^{(1/k)}$
 
