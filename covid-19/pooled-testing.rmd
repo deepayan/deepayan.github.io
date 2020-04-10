@@ -52,7 +52,7 @@ the estimation calculations are fairly simple. Suppose that
 - $$m$$ is the total number of tests that are to be performed (depends
   on available resources).
   
-- \(k\) is the number of samples (swabs) combined in each test.
+- \\(k\\) is the number of samples (swabs) combined in each test.
 
 - $n = mk$ is thus the total number of individuals sampled.
 

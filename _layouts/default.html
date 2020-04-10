@@ -54,23 +54,6 @@
 	crossorigin="anonymous">
 </script>
 
-{% if page.mathjax %}
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      processEscapes: true
-    }
-  });
-</script>
-
-<script type="text/javascript" id="MathJax-script" async
-  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
-</script>
-
-{% endif %}
-
-
 <!-- FIXME: make this customizable using a YML tag -->
 
 <script type="text/javascript">
@@ -84,7 +67,6 @@ $(document).ready(
     }
 );
 </script>
-
 
 
 </body>
