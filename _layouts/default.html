@@ -17,6 +17,10 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto Sans" >
   <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/notosansbengali.css" >
 
+  {% if page.mathjax %}
+  {% include mathjax.html %}
+  {% endif %}
+
 </head>
 
 <body>
@@ -67,10 +71,6 @@ $(document).ready(
     }
 );
 </script>
-
-{% if page.mathjax %}
-{% include mathjax.html %}
-{% endif %}
 
 </body>
 </html>
