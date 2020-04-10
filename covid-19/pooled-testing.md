@@ -1,6 +1,7 @@
 ---
 title: Statistical Implications of Pooled testing
 author: 'Mudit Kapoor, E Somanathan, Deepayan Sarkar'
+mathjax: true
 ---
 
 
@@ -35,7 +36,7 @@ same ideas should go through.
 Assuming that samples (swabs) are randomly mixed before being tested,
 the estimation calculations are fairly simple. Suppose that 
 
-- $m$ is the total number of tests that are to be performed (depends
+- $$m$$ is the total number of tests that are to be performed (depends
   on available resources).
   
 - $k$ is the number of samples (swabs) combined in each test.
