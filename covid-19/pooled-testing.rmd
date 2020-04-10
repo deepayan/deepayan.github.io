@@ -1,6 +1,7 @@
 ---
 title: Statistical Implications of Pooled testing
 author: 'Mudit Kapoor, E Somanathan, Deepayan Sarkar'
+mathjax: true
 ---
 
 
