@@ -51,16 +51,18 @@ Suppose the true proportion of positive cases in the population is
 $p$. Then the probability that each test sample (combining $k$
 randomly sampled individuals) is "positive" is 
 
-\begin{equation}
+$$
 q = 1 - (1-p)^k \implies p = 1 - (1-q)^{(1/k)}
-\end{equation}
+$$
 
 Assuming that the test is perfect (no false positives or false
 negatives), the total number $T$ of positive tests has a Binomial
 distribution:
+
 $$
 T \sim Bin(m, q)
 $$
+
 The obvious point estimates then are
 
 - $\hat{q} = T / m$
@@ -70,6 +72,7 @@ The obvious point estimates then are
 $\hat{q}$ is unbiased for $q$ and has a variance of $q(1-q)/n$. Using
 the Delta Method, it follows that $\hat{p}$ is also asymptotically
 unbiased (for large $m$) with a variance of 
+
 $$
 \frac{1 - (1-p)^k}{mk^2} (1-p)^{(2-k)}
 $$
