@@ -123,7 +123,6 @@ g <- within(g,
 xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
        abline = list(h = P), ylab = expression(hat(p)))
 ```
-\
 
 
 
@@ -142,7 +141,6 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
        ylab = expression("Mean Square Error of " * hat(p))) +
     layer_(panel.curve((1 - (1-P)^x) * (1-P)^(2-x) / (M*x^2), from = 1))
 ```
-\
 
 
 This confirms our visual impression that increasing $k$ is useful, and
@@ -168,7 +166,6 @@ g <- within(g,
 xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
        abline = list(h = P), ylab = expression(hat(p)))
 ```
-\
 
 
 The problem here is that when combining too many samples, the per-test
@@ -185,7 +182,6 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
        subset = (k <= 40) & (phat < 1),
        abline = list(h = P), ylab = expression(hat(p)))
 ```
-\
 
 
 Here, increasing $k$ improves the precision of $\hat{p}$ up to a
@@ -202,7 +198,6 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
        ylab = expression("Mean Square Error of " * hat(p))) +
     layer(panel.curve((1 - (1-P)^x) * (1-P)^(2-x) / (M*x^2), from = 1))
 ```
-\
 
 
 # Take-home message
@@ -301,7 +296,6 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
     layer(panel.average(x, y, fun = function(x) quantile(x, 0.1),
                         horizontal = FALSE, col = "red"))
 ```
-\
 
 
 
@@ -326,6 +320,5 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
     layer(panel.average(x, y, fun = function(x) quantile(x, 0.1),
                         horizontal = FALSE, col = "red"))
 ```
-\
 
 

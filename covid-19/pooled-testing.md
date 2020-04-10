@@ -106,7 +106,6 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-2](figures/pooltest-unnamed-chunk-2-1.png)
-\
 
 
 
@@ -128,7 +127,6 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
 ```
 
 ![plot of chunk unnamed-chunk-3](figures/pooltest-unnamed-chunk-3-1.png)
-\
 
 
 This confirms our visual impression that increasing $k$ is useful, and
@@ -157,7 +155,6 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-4](figures/pooltest-unnamed-chunk-4-1.png)
-\
 
 
 The problem here is that when combining too many samples, the per-test
@@ -177,7 +174,6 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-5](figures/pooltest-unnamed-chunk-5-1.png)
-\
 
 
 Here, increasing $k$ improves the precision of $\hat{p}$ up to a
@@ -197,7 +193,6 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
 ```
 
 ![plot of chunk unnamed-chunk-6](figures/pooltest-unnamed-chunk-6-1.png)
-\
 
 
 # Take-home message
@@ -300,7 +295,6 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-8](figures/pooltest-unnamed-chunk-8-1.png)
-\
 
 
 
@@ -328,6 +322,5 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-9](figures/pooltest-unnamed-chunk-9-1.png)
-\
 
 
