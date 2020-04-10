@@ -1,7 +1,7 @@
 ## Jekyll build settings
 markdown: kramdown
 kramdown:
-  math_engine: nil
+  math_engine: +nil+
 exclude:
   - covid-19/doubling.rmd
 
