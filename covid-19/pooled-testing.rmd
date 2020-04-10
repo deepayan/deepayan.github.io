@@ -63,9 +63,9 @@ using some statistical optimality criterion.
 Suppose the true proportion of positive cases in the population is
 $p$. Then the probability that each test sample (combining $k$
 randomly sampled individuals) is "positive" is 
-\begin{equation*}
+\begin{equation}
 q = 1 - (1-p)^k \implies p = 1 - (1-q)^{(1/k)}
-\end{equation*}
+\end{equation}
 Assuming that the test is perfect (no false positives or false
 negatives), the total number $T$ of positive tests has a Binomial
 distribution:
