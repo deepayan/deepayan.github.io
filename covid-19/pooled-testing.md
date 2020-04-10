@@ -36,10 +36,10 @@ same ideas should go through.
 Assuming that samples (swabs) are randomly mixed before being tested,
 the estimation calculations are fairly simple. Suppose that 
 
-- $$m$$ is the total number of tests that are to be performed (depends
+- $m$ is the total number of tests that are to be performed (depends
   on available resources).
   
-- \\(k\\) is the number of samples (swabs) combined in each test.
+- $k$ is the number of samples (swabs) combined in each test.
 
 - $n = mk$ is thus the total number of individuals sampled.
 
@@ -56,12 +56,12 @@ $$
 Assuming that the test is perfect (no false positives or false
 negatives), the total number $T$ of positive tests has a Binomial
 distribution:
-\\[
+$$
 T \sim Bin(m, q)
-\\]
+$$
 The obvious point estimates then are
 
-- \\(\hat{q} = T / m\\)
+- $\hat{q} = T / m$
 
 - $\hat{p} = 1 - (1-\hat{q})^{(1/k)}$
 
@@ -103,6 +103,8 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-2](figures/pooltest-unnamed-chunk-2-1.png)
+\
+
 
 
 Clearly, increasing $k$ improves the precision of $\hat{p}$, although
@@ -123,6 +125,8 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
 ```
 
 ![plot of chunk unnamed-chunk-3](figures/pooltest-unnamed-chunk-3-1.png)
+\
+
 
 This confirms our visual impression that increasing $k$ is useful, and
 that the explicit caculation matches what we see in simulation.
@@ -150,6 +154,8 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-4](figures/pooltest-unnamed-chunk-4-1.png)
+\
+
 
 The problem here is that when combining too many samples, the per-test
 positive probability becomes too high, and often _all_ the $m$ tests
@@ -168,6 +174,8 @@ xyplot(phat ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-5](figures/pooltest-unnamed-chunk-5-1.png)
+\
+
 
 Here, increasing $k$ improves the precision of $\hat{p}$ up to a
 point, after which it decreases again. 
@@ -186,6 +194,8 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
 ```
 
 ![plot of chunk unnamed-chunk-6](figures/pooltest-unnamed-chunk-6-1.png)
+\
+
 
 # Take-home message
 
@@ -287,6 +297,8 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-8](figures/pooltest-unnamed-chunk-8-1.png)
+\
+
 
 
 ## $m=1000, p=0.1$
@@ -313,4 +325,6 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
 ```
 
 ![plot of chunk unnamed-chunk-9](figures/pooltest-unnamed-chunk-9-1.png)
+\
+
 
