@@ -137,7 +137,7 @@ start.date <- as.Date("2020-01-22")
 xat <- pretty(start.date + c(0, D-1))
 (dr.naive <-
      xyplot(ts(death.rate[, porder], start = start.date),
-            type = "o", grid = TRUE, layout = c(6, NA),
+            type = "o", grid = TRUE, layout = c(6, 6),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
             scales = list(alternating = 3, rot = 45,
                           x = list(at = xat, labels = format(xat, format = "%d %b")),
@@ -148,7 +148,7 @@ xat <- pretty(start.date + c(0, D-1))
 )
 ```
 
-![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-1.png)
+![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-1.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-2.png)
 
 
 ## The lag-adjusted death rate
@@ -178,7 +178,7 @@ start.date <- as.Date("2020-01-22") + LAG
 xat <- pretty(start.date + c(0, nrow(death.rate)-1))
 dr.adjusted <- 
      xyplot(ts(death.rate[, porder], start = start.date),
-            type = "o", layout = c(6, NA),
+            type = "o", layout = c(6, 6),
             par.settings = simpleTheme(pch = 16, cex = 0.5), 
             col = ct$superpose.symbol$col[2],
             as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -188,7 +188,7 @@ update(dr.naive + dr.adjusted, ylim = c(0, 30),
                        text = c("Naive estimate", "One week lag-adjusted estimate")))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-1.png)
+![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-1.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-2.png)
 
 The adjusted death rates have less systematic trends than the naive
 estimate, but clearly there is still a lot of instability.
@@ -321,8 +321,8 @@ Compare these with other countries:
 
 ```r
 bg <- xyplot(deaths ~ day, data = subset(deaths.10, total >= 2000), grid = TRUE,
-             col = "grey", groups = region, type = "l",
-             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)))
+             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+             col = "grey", groups = region, type = "l")
 fg <- 
     xyplot(deaths ~ day | reorder(region, -total), data = subset(deaths.10, total < 2000),
            xlab = "Days since number of deaths exceeded 10", pch = 16,
@@ -335,6 +335,80 @@ fg + as.layer(bg, under = TRUE)
 ![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)
 
 
+## Which countries have reached their peak?
 
+Another important landmark for any country is when it has passed its
+peak, that is, the daily number of new deaths (or cases) has started
+going down. The following plots show this trend, after applying a
+little bit of smoothing on the cumulative log death counts.
+
+
+
+```r
+newDeathsSince10 <- function(region)
+{
+    x <- xcovid.deaths[, region, drop = TRUE]
+    x <- x[x > 10]
+    days <- seq_along(x)
+    xsmooth <- exp(fitted(loess(log(x) ~ days, span = 0.35)))
+    data.frame(region = region, day = days[-1],
+               deaths = diff(xsmooth), total = tail(x, 1))
+}
+new.deaths.10 <- do.call(rbind, lapply(colnames(xcovid.deaths), newDeathsSince10))
+panel.glabel <- function(x, y, group.value, col.symbol, ...) # x,y vectors; group.value scalar
+{
+    n <- length(x)
+    panel.text(x[n], y[n], label = group.value, pos = 4, col = col.symbol, srt = 40)
+}
+xyplot(deaths ~ day, data = subset(new.deaths.10, total >= 2000), grid = TRUE,
+       scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+       xlab = "Days since number of deaths exceeded 10", ylim = c(1, NA),
+       groups = region, type = "o") +
+    glayer_(panel.glabel(x, y, group.value = group.value, ...))
+```
+
+![plot of chunk unnamed-chunk-8](figures/deaths-unnamed-chunk-8-1.png)
+
+
+There's a lot of overlap, so let's look at these countries separately:
+
+
+```r
+bg <- xyplot(deaths ~ day, data = subset(new.deaths.10, total >= 2000), grid = TRUE,
+             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+             col = "grey", groups = region, type = "l", ylim = c(1, NA))
+fg1 <- 
+    xyplot(deaths ~ day | reorder(region, -total), data = subset(new.deaths.10, total >= 2000),
+           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, ylim = c(1, NA),
+           scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5),
+           type = "o")
+fg1 + as.layer(bg, under = TRUE)
+```
+
+![plot of chunk unnamed-chunk-9](figures/deaths-unnamed-chunk-9-1.png)
+
+Iran is a bit weird, holding steady, but otherwise Spain, Italy,
+France, and Netherlands appear to have just passed their peaks, and
+the US and Germany are approaching theirs. The situation in the UK is
+not clear. Belgium is still on an upward trajectory. (But beware of
+potential effects of the smoothing, especially at the ends).
+
+
+Compare these with other countries:
+
+
+
+```r
+fg2 <- 
+    xyplot(deaths ~ day | reorder(region, -total), data = subset(new.deaths.10, total < 2000),
+           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, ylim = c(1, NA),
+           scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5), layout = c(5, 5),
+           type = "o")
+fg2 + as.layer(bg, under = TRUE)
+```
+
+![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-1.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-2.png)
 
 
