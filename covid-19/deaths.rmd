@@ -380,7 +380,7 @@ fg <-
     xyplot(deaths ~ day | reorder(region, -total), data = subset(deaths.10, total < 2000),
            xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, 
            scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
-           as.table = TRUE, between = list(x = 0.5, y = 0.5),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5), layout = c(5, 5),
            type = "o", ylim = c(NA, 12500))
 fg + as.layer(bg, under = TRUE)
 ```
@@ -391,7 +391,7 @@ fg + as.layer(bg, under = TRUE)
 Another important landmark for any country is when it has passed its
 peak, that is, the daily number of new deaths (or cases) has started
 going down. The following plots show this trend, after applying a
-little bit of smoothing on the cumulative log death counts.
+little bit of smoothing on the cumulative death counts.
 
 
 ```{r, fig.height=8,warning=FALSE}
@@ -400,7 +400,8 @@ newDeathsSince10 <- function(region)
     x <- xcovid.deaths[, region, drop = TRUE]
     x <- x[x > 10]
     days <- seq_along(x)
-    xsmooth <- exp(fitted(loess(log(x) ~ days, span = 0.35)))
+    xsmooth <- fitted(loess(x ~ days, span = 0.35))
+    ## xsmooth <- sinh(predict(smooth.spline(days, asinh(x)), days)$y)
     data.frame(region = region, day = days[-1],
                deaths = diff(xsmooth), total = tail(x, 1))
 }
@@ -433,14 +434,14 @@ fg1 <-
 fg1 + as.layer(bg, under = TRUE)
 ```
 
-Iran is a bit weird, holding steady, but otherwise Spain, Italy,
-France, and Netherlands appear to have just passed their peaks, and
-the US and Germany are approaching theirs. The situation in the UK is
-not clear. Belgium is still on an upward trajectory. (But beware of
-potential effects of the smoothing, especially at the ends).
+Iran is a bit weird, holding steady, but otherwise Spain and Italy
+appear to have just passed their peaks, France, Netherlands, and
+Germany are approaching theirs. The US, UK and Belgium are still on
+upward trajectories.
 
 
-Compare these with other countries:
+Compare these with other countries (But beware of potential artifacts
+of the smoothing):
 
 
 ```{r,warning=FALSE}

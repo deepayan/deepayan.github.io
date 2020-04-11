@@ -106,14 +106,19 @@ further on, by assuming that on the log scale, the "increase" changes
 countries are sorted according to their case counts 4 days ago. 
 
 ```{r}
-predictCases <- function(x, days = 7, go.back = TRUE)
+predictCases <- function(x, days = 7, go.back = TRUE, smooth = TRUE)
     ## go.back = TRUE: use -days, -2*days to predict current
     ## go.back = FALSE: use -days, current to predict +days
+    ## smooth: use loess() to smooth noise in data 
 {
     u <- if (go.back) head(x, -days) else x # used for prediction
     N <- nrow(u)
+    if (smooth)
+        u <- apply(u, 2,
+                   function(v) predict(loess(v ~ seq_len(N),
+                                             span = 0.35)))
     if (N - 2 * days > nrow(x)) stop("Not enough data")
-    if (any(u[N - 2 * days, ] == 0))
+    if (any(u[N - 2 * days, ] <= 0))
     {
         warning("dropping zero counts at %g days for %s", N - 2 * days)
         keep <- u[N - 2 * days, ] > 0
