@@ -195,6 +195,27 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
 ![plot of chunk unnamed-chunk-6](figures/pooltest-unnamed-chunk-6-1.png)
 
 
+The following plot shows how the theoretical precision (mean square
+error) changes with $k$ for a few additional values of $p$:
+
+
+```r
+mse.p <- expand.grid(m = 1000, k = 1:30, p = c(0.01, 0.02, 0.05, 0.1, 0.2, 0.3))
+mse.p <- transform(mse.p,
+                   MSE = ((1 - (1-p)^k) * (1-p)^(2-k) / (m*k^2)),
+                   P = factor(p, labels = sprintf("p = %g", sort(unique(p)))))
+xyplot(MSE ~ k | P, mse.p, type = "l", as.table = TRUE, grid = TRUE,
+       scales = list(y = "free", rot = 0, x = list(alternating = 3)), 
+       between = list(y = 1))
+```
+
+![plot of chunk unnamed-chunk-7](figures/pooltest-unnamed-chunk-7-1.png)
+
+
+Given the risk of making $k$ too high if the true value of $p$ is more
+than 10%, it seems reasonable to choose $k$ between 10 and 20.
+
+
 # Take-home message
 
 
@@ -218,12 +239,15 @@ following observations will hold generally:
    not reflected by the mean squared error alone (such as $q$ becoming
    too high).
 
-
 Of course, we will not know $p$ in advance, and $p$ will also change
 over time as the infection spreads. Generally speaking, taking a
-fairly high $k$ (maybe around 30) would seem reasonable for a pilot
+fairly high $k$ (maybe around 20) would seem reasonable for a pilot
 study, with further refinements in subsequent rounds.
 
+Once a value of $k$ is fixed, the precision will naturally increase
+with $m$, the number of tests performed. A reasonable value for $m$
+(which will depend on $p$) can be chosen based on some plausible
+values for $p$ and the desired precision.
 
 
 
@@ -294,7 +318,7 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
                         horizontal = FALSE, col = "red"))
 ```
 
-![plot of chunk unnamed-chunk-8](figures/pooltest-unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-9](figures/pooltest-unnamed-chunk-9-1.png)
 
 
 
@@ -321,6 +345,6 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
                         horizontal = FALSE, col = "red"))
 ```
 
-![plot of chunk unnamed-chunk-9](figures/pooltest-unnamed-chunk-9-1.png)
+![plot of chunk unnamed-chunk-10](figures/pooltest-unnamed-chunk-10-1.png)
 
 
