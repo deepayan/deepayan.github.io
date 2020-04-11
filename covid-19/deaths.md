@@ -30,7 +30,7 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-04-10. Here is the
+2020-04-11. Here is the
 [source](deaths.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
