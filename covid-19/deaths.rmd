@@ -252,14 +252,13 @@ with(subset(latest.dr, region == "Europe"),
             ylab = "One week lag-adjusted COVID-19 mortality rate (per cent)",
             xlim = extendrange(range(PPGDP_2018/1000), f = 0.15),
             panel = function(x, y, ...) {
-                panel.abline(lm(y ~ x, weights = tdeaths), col.line = "grey90", lwd = 3)
+                ## panel.abline(lm(y ~ x, weights = tdeaths), col.line = "grey90", lwd = 3)
                 panel.xyplot(x, y, ...)
                 panel.text(x, y, labels = country, pos = 2, srt = 0)
             }))
 ```
 
-The grey line is a weighted linear regression line fit with the number
-of deaths as weights.
+<!-- The grey line is a weighted linear regression line fit with the number of deaths as weights. -->
 
 
 
@@ -379,7 +378,7 @@ bg <- xyplot(deaths ~ day, data = subset(deaths.10, total >= 2000), grid = TRUE,
              col = "grey", groups = region, type = "l")
 fg <- 
     xyplot(deaths ~ day | reorder(region, -total), data = subset(deaths.10, total < 2000),
-           xlab = "Days since number of deaths exceeded 10", pch = 16,
+           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, 
            scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
            as.table = TRUE, between = list(x = 0.5, y = 0.5),
            type = "o", ylim = c(NA, 12500))
