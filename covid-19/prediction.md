@@ -60,6 +60,7 @@ further on, by assuming that on the log scale, the "increase" changes
 countries are sorted according to their case counts 4 days ago. 
 
 
+
 ```r
 predictCases <- function(x, days = 7, go.back = TRUE, smooth = TRUE)
     ## go.back = TRUE: use -days, -2*days to predict current
@@ -75,7 +76,7 @@ predictCases <- function(x, days = 7, go.back = TRUE, smooth = TRUE)
     if (N - 2 * days > nrow(x)) stop("Not enough data")
     if (any(u[N - 2 * days, ] <= 0))
     {
-        warning("dropping zero counts at %g days for %s", N - 2 * days)
+        warning(sprintf("dropping zero counts at %g days", N - 2 * days))
         keep <- u[N - 2 * days, ] > 0
         u <- u[, keep, drop = FALSE]
         x <- x[, keep, drop = FALSE]
@@ -111,14 +112,6 @@ are low (not surprisingly), but generally reasonable.
 ```r
 torder <- tail(order(total.row), 30)
 pred.past <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = TRUE)
-```
-
-```
-Warning in predictCases(xcovid.row[, torder, drop = FALSE], days = 4,
-go.back = TRUE): dropping zero counts at %g days for %s70
-```
-
-```r
 dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
         xlab = "Predicted current number of cases based on data four days ago",
         par.settings = simpleTheme(pch = 16, col = c(1, 2)), auto.key = list(columns = 2),
@@ -135,13 +128,6 @@ Here are the predictions 4 days into the future (
 ```r
 torder <- tail(order(total.row), 60)
 pred.current <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = FALSE)
-```
-
-```
-Error in u[N - 2 * days, ]: incorrect number of dimensions
-```
-
-```r
 plot.col <- trellis.par.get("plot.symbol")$col
 with(pred.current,
      dotplot(reorder(region, predicted) ~ total0,
@@ -162,10 +148,11 @@ with(pred.current,
              scales = list(x = list(log = 10, equispaced.log = FALSE))))
 ```
 
-```
-Error in with(pred.current, dotplot(reorder(region, predicted) ~ total0, : object 'pred.current' not found
-```
+![plot of chunk unnamed-chunk-5](figures/prediction-unnamed-chunk-5-1.svg)
 
+
+
+<!--  
 
 ## Prediction using doubling time
 
@@ -299,9 +286,9 @@ my.panel <- function(x, y, ..., new.days, cumulative)
                   new.days = new.days,
                   cumulative = cumulative, alpha = 0.5)
     if (cumulative)
-        panel.xyplot(x, y, ..., type = "o")
+        panel.xyplot(x, y, ..., type = "l")
     else
-        panel.xyplot(x[-1], diff(y), ..., type = "o")
+        panel.xyplot(x[-1], diff(y), ..., type = "o", pch = ".", cex = 3)
 }
 ```
 
@@ -310,14 +297,22 @@ my.panel <- function(x, y, ..., new.days, cumulative)
 
 
 ```r
-regions <-  # at least 1000 cases
-    names(which(apply(xcovid.row, 2, tail, 1) > 999))
-t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(xcovid.row))
-xyplot(xcovid.row[, regions[27]] ~ t, new.days = 30, cumulative = FALSE,
+N <- nrow(xcovid.row)
+regions <- # at least 1000 cases
+    names(which(sort(xcovid.row[N, ], decreasing=TRUE) > 9999))
+t <- seq(as.Date("2020-01-22"), by = 1, length.out = N)
+d.regions <- data.frame(time = t,
+                        cases = as.vector(xcovid.row[, regions]),
+                        region = gl(length(regions), N, labels = regions))
+xyplot(cases ~ time | region, data = d.regions, 
+       new.days = 10, cumulative = TRUE, as.table = TRUE,
        drop.days = DAYS.USED, pred.days = DAYS.USED,
+       scales = list(y = "free"),
        prepanel = my.prepanel, panel = my.panel)
 ```
 
 ![plot of chunk unnamed-chunk-9](figures/prediction-unnamed-chunk-9-1.svg)
 
 
+
+-->

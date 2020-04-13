@@ -6,25 +6,10 @@ author: Deepayan Sarkar
 
 
 
-```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
-opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRUE,
-               comment = "", warning = TRUE, message = TRUE,
-               knitr.table.format = "html",
-			   ## dev.args = list(pointsize = 12),
-               fig.width = 12, fig.height = 12, dpi = 120, fig.path='figures/us-')
-library(lattice)
-library(RColorBrewer)
-library(latticeExtra)
-## bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
-## ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
-ct <- standard.theme("pdf", color = TRUE)
-ct$strip.background$col <- "grey90"
-ct$strip.border$col <- "grey50"
-ct$axis.line$col <- "grey50"
-lattice.options(default.theme = ct)
-```
 
-```{r}
+
+
+```r
 TARGET.cases <- "time_series_covid19_confirmed_US.csv"
 TARGET.deaths <- "time_series_covid19_deaths_US.csv"
 SURL <- "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series"
@@ -38,13 +23,14 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-`r {as.Date(file.mtime(TARGET.deaths))}`. Here is the
+2020-04-13. Here is the
 [source](us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
 
 
-```{r}
+
+```r
 covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FALSE)
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(colnames(covid.cases), colnames(covid.deaths)))
@@ -54,6 +40,13 @@ if (!identical(colnames(covid.cases), colnames(covid.deaths)))
     covid.deaths <- covid.deaths[colnames(covid.deaths) %in% common.colnames]
     covid.cases <- covid.cases[colnames(covid.cases) %in% common.colnames]
 }
+```
+
+```
+Warning: Cases and death data have different columns... using common.
+```
+
+```r
 if (!identical(rownames(covid.cases), rownames(covid.deaths)))
 {
     stop("Cases and death data have different rows... check versions.")
@@ -66,7 +59,8 @@ covid.cases <- subset(covid.cases, !(Province_State %in% omit.regions))
 
 
 
-```{r, warning=FALSE}
+
+```r
 correctLag <- function(x)
 {
     n <- length(x)
@@ -96,7 +90,8 @@ tdouble <- function(x)
 ## By state
 
 
-```{r}
+
+```r
 ## State-wise totals
 byState.cases <- split(covid.cases, covid.cases$Province_State)
 byState.deaths <- split(covid.deaths, covid.deaths$Province_State)
@@ -111,7 +106,8 @@ cases, across US states, with states sorted by the total number of
 deaths.
 
 
-```{r, warning=FALSE}
+
+```r
 stotal.deaths <- state.deaths[D, , drop = TRUE]
 stotal.cases <- state.cases[D, , drop = TRUE]
 sdt.deaths <- apply(state.deaths, 2, tdouble)
@@ -124,6 +120,8 @@ dotplot(reorder(state.names, stotal.deaths) ~ sdt.deaths + sdt.cases,
         par.settings = simpleTheme(pch = 16),
         auto.key = list(space = "right", text = c("Deaths", "Cases")))
 ```
+
+![plot of chunk unnamed-chunk-5](figures/us-unnamed-chunk-5-1.png)
 
 
 Generally speaking, the doubling times for cases are higher than that
@@ -138,7 +136,8 @@ times is less that 2 days (although Washington is doing pretty well in
 terms of the absolute doubling times).
 
 
-```{r, warning=FALSE, fig.height=6}
+
+```r
 dotplot(reorder(state.names, sdt.cases - sdt.deaths) ~ sdt.deaths + sdt.cases,
         subset = (sdt.cases - sdt.deaths < 2 & stotal.deaths > 40),
         scales = list(alternating = 3), xlab = "Doubling time in days",
@@ -146,12 +145,15 @@ dotplot(reorder(state.names, sdt.cases - sdt.deaths) ~ sdt.deaths + sdt.cases,
         auto.key = list(space = "right", text = c("Deaths", "Cases")))
 ```
 
+![plot of chunk unnamed-chunk-6](figures/us-unnamed-chunk-6-1.png)
+
 The following plots show how the number of deaths have grown in these
 states since the count first exceeded 50, compared to the other
 counties.
 
 
-```{r}
+
+```r
 deathsSince10 <- function(region, xdata)
 {
     x <- xdata[, region, drop = TRUE]
@@ -180,6 +182,8 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
+![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-3.png)
+
 
 
 ## By county or other administrative region
@@ -191,7 +195,8 @@ deaths.
 
 
 
-```{r, warning=FALSE, fig.height=8}
+
+```r
 keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 50 deaths
 covid.cases <- covid.cases[keep, ]
 covid.deaths <- covid.deaths[keep, ]
@@ -213,13 +218,16 @@ xyplot(dt.deaths ~ total.deaths, pch = 16, grid = TRUE,
                      pos = 2, col = "grey30"))
 ```
 
+![plot of chunk unnamed-chunk-8](figures/us-unnamed-chunk-8-1.png)
+
 
 The following plots show how the number of deaths have grown in these
 counties since the count first exceeded 50, compared to the other
 counties.
 
 
-```{r, fig.height=11}
+
+```r
 deaths.10 <- do.call(rbind, lapply(colnames(xcovid.deaths), deathsSince10,
                                    xdata = xcovid.deaths))
 bg <- xyplot(deaths ~ day, data = deaths.10, grid = TRUE,
@@ -234,4 +242,6 @@ fg <-
            type = "o", ylim = c(NA, 12500))
 fg + as.layer(bg, under = TRUE)
 ```
+
+![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)
 
