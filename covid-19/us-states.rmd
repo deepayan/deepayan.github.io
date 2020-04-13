@@ -1,0 +1,197 @@
+---
+layout: default
+title: 'COVID-19 in the US states'
+author: Deepayan Sarkar
+---
+
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+			   ## dev.args = list(pointsize = 12),
+               fig.width = 12, fig.height = 12, dpi = 120, fig.path='figures/us-')
+library(lattice)
+library(RColorBrewer)
+library(latticeExtra)
+bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
+ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
+lattice.options(default.theme = ct)
+```
+
+```{r}
+TARGET.cases <- "time_series_covid19_confirmed_US.csv"
+TARGET.deaths <- "time_series_covid19_deaths_US.csv"
+SURL <- "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series"
+## To download the latest version, delete the files and run again
+for (target in c(TARGET.cases, TARGET.deaths))
+{
+	if (!file.exists(target))
+        download.file(sprintf("%s/%s", SURL, target), destfile = target)
+}
+```
+
+
+[This note was last updated using data downloaded on 
+`r {as.Date(file.mtime(TARGET.deaths))}`. Here is the
+[source](us-states.rmd) of this analysis. Click <a href="#"
+data-toggle="collapse" data-target="div.sourceCode"
+aria-expanded="true">here</a> to show / hide the R code used. ]
+
+
+```{r}
+covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FALSE)
+covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
+if (!identical(colnames(covid.cases), colnames(covid.deaths)))
+{
+    warning("Cases and death data have different columns... using common.")
+    common.colnames <- intersect(colnames(covid.deaths), colnames(covid.cases))
+    covid.deaths <- covid.deaths[colnames(covid.deaths) %in% common.colnames]
+    covid.cases <- covid.cases[colnames(covid.cases) %in% common.colnames]
+}
+if (!identical(rownames(covid.cases), rownames(covid.deaths)))
+{
+    stop("Cases and death data have different rows... check versions.")
+}
+keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 50 deaths
+covid.cases <- covid.cases[keep, ]
+covid.deaths <- covid.deaths[keep, ]
+```
+
+
+
+
+```{r, warning=FALSE}
+correctLag <- function(x)
+{
+    n <- length(x)
+    stopifnot(n > 2)
+    for (i in seq(2, n-1))
+        if (x[i] == x[i-1])
+            x[i] <- sqrt(x[i-1] * x[i+1])
+    x
+}
+extractCasesTS <- function(d)
+{
+    x <- t(data.matrix(d[, -c(1:11)]))
+    x[x == -1] <- NA
+    colnames(x) <- with(d, paste(Province_State, Admin2, sep = " / "))
+    apply(x, 2, correctLag)
+}
+xcovid.cases <- extractCasesTS(covid.cases)
+xcovid.deaths <- extractCasesTS(covid.deaths)
+D <- nrow(xcovid.deaths)
+total.deaths <- xcovid.deaths[D, , drop = TRUE]
+```
+
+
+
+Current doubling time of deaths, compared to total number of deaths,
+across US regions with at least 50 deaths.
+
+
+
+```{r, warning=FALSE, fig.height=8}
+tdouble <- function(x)
+{
+    if (all(x == 0)) return (NA)
+    x <- c(0, x[x > 0])
+    i <- seq_along(x)
+    f <- approxfun(x, i)
+    diff(f(max(x) * c(0.5, 1)))
+}
+dt.deaths <- apply(xcovid.deaths, 2, tdouble)
+do.label.1 <- dt.deaths < 2 | dt.deaths > 10
+do.label.2 <- total.deaths > 1000
+xyplot(dt.deaths ~ total.deaths, pch = 16, grid = TRUE,
+       scales = list(alternating = 3, x = list(log = 10, equispaced.log = FALSE))) +
+    layer(panel.text(x[do.label.1], y[do.label.1],
+                     labels = names(total.deaths)[do.label.1],
+                     pos = 4)) + 
+    layer(panel.text(x[do.label.2], y[do.label.2],
+                     labels = names(total.deaths)[do.label.2],
+                     pos = 2))
+```
+
+
+## How fast are deaths increasing?
+
+The number of deaths is a better measure of how serious the COVID-19
+epidemic is in a country, compared to the number of detected cases,
+because deaths are less likely to be missed. The following plot,
+inspired by the very nice visualizations in the [Financial
+Times](https://www.ft.com/coronavirus-latest), shows the growth in the
+number of deaths, starting from the day the count exceeded 10, for
+countries with at least 2000 deaths.
+
+
+```{r, fig.height=11}
+deathsSince10 <- function(region)
+{
+    x <- xcovid.deaths[, region, drop = TRUE]
+    x <- x[x > 10]
+    data.frame(region = region, day = seq_along(x),
+               deaths = x, total = tail(x, 1))
+}
+deaths.10 <- do.call(rbind, lapply(colnames(xcovid.deaths), deathsSince10))
+panel.glabel <- function(x, y, group.value, col.symbol, ...) # x,y vectors; group.value scalar
+{
+    n <- length(x)
+    panel.text(x[n], y[n], label = group.value, pos = 4, col = col.symbol, srt = 40)
+}
+bg <- xyplot(deaths ~ day, data = deaths.10, grid = TRUE,
+             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+             col = "grey", groups = region, type = "l")
+fg <- 
+    xyplot(deaths ~ day | reorder(region, -total), data = subset(deaths.10, total < 2000),
+           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, 
+           scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5), layout = c(4, 5),
+           type = "o", ylim = c(NA, 12500))
+fg + as.layer(bg, under = TRUE)
+```
+
+
+## Which countries have reached their peak?
+
+Another important landmark for any country is when it has passed its
+peak, that is, the daily number of new deaths (or cases) has started
+going down. The following plots show this trend, after applying a
+little bit of smoothing on the cumulative death counts.
+
+
+```{r, fig.height=11,warning=FALSE}
+newDeathsSince10 <- function(region)
+{
+    x <- xcovid.deaths[, region, drop = TRUE]
+    x <- x[x > 10]
+    days <- seq_along(x)
+    xsmooth <- fitted(loess(x ~ days, span = 0.35))
+    ## xsmooth <- sinh(predict(smooth.spline(days, asinh(x)), days)$y)
+    data.frame(region = region, day = days[-1],
+               deaths = diff(xsmooth), total = tail(x, 1))
+}
+new.deaths.10 <- do.call(rbind, lapply(colnames(xcovid.deaths), newDeathsSince10))
+panel.glabel <- function(x, y, group.value, col.symbol, ...) # x,y vectors; group.value scalar
+{
+    n <- length(x)
+    panel.text(x[n], y[n], label = group.value, pos = 4, col = col.symbol, srt = 40)
+}
+bg <- xyplot(deaths ~ day, data = new.deaths.10, grid = TRUE,
+             scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+             col = "grey", groups = region, type = "l", ylim = c(1, NA))
+fg1 <- 
+    xyplot(deaths ~ day | reorder(region, -total), data = new.deaths.10,
+           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, ylim = c(1, NA),
+           scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
+           as.table = TRUE, between = list(x = 0.5, y = 0.5), layout = c(4, 5),
+           type = "o")
+fg1 + as.layer(bg, under = TRUE)
+```
+
+
+

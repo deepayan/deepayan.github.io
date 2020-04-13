@@ -12,7 +12,7 @@ author: Deepayan Sarkar
 
 
 [This note was last updated using data downloaded on 
-2020-04-10. Here is the
+2020-04-13. Here is the
 [source](prediction.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -111,6 +111,14 @@ are low (not surprisingly), but generally reasonable.
 ```r
 torder <- tail(order(total.row), 30)
 pred.past <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = TRUE)
+```
+
+```
+Warning in predictCases(xcovid.row[, torder, drop = FALSE], days = 4,
+go.back = TRUE): dropping zero counts at %g days for %s70
+```
+
+```r
 dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
         xlab = "Predicted current number of cases based on data four days ago",
         par.settings = simpleTheme(pch = 16, col = c(1, 2)), auto.key = list(columns = 2),
@@ -120,13 +128,20 @@ dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
 ![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.svg)
 
 Here are the predictions 4 days into the future (
-2020-04-14
+2020-04-17
 ) using current data.
 
 
 ```r
 torder <- tail(order(total.row), 60)
 pred.current <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = FALSE)
+```
+
+```
+Error in u[N - 2 * days, ]: incorrect number of dimensions
+```
+
+```r
 plot.col <- trellis.par.get("plot.symbol")$col
 with(pred.current,
      dotplot(reorder(region, predicted) ~ total0,
@@ -147,7 +162,9 @@ with(pred.current,
              scales = list(x = list(log = 10, equispaced.log = FALSE))))
 ```
 
-![plot of chunk unnamed-chunk-5](figures/prediction-unnamed-chunk-5-1.svg)
+```
+Error in with(pred.current, dotplot(reorder(region, predicted) ~ total0, : object 'pred.current' not found
+```
 
 
 ## Prediction using doubling time
