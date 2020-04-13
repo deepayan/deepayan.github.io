@@ -87,6 +87,25 @@ breaking too early.
 	- whatever else you wish: sausage / chicken bits / ...
 
 
+## Stir-fried Green Beans
+
+- Trim end of green beans (around 300-400 gms)
+
+- Put in (already) well-salted boiling water for two minutes, drain,
+  and put in cold water
+
+- Put a large skillet on medium heat, and add
+
+	- 1 tbsp olive oil, 3 tbsp butter (until butter melts)
+	
+	- minced garlic (2 cloves) + 1 tsp red chilli flakes (saute for 30 seconds)
+
+	- Add beans, continue to saute (about 5 minutes)
+	
+	- Add (optional) lemon zest (1 tsp) and season with salt and pepper
+
+
+
 # Chicken stew
 
 Source: [genius kitchen](http://www.geniuskitchen.com/recipe/chicken-stew-22127)
