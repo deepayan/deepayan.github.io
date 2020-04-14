@@ -12,7 +12,7 @@ author: Deepayan Sarkar
 
 
 [This note was last updated using data downloaded on 
-2020-04-13. Here is the
+2020-04-14. Here is the
 [source](prediction.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -115,13 +115,13 @@ pred.past <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back 
 dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
         xlab = "Predicted current number of cases based on data four days ago",
         par.settings = simpleTheme(pch = 16, col = c(1, 2)), auto.key = list(columns = 2),
-        scales = list(x = list(log = TRUE, equispaced.log = FALSE)))
+        scales = list(x = list(alternating = 3, log = TRUE, equispaced.log = FALSE)))
 ```
 
 ![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.svg)
 
 Here are the predictions 4 days into the future (
-2020-04-17
+2020-04-18
 ) using current data.
 
 

@@ -49,7 +49,7 @@ covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FA
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(colnames(covid.cases), colnames(covid.deaths)))
 {
-    warning("Cases and death data have different columns... using common.")
+    warning("Cases and death data have different columns (dates)... using common ones.")
     common.colnames <- intersect(colnames(covid.deaths), colnames(covid.cases))
     covid.deaths <- covid.deaths[colnames(covid.deaths) %in% common.colnames]
     covid.cases <- covid.cases[colnames(covid.cases) %in% common.colnames]

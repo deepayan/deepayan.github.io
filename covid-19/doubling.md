@@ -63,11 +63,12 @@ if (!file.exists(TARGET))
                   destfile = TARGET)
 covid <- read.csv(TARGET, check.names = FALSE,
                   stringsAsFactors = FALSE)
-covid <- subset(covid, `Country/Region` != "Diamond Princess")
+covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
+                        !(`Province/State` %in% c("Diamond Princess", "Grand Princess"))))
 ```
 
 This version was last updated using data downloaded on 
-2020-04-13.
+2020-04-14.
 
 
 Many of the high numbers are provinces in China, where spread is now

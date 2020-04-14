@@ -23,14 +23,14 @@ covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FA
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(dimnames(covid.cases), dimnames(covid.deaths)))
     stop("Cases and death data have different structure... check versions.")
-keep <- covid.deaths[[length(covid.deaths)]] > 50 # at least 50 deaths
+keep <- covid.deaths[[length(covid.deaths)]] > 100 # at least 100 deaths
 covid.cases <- covid.cases[keep, ]
 covid.deaths <- covid.deaths[keep, ]
 ```
 
 
 [This note was last updated using data downloaded on 
-2020-04-13. Here is the
+2020-04-14. Here is the
 [source](deaths.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -85,7 +85,7 @@ _recovered_ patients by date is available, but that is not enough).
 
 The plot below shows how the naive death rates (proportion of deaths
 over number of confirmed cases), on any given day, have changed over
-time for countries with at least 50 deaths.[^1] Although the estimate
+time for countries with at least 100 deaths.[^1] Although the estimate
 is eventually (asymptotically) supposed to stabilize (as the fraction
 of "active" cases decreases), this has clearly not happened yet for
 most countries.
@@ -401,8 +401,10 @@ of the smoothing):
 
 ```r
 fg2 <- 
-    xyplot(deaths ~ day | reorder(region, -total), data = subset(new.deaths.10, total < 2000),
-           xlab = "Days since number of deaths exceeded 10", pch = ".", cex = 3, ylim = c(1, NA),
+    xyplot(deaths ~ day | reorder(region, -total),
+           data = subset(new.deaths.10, total < 2000),
+           xlab = "Days since number of deaths exceeded 10",
+           pch = ".", cex = 3, ylim = c(1, NA),
            scales = list(alternating = 3, y = list(log = 10, equispaced.log = FALSE)),
            as.table = TRUE, between = list(x = 0.5, y = 0.5), layout = c(5, 5),
            type = "o")
