@@ -68,7 +68,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-04-14.
+2020-04-15.
 
 
 Many of the high numbers are provinces in China, where spread is now

@@ -23,7 +23,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-2020-04-14. Here is the
+2020-04-15. Here is the
 [source](us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -35,7 +35,7 @@ covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FA
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
 if (!identical(colnames(covid.cases), colnames(covid.deaths)))
 {
-    warning("Cases and death data have different columns... using common.")
+    warning("Cases and death data have different columns (dates)... using common ones.")
     common.colnames <- intersect(colnames(covid.deaths), colnames(covid.cases))
     covid.deaths <- covid.deaths[colnames(covid.deaths) %in% common.colnames]
     covid.cases <- covid.cases[colnames(covid.cases) %in% common.colnames]
@@ -43,7 +43,8 @@ if (!identical(colnames(covid.cases), colnames(covid.deaths)))
 ```
 
 ```
-Warning: Cases and death data have different columns... using common.
+Warning: Cases and death data have different columns (dates)... using
+common ones.
 ```
 
 ```r
@@ -243,5 +244,5 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)
+![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-4.png)
 
