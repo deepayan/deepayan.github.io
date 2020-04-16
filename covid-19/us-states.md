@@ -23,7 +23,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-2020-04-15. Here is the
+2020-04-16. Here is the
 [source](us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -43,8 +43,8 @@ if (!identical(colnames(covid.cases), colnames(covid.deaths)))
 ```
 
 ```
-Warning: Cases and death data have different columns (dates)... using
-common ones.
+Warning: Cases and death data have different columns (dates)... using common
+ones.
 ```
 
 ```r
