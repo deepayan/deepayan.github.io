@@ -207,7 +207,7 @@ D <- nrow(xcovid.deaths)
 total.deaths <- xcovid.deaths[D, , drop = TRUE]
 dt.deaths <- apply(xcovid.deaths, 2, tdouble)
 do.label.1 <- dt.deaths < 2 | dt.deaths > 11
-do.label.2 <- total.deaths > 1000
+do.label.2 <- (total.deaths > 1000) & !(do.label.1)
 xyplot(dt.deaths ~ total.deaths, pch = 16, grid = TRUE,
        ylab = "Doubling time in days", xlab = "Number of deaths",
        scales = list(alternating = 3, x = list(log = 10, equispaced.log = FALSE))) +
