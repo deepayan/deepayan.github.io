@@ -11,7 +11,7 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/covid19/', autodep = TRU
                comment = "", warning = TRUE, message = TRUE,
                knitr.table.format = "html",
 			   ## dev.args = list(pointsize = 12),
-               fig.width = 12, fig.height = 18, dpi = 120, fig.path='figures/doubling-')
+               fig.width = 12, fig.height = 9, dpi = 120, fig.path='figures/doubling-')
 library(lattice)
 library(RColorBrewer)
 library(latticeExtra)
@@ -21,7 +21,15 @@ ct$strip.background$col <- "grey90"
 ct$strip.border$col <- "grey50"
 ct$axis.line$col <- "grey50"
 lattice.options(default.theme = ct)
+knitr::render_markdown()
+source("covid-utils.R")
+source("knit-utils.R")
 ```
+
+
+
+
+
 
 
 Is "social distancing" working in your country? How is it doing
@@ -106,15 +114,6 @@ of the middle day is replaced by the geometric mean of its neighbours.
 
 
 ```{r, warning=FALSE}
-correctLag <- function(x)
-{
-    n <- length(x)
-    stopifnot(n > 2)
-    for (i in seq(2, n-1))
-        if (x[i] == x[i-1])
-            x[i] <- sqrt(x[i-1] * x[i+1])
-    x
-}
 extractCasesTS <- function(d)
 {
     x <- t(data.matrix(d[, -c(1:4)]))
@@ -144,7 +143,9 @@ total.row <- apply(xcovid.row, 2, tail, 1)
 total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
 total.row.2weekago <- apply(xcovid.row, 2, function(x) tail(x, 15)[1])
 torder <- tail(order(total.row), 60)
-dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total.row.2weekago[torder],
+dotplot(total.row[torder],
+        total.1 = total.row.1weekago[torder],
+        total.2 = total.row.2weekago[torder],
         xlab = "Total cases (NOTE: log scale)",
         xlim = c(10, NA),
         panel = function(x, y, ..., total.1, total.2, col) {
@@ -198,26 +199,6 @@ are not meaningless.
 
 
 
-```{r}
-tdouble <- function(n, x, min = 50)
-{
-    if (x[n] < min) return (NA_real_)
-    x <- head(x, n)
-    x <- c(0, x[x > 0])
-    i <- seq_along(x)
-    f <- approxfun(x, i)
-    diff(f(max(x) * c(0.5, 1)))
-}
-doubling.ts <- function(region, d, min = 50)
-{
-    t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(d))
-    td <- sapply(1:nrow(d), tdouble,
-                 x = d[, region, drop = TRUE], min = min)
-    data.frame(region = region, date = t, tdouble = td)
-}
-```
-
-
 ## The situation in China
 
 Let's do this first for the provinces of China that had at least 200
@@ -239,7 +220,7 @@ devolution <-
                                lapply(regions, doubling.ts,
                                       d = xcovid.china, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = '.', cex = 3, grid = TRUE,
        xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -265,18 +246,20 @@ long ago the number of cases first exceeded 50, and not by total
 cases.
 
 
-```{r, warning=FALSE}
+```{r dgt1000, warning=FALSE, pages="carousel"}
 regions <-  # at least 1000 cases
     names(which(apply(xcovid.row, 2, tail, 1) > 999))
 devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
        ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+       layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
+
+
 
 
 Many of these countries were not showing systematic increase in the
@@ -288,6 +271,7 @@ the then current rates as on March 21, for example,
 - Spain would have reached 50,000 cases by March 27
 
 - France would have reached 50,000 cases by March 31
+
 
 Germany has shown steady improvement since then (it actually reached
 50,000 cases on March 27). Spain did not improve immediately, and
@@ -309,7 +293,7 @@ Next, we look at countries where the count is at least 200 but less
 than 1000.
 
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, pages=TRUE}
 total.row <- apply(xcovid.row, 2, tail, 1)
 regions <-  # between 100 and 1000 cases
     names(which(total.row > 199 & total.row < 1000))
@@ -317,10 +301,10 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
        ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+       layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
 
@@ -337,7 +321,8 @@ A similar analysis can be done for death rates (code
 least 100 deaths. The following plot shows the current number of
 deaths and compares it with the number one week ago (on a log scale).
 
-![total deaths](figures/deaths-tdeath-1.png)
+
+<img src="figures/deaths-tdeath-1.png" alt="total deaths">
 
 
 The following plot gives the doubling time for deaths in these
@@ -346,6 +331,6 @@ in grey. Generally speaking, the doubling times are comparable within
 each country / region (possibly with a slight lag).
 
 
-![doubling time for deaths](figures/deaths-ddeath-1.png)
+<img src="figures/deaths-ddeath-1.png" alt="doubling time for deaths">
 
 

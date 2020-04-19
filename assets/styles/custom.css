@@ -37,4 +37,9 @@ h1, h2, h3
 h3 { font-style: italic; }
 
 
+.carousel-control-next-icon, .carousel-control-prev-icon
+{
+    color: black;
+    background-image: none;
+}
 

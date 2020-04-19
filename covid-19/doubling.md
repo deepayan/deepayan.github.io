@@ -9,6 +9,11 @@ author: Deepayan Sarkar
 
 
 
+
+
+
+
+
 Is "social distancing" working in your country? How is it doing
 compared to other countries? How long will it take for the number of
 cases to reach 50,000? Or 100,000? Or a million?
@@ -68,7 +73,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-04-15.
+2020-04-19.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -94,15 +99,6 @@ of the middle day is replaced by the geometric mean of its neighbours.
 
 
 ```r
-correctLag <- function(x)
-{
-    n <- length(x)
-    stopifnot(n > 2)
-    for (i in seq(2, n-1))
-        if (x[i] == x[i-1])
-            x[i] <- sqrt(x[i-1] * x[i+1])
-    x
-}
 extractCasesTS <- function(d)
 {
     x <- t(data.matrix(d[, -c(1:4)]))
@@ -133,7 +129,9 @@ total.row <- apply(xcovid.row, 2, tail, 1)
 total.row.1weekago <- apply(xcovid.row, 2, function(x) tail(x, 8)[1])
 total.row.2weekago <- apply(xcovid.row, 2, function(x) tail(x, 15)[1])
 torder <- tail(order(total.row), 60)
-dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total.row.2weekago[torder],
+dotplot(total.row[torder],
+        total.1 = total.row.1weekago[torder],
+        total.2 = total.row.2weekago[torder],
         xlab = "Total cases (NOTE: log scale)",
         xlim = c(10, NA),
         panel = function(x, y, ..., total.1, total.2, col) {
@@ -147,7 +145,7 @@ dotplot(total.row[torder], total.1 = total.row.1weekago[torder], total.2 = total
         scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/doubling-unnamed-chunk-4-1.png)
+<img src='figures/doubling-unnamed-chunk-4-1.png'>
 
 
 The latest numbers don't tell the whole story however, even combined
@@ -189,27 +187,6 @@ are not meaningless.
 
 
 
-
-```r
-tdouble <- function(n, x, min = 50)
-{
-    if (x[n] < min) return (NA_real_)
-    x <- head(x, n)
-    x <- c(0, x[x > 0])
-    i <- seq_along(x)
-    f <- approxfun(x, i)
-    diff(f(max(x) * c(0.5, 1)))
-}
-doubling.ts <- function(region, d, min = 50)
-{
-    t <- seq(as.Date("2020-01-22"), by = 1, length.out = nrow(d))
-    td <- sapply(1:nrow(d), tdouble,
-                 x = d[, region, drop = TRUE], min = min)
-    data.frame(region = region, date = t, tdouble = td)
-}
-```
-
-
 ## The situation in China
 
 Let's do this first for the provinces of China that had at least 200
@@ -232,7 +209,7 @@ devolution <-
                                lapply(regions, doubling.ts,
                                       d = xcovid.china, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = '.', cex = 3, grid = TRUE,
        xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        as.table = TRUE, between = list(x = 0.5, y = 0.5),
@@ -240,7 +217,7 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
                      col = "grey50", lwd = 2, lty = 3))
 ```
 
-![plot of chunk unnamed-chunk-6](figures/doubling-unnamed-chunk-6-1.png)
+<img src='figures/doubling-unnamed-chunk-5-1.png'>
 
 
 As of March 22, the doubling time in Hong Kong had stabilized (at
@@ -268,13 +245,33 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
        ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+       layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
-![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-3.png)![plot of chunk unnamed-chunk-7](figures/doubling-unnamed-chunk-7-4.png)
+<div id='dgt1000' class='carousel slide carousel-fade' data-ride='carousel' data-interval='2000' data-pause='hover'>
+<div class='carousel-inner'>
+<div class='carousel-item active'><img class='d-block w-100' src='figures/doubling-dgt1000-1.png' alt='Slide 1'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-2.png' alt='Slide 2'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-3.png' alt='Slide 3'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-4.png' alt='Slide 4'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-5.png' alt='Slide 5'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-6.png' alt='Slide 6'></div>
+</div>
+
+<a class='carousel-control-prev' href='#dgt1000' role='button' data-slide='prev'>
+<span class='carousel-control-prev-icon' aria-hidden='true'>&lt;&lt;</span>
+<span class='sr-only'>Previous</span>
+</a>
+<a class='carousel-control-next' href='#dgt1000' role='button' data-slide='next'>
+<span class='carousel-control-next-icon' aria-hidden='true'>&gt;&gt;</span>
+<span class='sr-only'>Next</span>
+</a>
+</div>
+
+
 
 
 Many of these countries were not showing systematic increase in the
@@ -286,6 +283,7 @@ the then current rates as on March 21, for example,
 - Spain would have reached 50,000 cases by March 27
 
 - France would have reached 50,000 cases by March 31
+
 
 Germany has shown steady improvement since then (it actually reached
 50,000 cases on March 27). Spain did not improve immediately, and
@@ -316,13 +314,24 @@ devolution <-
     droplevels(na.omit(do.call(rbind, lapply(regions, doubling.ts,
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
-       data = devolution, type = "o", pch = 16, grid = TRUE,
+       data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
        ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
-       layout = c(0, 24), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+       layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
 
-![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-1.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-2.png)![plot of chunk unnamed-chunk-8](figures/doubling-unnamed-chunk-8-3.png)
+<div class='mx-auto'>
+<nav>
+<ul class='pagination'>
+<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-1.png"' >1</a></li>
+<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-2.png"' >2</a></li>
+<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-3.png"' >3</a></li>
+<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-4.png"' >4</a></li>
+</ul>
+</nav>
+
+<img id='unnamed-chunk-6' src='figures/doubling-unnamed-chunk-6-1.png'>
+</div></n>
 
 
 It is too early to say how things will go for these countries, as the
@@ -338,7 +347,8 @@ A similar analysis can be done for death rates (code
 least 100 deaths. The following plot shows the current number of
 deaths and compares it with the number one week ago (on a log scale).
 
-![total deaths](figures/deaths-tdeath-1.png)
+
+<img src="figures/deaths-tdeath-1.png" alt="total deaths">
 
 
 The following plot gives the doubling time for deaths in these
@@ -347,6 +357,6 @@ in grey. Generally speaking, the doubling times are comparable within
 each country / region (possibly with a slight lag).
 
 
-![doubling time for deaths](figures/deaths-ddeath-1.png)
+<img src="figures/deaths-ddeath-1.png" alt="doubling time for deaths">
 
 

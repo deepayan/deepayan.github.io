@@ -4,7 +4,11 @@
       integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
       crossorigin="anonymous">
 
-<style>
+<link rel="stylesheet"
+      href="../assets/styles/custom.css">
+
+
+<!-- style>
   h1.title { text-align: center; }
   p.author { text-align: center; }
   img { display: block; margin-left: auto; margin-right: auto; width: 100%; }
@@ -24,4 +28,4 @@
       font-weight: bold;
       font-size: 110%;
   }
-</style>
+</style -->
