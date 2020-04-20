@@ -33,8 +33,9 @@ aria-expanded="true">here</a> to show / hide the R code used. ]
 ```r
 covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FALSE)
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
-if (!identical(setdiff(colnames(covid.deaths), colnames(covid.cases)), "Population") ||
-    !identical(setdiff(colnames(covid.cases), colnames(covid.deaths)), character(0)))
+## covid.deaths has an extra column called Population, which we drop for now
+covid.deaths$Population <- NULL
+if (!identical(colnames(covid.deaths), colnames(covid.cases)))
 {
     warning("Cases and death data have different columns (dates)... using common ones.")
     common.colnames <- intersect(colnames(covid.deaths), colnames(covid.cases))
@@ -139,9 +140,7 @@ dotplot(reorder(state.names, sdt.cases - sdt.deaths) ~ sdt.deaths + sdt.cases,
         auto.key = list(space = "right", text = c("Deaths", "Cases")))
 ```
 
-```
-Error in compute.packet(cond, cond.current.level): any(id) is not TRUE
-```
+![plot of chunk unnamed-chunk-6](figures/us-unnamed-chunk-6-1.png)
 
 The following plots show how the number of deaths have grown in these
 states since the count first exceeded 50, compared to the other
