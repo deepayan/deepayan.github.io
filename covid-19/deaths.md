@@ -56,7 +56,7 @@ crude (marginal) country-specific mortality rate is rather difficult
 to estimate.
 
 
-## The problem with the naive death rate estimate
+# The problem with the naive death rate estimate
 
 The main difficulty is in knowing the size of the vulnerable
 population. Although it is possible that deaths due to COVID-19 are
@@ -151,7 +151,7 @@ xat <- pretty(start.date + c(0, D-1))
 ![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-1.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-2.png)
 
 
-## The lag-adjusted death rate
+# The lag-adjusted death rate
 
 A very simple alternative is to assume that the correct denominator
 for the proportion of deaths of not the _current_ number of cases, but
@@ -278,7 +278,7 @@ represents the corresponding doubling time of the number of cases.
 
 
 
-## How fast are deaths increasing?
+# How fast are deaths increasing?
 
 The number of deaths is a better measure of how serious the COVID-19
 epidemic is in a country, compared to the number of detected cases,
@@ -334,7 +334,7 @@ fg + as.layer(bg, under = TRUE)
 ![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-2.png)
 
 
-## Which countries have reached their peak?
+# Which countries have reached their peak?
 
 Another important landmark for any country is when it has passed its
 peak, that is, the daily number of new deaths (or cases) has started

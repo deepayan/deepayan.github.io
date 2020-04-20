@@ -154,7 +154,7 @@ with(pred.current,
 
 <!--  
 
-## Prediction using doubling time
+# Prediction using doubling time
 
 [TODO]
 

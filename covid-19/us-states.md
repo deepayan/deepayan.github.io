@@ -81,7 +81,7 @@ tdouble <- function(x)
 }
 ```
 
-## By state
+# By state
 
 
 
@@ -182,7 +182,7 @@ fg + as.layer(bg, under = TRUE)
 
 
 
-## By county or other administrative region
+# By county or other administrative region
 
 Most cases are concentrated in some specific counties. The following
 plot gives the current doubling time of deaths, compared to total

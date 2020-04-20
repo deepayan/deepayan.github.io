@@ -42,7 +42,7 @@ to experiment with it. The analysis is done using R, click
 <a href="#" data-toggle="collapse" data-target="div.sourceCode"
    aria-expanded="true">here</a> to show / hide the R code.
 
-## Executive summary
+# Executive summary
 
 In most countries, the number of cases are doubling every 3 to 5
 days. This means that if you have, say, 1000 cases today, you will
@@ -55,7 +55,7 @@ and
 [here](https://medium.com/@tomaspueyo/coronavirus-the-hammer-and-the-dance-be9337092b56).
 
 
-## Preparatory steps
+# Preparatory steps
 
 First, we download the data and read it in.
 
@@ -157,7 +157,7 @@ countries / regions are taking. How can we compare countries at
 various stages of spread in terms of something that is actually
 comparable?
 
-## The doubling time
+# The doubling time
 
 It is not unreasonable to assume that without any preventive measures,
 the number of infections will grow exponentially in the early phases,
@@ -187,7 +187,7 @@ are not meaningless.
 
 
 
-## The situation in China
+# The situation in China
 
 Let's do this first for the provinces of China that had at least 200
 cases, and plot the evolution of doubling time over time. Instead of
@@ -227,9 +227,9 @@ happening in Singapore and Taiwan.
 
 
 
-## The situation elsewhere
+# The situation elsewhere
 
-### Countries with already widespread infections
+## Countries with already widespread infections
 
 Next, let's look at similar plots for other countries where the count
 is at least 1000. Again, the countries / regions are sorted by how
@@ -299,7 +299,7 @@ The countries that seem to be doing well are Denmark, Sweden, and
 Norway, and to a lesser extent Iran and even Italy.
 
 
-### Countries with less widespread infections
+## Countries with less widespread infections
 
 Next, we look at countries where the count is at least 200 but less
 than 1000.
@@ -339,7 +339,7 @@ couple of weeks.
 
 
 
-## The doubling time of death rates
+# The doubling time of death rates
 
 A similar analysis can be done for death rates (code
 [here](deaths.rmd)). We only consider countries / regions with at
