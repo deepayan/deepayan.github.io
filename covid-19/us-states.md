@@ -23,7 +23,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-2020-04-19. Here is the
+2020-04-20. Here is the
 [source](us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -33,21 +33,14 @@ aria-expanded="true">here</a> to show / hide the R code used. ]
 ```r
 covid.cases <- read.csv(TARGET.cases, check.names = FALSE, stringsAsFactors = FALSE)
 covid.deaths <- read.csv(TARGET.deaths, check.names = FALSE, stringsAsFactors = FALSE)
-if (!identical(colnames(covid.cases), colnames(covid.deaths)))
+if (!identical(setdiff(colnames(covid.deaths), colnames(covid.cases)), "Population") ||
+    !identical(setdiff(colnames(covid.cases), colnames(covid.deaths)), character(0)))
 {
     warning("Cases and death data have different columns (dates)... using common ones.")
     common.colnames <- intersect(colnames(covid.deaths), colnames(covid.cases))
     covid.deaths <- covid.deaths[colnames(covid.deaths) %in% common.colnames]
     covid.cases <- covid.cases[colnames(covid.cases) %in% common.colnames]
 }
-```
-
-```
-Warning: Cases and death data have different columns (dates)... using
-common ones.
-```
-
-```r
 if (!identical(rownames(covid.cases), rownames(covid.deaths)))
 {
     stop("Cases and death data have different rows... check versions.")
@@ -146,7 +139,9 @@ dotplot(reorder(state.names, sdt.cases - sdt.deaths) ~ sdt.deaths + sdt.cases,
         auto.key = list(space = "right", text = c("Deaths", "Cases")))
 ```
 
-![plot of chunk unnamed-chunk-6](figures/us-unnamed-chunk-6-1.png)
+```
+Error in compute.packet(cond, cond.current.level): any(id) is not TRUE
+```
 
 The following plots show how the number of deaths have grown in these
 states since the count first exceeded 50, compared to the other

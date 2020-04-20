@@ -13,7 +13,7 @@ pandemic:
 
 - [Very naive short-term prediction](covid-19/prediction.html)
 
-- [Some Analysis is US Data](covid-19/us-states.html)
+- [Some Analysis of US Data](covid-19/us-states.html)
 
 - [Optimality in Pooled Testing](covid-19/pooled-testing.html)
 
