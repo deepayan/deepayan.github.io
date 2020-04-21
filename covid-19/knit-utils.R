@@ -39,7 +39,7 @@ makeHooks <- function()
                            if (fcur == fnum)
                            {
                                ans <- c(ans, "</ul>\n</nav>\n")
-                               ans <- c(ans, sprintf("\n<img id='%s' src='%s'>\n</div></n>",
+                               ans <- c(ans, sprintf("\n<img id='%s' src='%s'>\n</div>\n",
                                                      id, shared.env$initial.image))
                                shared.env$initial.image <<- NULL
                            }
