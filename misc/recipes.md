@@ -109,6 +109,35 @@ breaking too early.
 
 
 
+
+# Fried Rice
+
+Start with cooked rice that is non-sticky. Preferably long-grained
+(e.g., basmati), add a little oil while cooking, and drain the
+starch. Don't overcook.
+
+Heat olive / sesame oil on high flame. 
+
+Add the following, keeping flame high, and basically stirring continuously:
+
+- chopped garlic (20--30 seconds)
+
+- optional: mace and star anise
+
+- chopped vegetables, e.g., carrot, peas, beans, capsicum (2 minutes)
+
+- 2 eggs whisked (scramble and mix with vegetables)
+
+- vinegar, salt, optionally soya sauce, etc.
+
+- cooked rice
+
+- pepper powder
+
+Mix well, but not for too long (~2 minutes), as otherwise rice will
+become dry.
+
+
 # Chicken stew
 
 Source: [genius kitchen](http://www.geniuskitchen.com/recipe/chicken-stew-22127)
