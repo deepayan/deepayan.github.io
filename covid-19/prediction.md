@@ -9,10 +9,13 @@ author: Deepayan Sarkar
 
 
 
+```
+Error in if (x[i] == x[i - 1]) x[i] <- sqrt(x[i - 1] * x[i + 1]): missing value where TRUE/FALSE needed
+```
 
 
 [This note was last updated using data downloaded on 
-2020-04-21. Here is the
+2020-04-25. Here is the
 [source](prediction.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -35,9 +38,37 @@ growth.
 
 ```r
 total.row <- apply(xcovid.row, 2, tail, 1)
+```
+
+```
+Error in apply(xcovid.row, 2, tail, 1): object 'xcovid.row' not found
+```
+
+```r
 total.row.1 <- apply(xcovid.row, 2, function(x) tail(x, 5)[1])
+```
+
+```
+Error in apply(xcovid.row, 2, function(x) tail(x, 5)[1]): object 'xcovid.row' not found
+```
+
+```r
 total.row.2 <- apply(xcovid.row, 2, function(x) tail(x, 9)[1])
+```
+
+```
+Error in apply(xcovid.row, 2, function(x) tail(x, 9)[1]): object 'xcovid.row' not found
+```
+
+```r
 torder <- tail(order(total.row), 60)
+```
+
+```
+Error in order(total.row): object 'total.row' not found
+```
+
+```r
 dotplot(total.row[torder], total.1 = total.row.1[torder], total.2 = total.row.2[torder],
         xlab = "Total cases (NOTE: log scale)",
         xlim = c(100, NA),
@@ -52,7 +83,9 @@ dotplot(total.row[torder], total.1 = total.row.1[torder], total.2 = total.row.2[
         scales = list(x = list(alternating = 3, log = 10, equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-2](figures/prediction-unnamed-chunk-2-1.svg)
+```
+Error in dotplot(total.row[torder], total.1 = total.row.1[torder], total.2 = total.row.2[torder], : object 'total.row' not found
+```
 
 We can use this for a crude prediction of the number of cases 4 days
 further on, by assuming that on the log scale, the "increase" changes
@@ -111,23 +144,53 @@ are low (not surprisingly), but generally reasonable.
 
 ```r
 torder <- tail(order(total.row), 30)
+```
+
+```
+Error in order(total.row): object 'total.row' not found
+```
+
+```r
 pred.past <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = TRUE)
+```
+
+```
+Error in head(x, -days): object 'xcovid.row' not found
+```
+
+```r
 dotplot(reorder(region, total0) ~ predicted + observed, data = pred.past,
         xlab = "Predicted current number of cases based on data four days ago",
         par.settings = simpleTheme(pch = 16, col = c(1, 2)), auto.key = list(columns = 2),
         scales = list(x = list(alternating = 3, log = TRUE, equispaced.log = FALSE)))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/prediction-unnamed-chunk-4-1.svg)
+```
+Error in dotplot.formula(reorder(region, total0) ~ predicted + observed, : object 'pred.past' not found
+```
 
 Here are the predictions 4 days into the future (
-2020-04-25
+2020-04-29
 ) using current data.
 
 
 ```r
 torder <- tail(order(total.row), 60)
+```
+
+```
+Error in order(total.row): object 'total.row' not found
+```
+
+```r
 pred.current <- predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = FALSE)
+```
+
+```
+Error in predictCases(xcovid.row[, torder, drop = FALSE], days = 4, go.back = FALSE): object 'xcovid.row' not found
+```
+
+```r
 plot.col <- trellis.par.get("plot.symbol")$col
 with(pred.current,
      dotplot(reorder(region, predicted) ~ total0,
@@ -148,7 +211,9 @@ with(pred.current,
              scales = list(x = list(log = 10, equispaced.log = FALSE))))
 ```
 
-![plot of chunk unnamed-chunk-5](figures/prediction-unnamed-chunk-5-1.svg)
+```
+Error in with(pred.current, dotplot(reorder(region, predicted) ~ total0, : object 'pred.current' not found
+```
 
 
 
@@ -298,12 +363,40 @@ my.panel <- function(x, y, ..., new.days, cumulative)
 
 ```r
 N <- nrow(xcovid.row)
+```
+
+```
+Error in nrow(xcovid.row): object 'xcovid.row' not found
+```
+
+```r
 regions <- # at least 1000 cases
     names(which(sort(xcovid.row[N, ], decreasing=TRUE) > 9999))
+```
+
+```
+Error in sort(xcovid.row[N, ], decreasing = TRUE): object 'xcovid.row' not found
+```
+
+```r
 t <- seq(as.Date("2020-01-22"), by = 1, length.out = N)
+```
+
+```
+Error in seq.Date(as.Date("2020-01-22"), by = 1, length.out = N): object 'N' not found
+```
+
+```r
 d.regions <- data.frame(time = t,
                         cases = as.vector(xcovid.row[, regions]),
                         region = gl(length(regions), N, labels = regions))
+```
+
+```
+Error in as.vector(xcovid.row[, regions]): object 'xcovid.row' not found
+```
+
+```r
 xyplot(cases ~ time | region, data = d.regions, 
        new.days = 10, cumulative = TRUE, as.table = TRUE,
        drop.days = DAYS.USED, pred.days = DAYS.USED,
@@ -311,7 +404,9 @@ xyplot(cases ~ time | region, data = d.regions,
        prepanel = my.prepanel, panel = my.panel)
 ```
 
-![plot of chunk unnamed-chunk-9](figures/prediction-unnamed-chunk-9-1.svg)
+```
+Error in eval(substitute(groups), data, environment(x)): object 'd.regions' not found
+```
 
 
 
