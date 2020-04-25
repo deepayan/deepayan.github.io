@@ -87,7 +87,7 @@ breaking too early.
 	- whatever else you wish: sausage / chicken bits / ...
 
 
-## Stir-fried Green Beans
+# Stir-fried Green Beans
 
 - Trim end of green beans (around 300-400 gms)
 
