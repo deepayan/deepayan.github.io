@@ -24,11 +24,14 @@ Source: Aloka Sarkar
 - Deep fry
 
 
-
 # মুসুর ডাল / মুগ ডাল
 
 - Moong Dal - dry roast in pan under medium heat (be careful not to
   burn). Maybe a little for Masoor Dal as well (doesn't seem to harm).
+  
+- Optional: Fresh কাঁচা আম cut through the seed (কুষি), remove the seed
+  (but not the layer around it) boil along with dal. Usually done with
+  musur dal only. Needs sugar in the last step.
   
 - Add water and salt and boil till done, try to mash a bit. Keep aside
   (or start next steps when almost done, a little extra boiling is
