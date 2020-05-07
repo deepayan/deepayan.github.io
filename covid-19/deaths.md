@@ -30,10 +30,12 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-05-06. Here is the
-[source](deaths.rmd) of this analysis. Click <a href="#"
-data-toggle="collapse" data-target="div.sourceCode"
-aria-expanded="true">here</a> to show / hide the R code used. ]
+2020-05-07. Here is the
+[source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/deaths.rmd)
+of this analysis. Click 
+<a href="#" data-toggle="collapse" 
+   data-target="div.sourceCode" aria-expanded="true">here</a> to show /
+hide the R code used. ]
 
 
 

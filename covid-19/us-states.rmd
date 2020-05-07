@@ -39,7 +39,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 [This note was last updated using data downloaded on 
 `r {as.Date(file.mtime(TARGET.deaths))}`. Here is the
-[source](us-states.rmd) of this analysis. Click <a href="#"
+[source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
 

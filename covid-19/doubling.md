@@ -37,10 +37,12 @@ not matter as long as the _proportion_ of true cases being detected
 remains more or less stable (even this proportion may change as the
 testing poicy is refined).
 
-Here is the [source](doubling.rmd) of this analysis, in case you want
-to experiment with it. The analysis is done using R, click 
-<a href="#" data-toggle="collapse" data-target="div.sourceCode"
-   aria-expanded="true">here</a> to show / hide the R code.
+Here is the
+[source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/doubling.rmd)
+of this analysis, in case you want to experiment with it. The analysis
+is done using R, click <a href="#" data-toggle="collapse"
+data-target="div.sourceCode" aria-expanded="true">here</a> to show /
+hide the R code.
 
 # Executive summary
 
@@ -73,7 +75,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-05-06.
+2020-05-07.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -343,9 +345,10 @@ couple of weeks.
 # The doubling time of death rates
 
 A similar analysis can be done for death rates (code
-[here](deaths.rmd)). We only consider countries / regions with at
-least 100 deaths. The following plot shows the current number of
-deaths and compares it with the number one week ago (on a log scale).
+[here](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/deaths.rmd)).
+We only consider countries / regions with at least 100 deaths. The
+following plot shows the current number of deaths and compares it with
+the number one week ago (on a log scale).
 
 
 <img src="figures/deaths-tdeath-1.png" alt="total deaths">

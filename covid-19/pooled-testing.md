@@ -8,7 +8,7 @@ mathjax: true
 
 
 
-[Here is the [source](pooled-testing.rmd) of this document. Click <a
+[Here is the [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/pooled-testing.rmd) of this document. Click <a
 href="#" data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
 
