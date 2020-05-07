@@ -13,6 +13,14 @@ Useful resources for making pages using jekyll:
 - Github-flavoured markdown: <https://github.github.com/gfm/> - see about tagfilter
 
 
+
+NOTE: Linking to R Markdown files is basically impossible, because
+Jekyll will insist on processing anything that has a YAML header (they
+can be completely excluded from the site, but not left alone
+as-it-is). So, link explicitly to the repository links on Github.
+
+
+
 Using math: This is a bit irritating because for some reason,
 
 - Github does not allow disabling of math processing in kramdown (some
