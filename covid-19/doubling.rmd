@@ -335,5 +335,7 @@ each country / region (possibly with a slight lag).
 
 
 <img src="figures/deaths-ddeath-1.png" alt="doubling time for deaths">
+<img src="figures/deaths-ddeath-2.png" alt="doubling time for deaths">
+<img src="figures/deaths-ddeath-3.png" alt="doubling time for deaths">
 
 

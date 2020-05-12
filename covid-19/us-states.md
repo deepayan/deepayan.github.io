@@ -23,7 +23,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-2020-05-07. Here is the
+2020-05-12. Here is the
 [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -238,5 +238,5 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-4.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-5.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-6.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-7.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-8.png)
+![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-4.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-5.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-6.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-7.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-8.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-9.png)
 

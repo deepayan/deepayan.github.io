@@ -30,7 +30,7 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-05-07. Here is the
+2020-05-12. Here is the
 [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/deaths.rmd)
 of this analysis. Click 
 <a href="#" data-toggle="collapse" 
@@ -390,10 +390,8 @@ fg1 + as.layer(bg, under = TRUE)
 
 ![plot of chunk unnamed-chunk-9](figures/deaths-unnamed-chunk-9-1.png)
 
-Iran is a bit weird, holding steady, but otherwise Spain and Italy
-appear to have just passed their peaks, France, Netherlands, and
-Germany are approaching theirs. The US, UK and Belgium are still on
-upward trajectories.
+As of May 12, most of these countries appear to have passed their
+peaks, except Mexico and Brazil.
 
 
 Compare these with other countries (But beware of potential artifacts
