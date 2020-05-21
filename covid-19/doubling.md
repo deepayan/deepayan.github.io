@@ -75,7 +75,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-05-07.
+2020-05-18.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -261,6 +261,7 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-4.png' alt='Slide 4'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-5.png' alt='Slide 5'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-6.png' alt='Slide 6'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-7.png' alt='Slide 7'></div>
 </div>
 
 <a class='carousel-control-prev' href='#dgt1000' role='button' data-slide='prev'>
@@ -361,5 +362,7 @@ each country / region (possibly with a slight lag).
 
 
 <img src="figures/deaths-ddeath-1.png" alt="doubling time for deaths">
+<img src="figures/deaths-ddeath-2.png" alt="doubling time for deaths">
+<img src="figures/deaths-ddeath-3.png" alt="doubling time for deaths">
 
 
