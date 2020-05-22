@@ -30,7 +30,7 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-05-18. Here is the
+2020-05-22. Here is the
 [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/deaths.rmd)
 of this analysis. Click 
 <a href="#" data-toggle="collapse" 
