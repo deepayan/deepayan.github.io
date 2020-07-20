@@ -11,7 +11,8 @@ author: Deepayan Sarkar
 
 
 
-
+[NOTE: The commentary in this document is now severely outdated, even
+though I still try to update the results once every few days.]
 
 
 Is "social distancing" working in your country? How is it doing
@@ -75,7 +76,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-06-30.
+2020-07-20.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -248,7 +249,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
-       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(0, 30), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -264,6 +265,7 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-7.png' alt='Slide 7'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-8.png' alt='Slide 8'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-9.png' alt='Slide 9'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-10.png' alt='Slide 10'></div>
 </div>
 
 <a class='carousel-control-prev' href='#dgt1000' role='button' data-slide='prev'>
@@ -275,7 +277,6 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <span class='sr-only'>Next</span>
 </a>
 </div>
-
 
 
 
@@ -320,7 +321,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
-       ylim = c(NA, 20), xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(0, 30), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -330,7 +331,6 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <ul class='pagination'>
 <li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-1.png"' >1</a></li>
 <li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-2.png"' >2</a></li>
-<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-3.png"' >3</a></li>
 </ul>
 </nav>
 
