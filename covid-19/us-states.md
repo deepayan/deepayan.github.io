@@ -7,6 +7,9 @@ author: Deepayan Sarkar
 
 
 
+```
+## Error in library(latticeExtra): there is no package called 'latticeExtra'
+```
 
 
 ```r
@@ -23,7 +26,7 @@ for (target in c(TARGET.cases, TARGET.deaths))
 
 
 [This note was last updated using data downloaded on 
-2020-08-02. Here is the
+2020-08-25. Here is the
 [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/us-states.rmd) of this analysis. Click <a href="#"
 data-toggle="collapse" data-target="div.sourceCode"
 aria-expanded="true">here</a> to show / hide the R code used. ]
@@ -177,7 +180,9 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/us-unnamed-chunk-7-3.png)
+```
+Error in as.layer(bg, under = TRUE): could not find function "as.layer"
+```
 
 
 
@@ -213,7 +218,9 @@ xyplot(dt.deaths ~ total.deaths, pch = 16, grid = TRUE,
                      pos = 2, col = "grey30"))
 ```
 
-![plot of chunk unnamed-chunk-8](figures/us-unnamed-chunk-8-1.png)
+```
+Error in layer(panel.text(x[do.label.1], y[do.label.1], labels = names(total.deaths)[do.label.1], : could not find function "layer"
+```
 
 
 The following plots show how the number of deaths have grown in these
@@ -238,5 +245,7 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-1.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-2.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-3.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-4.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-5.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-6.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-7.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-8.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-9.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-10.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-11.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-12.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-13.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-14.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-15.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-16.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-17.png)![plot of chunk unnamed-chunk-9](figures/us-unnamed-chunk-9-18.png)
+```
+Error in as.layer(bg, under = TRUE): could not find function "as.layer"
+```
 

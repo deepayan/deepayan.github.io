@@ -7,6 +7,29 @@ author: Deepayan Sarkar
 
 
 
+```
+## Error in library(latticeExtra): there is no package called 'latticeExtra'
+```
+
+```
+## Error in custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, : could not find function "custom.theme"
+```
+
+```
+## Error in ct$strip.background$col <- "grey90": object 'ct' not found
+```
+
+```
+## Error in ct$strip.border$col <- "grey50": object 'ct' not found
+```
+
+```
+## Error in ct$axis.line$col <- "grey50": object 'ct' not found
+```
+
+```
+## Error in lattice.options(default.theme = ct): object 'ct' not found
+```
 
 
 
@@ -76,7 +99,7 @@ covid <- subset(covid, ((`Country/Region` != "Diamond Princess") &
 ```
 
 This version was last updated using data downloaded on 
-2020-08-02.
+2020-08-25.
 
 
 Many of the high numbers are provinces in China, where spread is now
@@ -266,6 +289,7 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-8.png' alt='Slide 8'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-9.png' alt='Slide 9'></div>
 <div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-10.png' alt='Slide 10'></div>
+<div class='carousel-item '><img class='d-block w-100' src='figures/doubling-dgt1000-11.png' alt='Slide 11'></div>
 </div>
 
 <a class='carousel-control-prev' href='#dgt1000' role='button' data-slide='prev'>
@@ -331,7 +355,6 @@ xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
 <ul class='pagination'>
 <li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-1.png"' >1</a></li>
 <li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-2.png"' >2</a></li>
-<li class='page-item'><a class='page-link' onclick='document.getElementById("unnamed-chunk-6").src="figures/doubling-unnamed-chunk-6-3.png"' >3</a></li>
 </ul>
 </nav>
 
