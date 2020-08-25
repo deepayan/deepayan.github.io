@@ -7,29 +7,6 @@ author: Deepayan Sarkar
 
 
 
-```
-## Error in library(latticeExtra): there is no package called 'latticeExtra'
-```
-
-```
-## Error in custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, : could not find function "custom.theme"
-```
-
-```
-## Error in ct$strip.background$col <- "grey90": object 'ct' not found
-```
-
-```
-## Error in ct$strip.border$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in ct$axis.line$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in lattice.options(default.theme = ct): object 'ct' not found
-```
 
 
 ```r
@@ -208,21 +185,12 @@ dr.adjusted <-
             col = ct$superpose.symbol$col[2],
             as.table = TRUE, between = list(x = 0.5, y = 0.5),
             ylim = c(0, 30))
-```
-
-```
-Error in lapply(X = X, FUN = FUN, ...): object 'ct' not found
-```
-
-```r
 update(dr.naive + dr.adjusted, ylim = c(0, 30),
        auto.key = list(lines = TRUE, points = FALSE, columns = 2, type = "o",
                        text = c("Naive estimate", "One week lag-adjusted estimate")))
 ```
 
-```
-Error in update(dr.naive + dr.adjusted, ylim = c(0, 30), auto.key = list(lines = TRUE, : object 'dr.adjusted' not found
-```
+![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-1.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-2.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-3.png)
 
 The adjusted death rates have less systematic trends than the naive
 estimate, but clearly there is still a lot of instability.
@@ -325,9 +293,6 @@ represents the corresponding doubling time of the number of cases.
 
 
 
-```
-Error in p.deaths + p.cases: non-numeric argument to binary operator
-```
 
 
 
@@ -364,9 +329,7 @@ xyplot(deaths ~ day, data = subset(deaths.10, total >= 2000), grid = TRUE,
     glayer_(panel.glabel(x, y, group.value = group.value, ...))
 ```
 
-```
-Error in glayer_(panel.glabel(x, y, group.value = group.value, ...)): could not find function "glayer_"
-```
+![plot of chunk unnamed-chunk-6](figures/deaths-unnamed-chunk-6-1.png)
 
 
 Compare these with other countries:
@@ -386,9 +349,7 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-```
-Error in as.layer(bg, under = TRUE): could not find function "as.layer"
-```
+![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-3.png)
 
 
 # Which countries have reached their peak?
@@ -424,9 +385,7 @@ xyplot(deaths ~ day, data = subset(new.deaths.10, total >= 2000), grid = TRUE,
     glayer_(panel.glabel(x, y, group.value = group.value, ...))
 ```
 
-```
-Error in glayer_(panel.glabel(x, y, group.value = group.value, ...)): could not find function "glayer_"
-```
+![plot of chunk unnamed-chunk-8](figures/deaths-unnamed-chunk-8-1.png)
 
 
 There's a lot of overlap, so let's look at these countries separately:
@@ -445,9 +404,7 @@ fg1 <-
 fg1 + as.layer(bg, under = TRUE)
 ```
 
-```
-Error in as.layer(bg, under = TRUE): could not find function "as.layer"
-```
+![plot of chunk unnamed-chunk-9](figures/deaths-unnamed-chunk-9-1.png)
 
 As of May 12, most of these countries appear to have passed their
 peaks, except Mexico and Brazil.
@@ -470,8 +427,6 @@ fg2 <-
 fg2 + as.layer(bg, under = TRUE)
 ```
 
-```
-Error in as.layer(bg, under = TRUE): could not find function "as.layer"
-```
+![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-1.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-2.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-3.png)
 
 

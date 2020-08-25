@@ -7,29 +7,6 @@ author: Deepayan Sarkar
 
 
 
-```
-## Error in library(latticeExtra): there is no package called 'latticeExtra'
-```
-
-```
-## Error in custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, : could not find function "custom.theme"
-```
-
-```
-## Error in ct$strip.background$col <- "grey90": object 'ct' not found
-```
-
-```
-## Error in ct$strip.border$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in ct$axis.line$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in lattice.options(default.theme = ct): object 'ct' not found
-```
 
 
 

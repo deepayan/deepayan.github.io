@@ -6,29 +6,6 @@ mathjax: true
 
 
 
-```
-## Error in library(latticeExtra): there is no package called 'latticeExtra'
-```
-
-```
-## Error in custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, : could not find function "custom.theme"
-```
-
-```
-## Error in ct$strip.background$col <- "grey90": object 'ct' not found
-```
-
-```
-## Error in ct$strip.border$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in ct$axis.line$col <- "grey50": object 'ct' not found
-```
-
-```
-## Error in lattice.options(default.theme = ct): object 'ct' not found
-```
 
 
 [Here is the [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/pooled-testing.rmd) of this document. Click <a
@@ -149,9 +126,7 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
     layer_(panel.curve((1 - (1-P)^x) * (1-P)^(2-x) / (M*x^2), from = 1))
 ```
 
-```
-Error in layer_(panel.curve((1 - (1 - P)^x) * (1 - P)^(2 - x)/(M * x^2), : could not find function "layer_"
-```
+![plot of chunk unnamed-chunk-3](figures/pooltest-unnamed-chunk-3-1.png)
 
 
 This confirms our visual impression that increasing $k$ is useful, and
@@ -217,9 +192,7 @@ xyplot(tapply((phat - p)^2, k, mean) ~ tapply(k, k, unique),
     layer(panel.curve((1 - (1-P)^x) * (1-P)^(2-x) / (M*x^2), from = 1))
 ```
 
-```
-Error in layer(panel.curve((1 - (1 - P)^x) * (1 - P)^(2 - x)/(M * x^2), : could not find function "layer"
-```
+![plot of chunk unnamed-chunk-6](figures/pooltest-unnamed-chunk-6-1.png)
 
 
 The following plot shows how the theoretical precision (mean square
@@ -345,9 +318,7 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
                         horizontal = FALSE, col = "red"))
 ```
 
-```
-Error in layer(panel.average(x, y, fun = function(x) quantile(x, 0.1), : could not find function "layer"
-```
+![plot of chunk unnamed-chunk-9](figures/pooltest-unnamed-chunk-9-1.png)
 
 
 
@@ -374,8 +345,6 @@ xyplot(lcl.approx ~ k, data = g, jitter.x = TRUE, grid = TRUE, alpha = 0.2,
                         horizontal = FALSE, col = "red"))
 ```
 
-```
-Error in layer(panel.average(x, y, fun = function(x) quantile(x, 0.1), : could not find function "layer"
-```
+![plot of chunk unnamed-chunk-10](figures/pooltest-unnamed-chunk-10-1.png)
 
 
