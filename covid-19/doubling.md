@@ -249,7 +249,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
-       ylim = c(0, 30), xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(0, 40), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
@@ -322,7 +322,7 @@ devolution <-
                                              d = xcovid.row, min = 50))))
 xyplot(tdouble ~ date | reorder(region, tdouble, function(x) -length(x)),
        data = devolution, type = "o", pch = ".", cex = 3, grid = TRUE,
-       ylim = c(0, 30), xlab = "Date", ylab = "Doubling time (days)",
+       ylim = c(0, 40), xlab = "Date", ylab = "Doubling time (days)",
        scales = list(alternating = 3, x = list(rot = 45)),
        layout = c(4, 4), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 ```
