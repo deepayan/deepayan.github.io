@@ -30,7 +30,7 @@ covid.deaths <- covid.deaths[keep, ]
 
 
 [This note was last updated using data downloaded on 
-2020-08-25. Here is the
+2020-10-03. Here is the
 [source](https://github.com/deepayan/deepayan.github.io/blob/master/covid-19/deaths.rmd)
 of this analysis. Click 
 <a href="#" data-toggle="collapse" 
@@ -150,7 +150,7 @@ xat <- pretty(start.date + c(0, D-1))
 )
 ```
 
-![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-1.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-2.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-3.png)
+![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-1.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-2.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-3.png)![plot of chunk unnamed-chunk-3](figures/deaths-unnamed-chunk-3-4.png)
 
 
 # The lag-adjusted death rate
@@ -190,7 +190,7 @@ update(dr.naive + dr.adjusted, ylim = c(0, 30),
                        text = c("Naive estimate", "One week lag-adjusted estimate")))
 ```
 
-![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-1.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-2.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-3.png)
+![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-1.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-2.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-3.png)![plot of chunk unnamed-chunk-4](figures/deaths-unnamed-chunk-4-4.png)
 
 The adjusted death rates have less systematic trends than the naive
 estimate, but clearly there is still a lot of instability.
@@ -218,13 +218,6 @@ mortality rate.
 ```r
 ppgdp <- read.csv("PPGDP_2018.csv") # world bank data
 data(UN, package = "carData")
-```
-
-```
-Error in find.package(package, lib.loc, verbose = verbose): there is no package called 'carData'
-```
-
-```r
 latest.dr <- as.data.frame(t(rbind(dr.naive.latest,
                                    dr.adjusted.latest,
                                    tail(xcovid.deaths, 1))))
@@ -249,13 +242,6 @@ latest.dr <- cbind(latest.dr,
                    country = rownames(latest.dr),
                    ppgdp[mapNamesWB(rownames(latest.dr)), , drop = FALSE],
                    UN[mapNamesUN(rownames(latest.dr)), , drop = FALSE])
-```
-
-```
-Error in data.frame(..., check.names = FALSE): object 'UN' not found
-```
-
-```r
 with(subset(latest.dr, region == "Europe"),
      xyplot(adjusted ~ (PPGDP_2018/1000), pch = 16, cex = 1.5, aspect = 0.75,
             xlab = "GDP per capita (x 1000 USD) in 2018",
@@ -268,9 +254,7 @@ with(subset(latest.dr, region == "Europe"),
             }))
 ```
 
-```
-Error in eval(e, x, parent.frame()): object 'region' not found
-```
+![plot of chunk unnamed-chunk-5](figures/deaths-unnamed-chunk-5-1.png)
 
 <!-- The grey line is a weighted linear regression line fit with the number of deaths as weights. -->
 
@@ -349,7 +333,7 @@ fg <-
 fg + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-3.png)
+![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-1.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-2.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-3.png)![plot of chunk unnamed-chunk-7](figures/deaths-unnamed-chunk-7-4.png)
 
 
 # Which countries have reached their peak?
@@ -427,6 +411,6 @@ fg2 <-
 fg2 + as.layer(bg, under = TRUE)
 ```
 
-![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-1.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-2.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-3.png)
+![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-1.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-2.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-3.png)![plot of chunk unnamed-chunk-10](figures/deaths-unnamed-chunk-10-4.png)
 
 
