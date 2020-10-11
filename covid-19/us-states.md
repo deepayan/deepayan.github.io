@@ -2,6 +2,7 @@
 layout: default
 title: 'COVID-19 in the US states'
 author: Deepayan Sarkar
+code: collapse
 ---
 
 

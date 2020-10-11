@@ -2,6 +2,7 @@
 layout: default
 title: 'Doubling times of COVID-19 cases'
 author: Deepayan Sarkar
+code: collapse
 ---
 
 

@@ -2,11 +2,8 @@
 layout: default
 title: 'Analysis of COVID-19 Mortality'
 author: Deepayan Sarkar
+code: collapse
 ---
-
-
-
-
 
 
 ```r

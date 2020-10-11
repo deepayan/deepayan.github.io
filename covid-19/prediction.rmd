@@ -2,6 +2,7 @@
 layout: default
 title: 'Predicting COVID-19 cases'
 author: Deepayan Sarkar
+code: collapse
 ---
 
 
