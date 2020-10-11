@@ -326,13 +326,13 @@ p.deaths <-
            data = devolution.deaths, type = "o", pch = ".", cex = 2, grid = TRUE,
            xlab = "Date", ylab = "Doubling time for deaths (days)",
            scales = list(alternating = 3, x = list(rot = 45)),
-           ylim = c(NA, 20), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+           ylim = c(0, 30), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 p.cases <-
     xyplot(tdouble ~ date | factor(region, levels = regions),
            data = devolution.cases, type = "l", pch = 16, col = "grey50",
            xlab = "Date", ylab = "Doubling time for deaths (days)",
            scales = list(alternating = 3, x = list(rot = 45)),
-           ylim = c(NA, 20), as.table = TRUE, between = list(x = 0.5, y = 0.5))
+           ylim = c(0, 30), as.table = TRUE, between = list(x = 0.5, y = 0.5))
 update(p.deaths + p.cases, layout = c(5, 5))
 ```
 

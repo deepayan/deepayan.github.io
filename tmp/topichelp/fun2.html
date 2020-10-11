@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: A duplicate alias</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for fun2 {topichelp}"><tr><td>fun2 {topichelp}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>A duplicate alias</h2>
+
+<h3>Description</h3>
+
+<p>This file documents <code>fun2</code>, which is already documented in <a href="funs.html">fun1</a>.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+fun2(x, ...)
+fun3(x, ...)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x</code></td>
+<td>
+<p>An object.</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+<p>Extra arguments.</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>The existence of this help page should trigger a WARNING during
+<code>R CMD check</code>.
+</p>
+<p>Other than that, this file checks for possible problems in how
+within-package links are handled, as well as potential problems with
+special characters and case.
+</p>
+<p>The usual forms of a within-package link to a topic <code>foo</code> are
+</p>
+
+<ul>
+<li> <p><code>\link{foo}</code> 
+</p>
+</li>
+<li> <p><code>\link[=foo]{link-text}</code> 
+</p>
+</li></ul>
+
+<p>These are meant to behave like <code>help(foo)</code>, presumably with
+preference to the current package, although this is maybe not clearly
+documented.  Links to a file by name are not supported. The following
+are examples of the first form:
+</p>
+
+<ul>
+<li> <p><code>\link{fun1}</code>: <code><a href="../../topichelp/help/fun1.html">fun1</a></code> is a topic in both
+<code>fun2.Rd</code> and <code>funs.Rd</code>
+</p>
+</li>
+<li> <p><code>\link{fun2}</code>: <code><a href="../../topichelp/help/fun2.html">fun2</a></code> is a topic only in <code>funs.Rd</code>
+</p>
+</li>
+<li> <p><code>\link{fun3}</code>: <code><a href="../../topichelp/help/fun3.html">fun3</a></code> is a topic only in
+<code>fun2.Rd</code> (this file)
+</p>
+</li>
+<li> <p><code>\link{funs}</code>: <code><a href="../../dplyr/html/funs.html">funs</a></code> is a not a topic, but
+a file, so the link should be invalid. It may go to the same topic
+in another package (e.g., <span class="pkg">dplyr</span>), if available, even if that
+package is not loaded.
+</p>
+</li>
+<li> <p><code>\link{fit}</code>: <code><a href="../../generics/html/fit.html">fit</a></code> should go to either
+<code>generics::fit</code> or <code>parsnip::fit</code>; if both packages are
+loaded, it should give a choice.
+</p>
+</li>
+<li> <p><code>\link{foobar}</code>: <code>foobar</code> really shouldn't
+go anywhere.
+</p>
+</li></ul>
+
+<p>For the last two examples, the resolution to a topic in another
+package is attempted at package installation time for static HTML, so
+this is one situation where the static behaviour cannot easily be
+changed to match the dynamic behaviour.
+</p>
+<p>Corresponding examples of the second form are:
+</p>
+
+<ul>
+<li> <p><code>\link[=fun1]{link-text}</code>: <code><a href="../../topichelp/help/fun1.html">link-text</a></code>
+</p>
+</li>
+<li> <p><code>\link[=fun2]{link-text}</code>: <code><a href="../../topichelp/help/fun2.html">link-text</a></code>
+</p>
+</li>
+<li> <p><code>\link[=fun3]{link-text}</code>: <code><a href="../../topichelp/help/fun3.html">link-text</a></code>
+</p>
+</li>
+<li> <p><code>\link[=funs]{link-text}</code>: <code><a href="../../dplyr/html/funs.html">link-text</a></code>
+</p>
+</li>
+<li> <p><code>\link[=fit]{link-text}</code>: <code><a href="../../generics/html/fit.html">link-text</a></code>
+</p>
+</li></ul>
+
+
+
+<h3>Special characters</h3>
+
+<p>Math operator aliases in particular could lead to weird
+filenames. Here are some examples:
+</p>
+
+<ul>
+<li> <p><code><a href="../../base/help/Arithmetic.html">Arithmetic</a></code> (file name, but also alias)
+</p>
+</li>
+<li> <p><code><a href="../../base/help/+.html">+</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/-.html">-</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/*.html">*</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/**.html">**</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help//.html">/</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/%5E.html">^</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/%25%25.html">%%</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/%25/%25.html">%/%</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../magrittr/help/%25%3E%25.html">%&gt;%</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/%25*%25.html">%*%</a></code> 
+</p>
+</li>
+<li> <p><code><a href="../../base/help/%25in%25.html">%in%</a></code> 
+</p>
+</li></ul>
+
+
+
+<h3>Case mismatch</h3>
+
+<p>Filenames on Windows / Mac (?) are not case-sensitive; this could lead
+to problems particularly with aliases that differ by case.
+</p>
+<p>These links to grid have the wrong case: <code><a href="../../grid/help/rectgrob.html">rectgrob</a></code>;
+<code><a href="../../grid/help/GRID.RECT.html">GRID.RECT</a></code>.
+</p>
+<p>The following pairs of aliases are both valid, but are in different files.
+</p>
+<p>Explicit package links: <code><a href="../help/FUN4.html">FUN4</a></code>; <code><a href="../help/fun4.html">fun4</a></code>.
+</p>
+<p>Implicit package links: <code><a href="../../topichelp/help/FUN4.html">FUN4</a></code>; <code><a href="../../topichelp/help/fun4.html">fun4</a></code>.
+</p>
+
+<hr /><div style="text-align: center;">[Package <em>topichelp</em> version 0.0-1 <a href="00Index.html">Index</a>]</div>
+</body></html>
