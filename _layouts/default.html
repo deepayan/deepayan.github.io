@@ -101,15 +101,23 @@
 <script type="text/javascript">
 // Javascript to set up hiding and toggling of code blocks
 
+  {% include mathjax.html %}
+
+  
 $(document).ready(
     function() {
 	// console.log("ready");
 	$( "div.highlighter-rouge" ).addClass( "sourceCode" );
+	{% if page.code == "collapse" %}
 	$( "div.sourceCode" ).addClass( "collapse" );
+	{% endif %}
 	$("#topnav").autoHidingNavbar();
     }
 );
 </script>
+
+
+
 
 </body>
 </html>
