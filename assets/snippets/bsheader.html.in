@@ -1,0 +1,31 @@
+
+<link rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous">
+
+<link rel="stylesheet"
+      href="../assets/styles/custom.css">
+
+
+<!-- style>
+  h1.title { text-align: center; }
+  p.author { text-align: center; }
+  img { display: block; margin-left: auto; margin-right: auto; width: 100%; }
+  pre { border: none; font-weight: bold; font-size: 110%; background: #f9f9f9; }
+  pre.sourceCode
+  {
+      border-left: 2px solid red;
+      padding: 0.5em;
+      font-weight: normal;
+      font-size: 95%;
+      background: #dddddd;
+  }
+  table code
+  {
+      color: black;
+      background-color: transparent;
+      font-weight: bold;
+      font-size: 110%;
+  }
+</style -->

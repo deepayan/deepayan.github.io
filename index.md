@@ -4,8 +4,7 @@ author: Deepayan Sarkar
 ---
 
 
-For now, this site only contains some analysis of the ongoing COVID-19
-pandemic:
+Some (fairly outdated) analysis of the ongoing COVID-19 pandemic:
 
 - [How the doubling times of cases (and deaths) have changed over time](covid-19/doubling.html)
 
@@ -18,6 +17,10 @@ pandemic:
 - [Optimality in Pooled Testing](covid-19/pooled-testing.html)
 
 
+
+R packages:
+
+- [Using the `rip.opencv` package](rip/opencv-intro.html)
 
 
 
