@@ -1,6 +1,7 @@
 ---
 title: Using the rip.opencv package
 author: Deepayan Sarkar and Kaustav Nandy
+mathjax: true
 vignette: >
   %\VignetteIndexEntry{Using the rip.opencv package}
   %\VignetteEngine{knitr::knitr}
