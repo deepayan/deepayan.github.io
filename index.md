@@ -18,9 +18,11 @@ Some (fairly outdated) analysis of the ongoing COVID-19 pandemic:
 
 
 
-R packages:
+R packages for image processing:
 
 - [Using the `rip.opencv` package](rip/opencv-intro.html)
+
+- [Using the `rip.recover` package](rip/recover-intro.html)
 
 
 
