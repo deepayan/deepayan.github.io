@@ -9,7 +9,7 @@ all: doubling.html deaths.html us-states.html prediction.html pooled-testing.htm
 %.md: %.rmd knit-utils.R covid-utils.R
 	Rscript -e "library(knitr); knit('$<')"
 
-%.html: %.md bsheader.html.in bsbefore.html.in bsbefore.html.in
+%.html: %.md bsheader.html.in bsbefore.html.in bsafter.html.in
 	pandoc -s --to html --mathjax						\
 		--from markdown-markdown_in_html_blocks				\
 		-H bsheader.html.in -B bsbefore.html.in -A bsafter.html.in	\

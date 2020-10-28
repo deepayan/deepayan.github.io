@@ -1,4 +1,5 @@
 ---
+layout: default
 title: Using the rip.opencv package
 author: Deepayan Sarkar and Kaustav Nandy
 mathjax: true
@@ -12,9 +13,12 @@ vignette: >
 
 
 
+
 # Introduction
 
-The `rip.opencv` package provides access to selected routines in the
+The
+[`rip.opencv`](https://github.com/deepayan/rip/tree/main/rip.opencv)
+package provides access to selected routines in the
 [OpenCV](http://opencv.org/) computer vision library. Rather than
 exposing OpenCV classes and methods directly through external
 pointers, the package uses standard R objects to represent
@@ -110,7 +114,7 @@ image(log(Mod(V)), main = "log-modulus of DFT coefficients")
 image(Arg(V), main = "argument of DFT coefficients")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+![plot of chunk unnamed-chunk-3](figure/opencv-unnamed-chunk-3-1.png)
 
 # Using the `"rip"` object for image manipulation
 
@@ -194,7 +198,7 @@ image(as.rip(a[,,2]))
 image(as.rip(a[,,3]))
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
+![plot of chunk unnamed-chunk-6](figure/opencv-unnamed-chunk-6-1.png)
 
 The `as.rip()` function can also handle 3-way arrays as input,
 interpreting it as a color image. This allows channels to be
@@ -208,7 +212,7 @@ green <- a; green[,,-2] <- 0; image(as.rip(green))
 blue  <- a;  blue[,,-3] <- 0; image(as.rip(blue))
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
+![plot of chunk unnamed-chunk-7](figure/opencv-unnamed-chunk-7-1.png)
 
 
 
@@ -220,7 +224,7 @@ green[,,-2] <- runif(N, 0, 255); image(as.rip(green))
  blue[,,-3] <- runif(N, 0, 255); image(as.rip(blue))
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png)
+![plot of chunk unnamed-chunk-8](figure/opencv-unnamed-chunk-8-1.png)
 
 Similar methods are also available to convert to and from `"raster"` objects 
 (in fact, this is how the `image()` methods works).
@@ -250,6 +254,13 @@ converted using suitable `as.rip()` methods.
 
 ```r
 require(png)
+```
+
+```
+Loading required package: png
+```
+
+```r
 f <- system.file("img", "Rlogo.png", package="png")
 img <- readPNG(f)
 img.n <- readPNG(f, native = TRUE) # "nativeRaster" representation
@@ -283,7 +294,7 @@ image(as.rip(img))
 image(as.rip(img.n))
 ```
 
-![plot of chunk unnamed-chunk-10](figure/unnamed-chunk-10-1.png)
+![plot of chunk unnamed-chunk-10](figure/opencv-unnamed-chunk-10-1.png)
 
 # Modules
 
@@ -322,7 +333,7 @@ rip.cv$IO$imread
 ```
 
 ```
-internal C++ function <0x563245253310>
+internal C++ function <0x5556b59546e0>
     docstring : Read image from file: type 0=grayscale, 1=color
     signature : Rcpp::Matrix<14, Rcpp::PreserveStorage> imread(std::vector<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::allocator<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >, int)
 ```
@@ -364,7 +375,7 @@ image(x, rescale = FALSE)
 image(255 - x, rescale = FALSE) # negative
 ```
 
-![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png)
+![plot of chunk unnamed-chunk-14](figure/opencv-unnamed-chunk-14-1.png)
 
 ## Example: convert color image to grayscale
 
@@ -404,7 +415,7 @@ image(y2, rescale = FALSE, main = "cvtColor")
 image(y1 - y2, rescale = TRUE, main = "difference")
 ```
 
-![plot of chunk unnamed-chunk-16](figure/unnamed-chunk-16-1.png)
+![plot of chunk unnamed-chunk-16](figure/opencv-unnamed-chunk-16-1.png)
 
 The `cv::cvtColor()` function is designed for more general color space
 conversion, and can be used, for example, to go from the default BGR
@@ -421,7 +432,7 @@ image(x.rgb)
 image(x.hsv)
 ```
 
-![plot of chunk unnamed-chunk-17](figure/unnamed-chunk-17-1.png)
+![plot of chunk unnamed-chunk-17](figure/opencv-unnamed-chunk-17-1.png)
 
 We can of course extract specific channels using `as.array()` from
 these objects; for example, the HSV channels can be plotted separately
@@ -436,7 +447,7 @@ image(as.rip(a[,,2]))
 image(as.rip(log1p(a[,,3])))
 ```
 
-![plot of chunk unnamed-chunk-18](figure/unnamed-chunk-18-1.png)
+![plot of chunk unnamed-chunk-18](figure/opencv-unnamed-chunk-18-1.png)
 
 The following are more interesting examples of photographic image
 transformations.
@@ -450,7 +461,7 @@ image(y <- rip.cv$photo$edgePreservingFilter(x, 2L, 60), rescale = FALSE)
 image(rip.cv$photo$stylization(y, 60), rescale = FALSE)
 ```
 
-![plot of chunk unnamed-chunk-19](figure/unnamed-chunk-19-1.png)
+![plot of chunk unnamed-chunk-19](figure/opencv-unnamed-chunk-19-1.png)
 
 
 ## Other modules
@@ -485,43 +496,41 @@ do.call(rbind, lapply(ls(rip.cv), function(m) data.frame(Module = m, Function = 
 18     filter             bilateralFilter( 
 19     filter                        blur( 
 20     filter                   boxFilter( 
-21     filter                     conv2ml( 
-22     filter                     filt2ml( 
-23     filter                    filter2D( 
-24     filter             getDerivKernels( 
-25     filter              getGaborKernel( 
-26     filter           getGaussianKernel( 
-27     filter                  medianBlur( 
-28     filter                 sepFilter2D( 
-29    imgproc                    cvtColor( 
-30    imgproc                      dilate( 
-31    imgproc                equalizeHist( 
-32    imgproc                       erode( 
-33    imgproc               getRectSubPix( 
-34    imgproc         getRotationMatrix2D( 
-35    imgproc       getStructuringElement( 
-36    imgproc       invertAffineTransform( 
-37    imgproc               matchTemplate( 
-38    imgproc                     pyrDown( 
-39    imgproc       pyrMeanShiftFiltering( 
-40    imgproc                       pyrUp( 
-41    imgproc                      resize( 
-42    imgproc                  warpAffine( 
-43    imgproc             warpPerspective( 
-44         IO                      imread( 
-45         IO                     imwrite( 
-46         IO                      vfread( 
-47      photo                     decolor( 
-48      photo        edgePreservingFilter( 
-49      photo        fastNlMeansDenoising( 
-50      photo fastNlMeansDenoisingColored( 
-51      photo                     inpaint( 
-52      photo                pencilSketch( 
-53      photo                 stylization( 
-54 transforms                         dft( 
-55 transforms           getOptimalDFTSize( 
-56 transforms                        idft( 
-57 transforms                mulSpectrums( 
+21     filter                    filter2D( 
+22     filter             getDerivKernels( 
+23     filter              getGaborKernel( 
+24     filter           getGaussianKernel( 
+25     filter                  medianBlur( 
+26     filter                 sepFilter2D( 
+27    imgproc                    cvtColor( 
+28    imgproc                      dilate( 
+29    imgproc                equalizeHist( 
+30    imgproc                       erode( 
+31    imgproc               getRectSubPix( 
+32    imgproc         getRotationMatrix2D( 
+33    imgproc       getStructuringElement( 
+34    imgproc       invertAffineTransform( 
+35    imgproc               matchTemplate( 
+36    imgproc                     pyrDown( 
+37    imgproc       pyrMeanShiftFiltering( 
+38    imgproc                       pyrUp( 
+39    imgproc                      resize( 
+40    imgproc                  warpAffine( 
+41    imgproc             warpPerspective( 
+42         IO                      imread( 
+43         IO                     imwrite( 
+44         IO                      vfread( 
+45      photo                     decolor( 
+46      photo        edgePreservingFilter( 
+47      photo        fastNlMeansDenoising( 
+48      photo fastNlMeansDenoisingColored( 
+49      photo                     inpaint( 
+50      photo                pencilSketch( 
+51      photo                 stylization( 
+52 transforms                         dft( 
+53 transforms           getOptimalDFTSize( 
+54 transforms                        idft( 
+55 transforms                mulSpectrums( 
 ```
 
 The choice of functions as well as their organization into modules are
@@ -575,6 +584,7 @@ changing DFT coefficients from a $[0, 2\pi]$ range to $[-\pi, \pi]$ and
 back.
 
 
-The project page on Gihub can be used for bug reports and patches.
+The [project page](https://github.com/deepayan/rip) on Github can be
+used for bug reports and patches.
 
 

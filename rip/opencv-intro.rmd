@@ -16,8 +16,10 @@ knitr::opts_chunk$set(dev = "png", cache = TRUE, cache.path = "~/knitr-cache/rip
                       prompt = FALSE, comment = NA, 
                       warning = TRUE, message = TRUE,
                       knitr.table.format = "html",
-                      fig.width = 6, fig.height = 7, dpi = 96)
+                      fig.width = 6, fig.height = 7, dpi = 96,
+                      fig.path='figure/opencv-')
 ```
+
 
 
 # Introduction
@@ -360,7 +362,7 @@ changing DFT coefficients from a $[0, 2\pi]$ range to $[-\pi, \pi]$ and
 back.
 
 
-The [project page](https://github.com/deepayan/rip) on Gihub can be
+The [project page](https://github.com/deepayan/rip) on Github can be
 used for bug reports and patches.
 
 

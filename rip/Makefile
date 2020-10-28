@@ -1,5 +1,5 @@
 
-all: opencv-intro.html
+all: opencv-intro.html recover-intro.html
 
 .PRECIOUS: %.md
 
