@@ -155,24 +155,30 @@ and asymmetric, which `symmetric.blur()` is unable to estimate (more
 sophisticated methods are available for such blurs, but not yet
 implemented in this package).
 
-But another problem in the recovered image is that it has become
-grainy. The `rip.recover` package allows image reconstruction using a
-Bayesian approach, supporting the so-called hyper-Laplacian family of
-priors for image gradients that also allows the gradients to be
-locally correlated; see `help(rip.deconv)` for details. This approach
-is much slower than the Richardson-Lucy algorithm, but a comprehensive
-set of examples can be found
-[here](https://www.isid.ac.in/~deepayan/rip/html), with the
-corresponding code available [here](https://github.com/deepayan/rip.testing).
+# Example: Bayesian image denoising
 
-Here, we give a simple example where the Bayesian image reconstruction
-approach is used as a post-processing step to denoise the output of
-the Richardson-Lucy algorithm. It uses a so-called "sparse" prior
-($\alpha = 0.8$), with image gradient density proportional to
-$e^{-\lvert x \rvert^\alpha}$, with the gradients correlated according
-to a 2-D auto-regressive model. In addition, a robust (Huber) loss
-function comparing the input and estimated images is minimized instead
-of squared error loss.
+But another problem in the recovered image above is that it has become
+grainy. This is common with the Richardson-Lucy algorithm, which does
+not impose any regularization penalty on the estimated image. The
+`rip.recover` package allows image reconstruction using a Bayesian
+approach, supporting the so-called hyper-Laplacian family of priors
+for image gradients that also allows the gradients to be locally
+correlated; see `help(rip.deconv)` for details. This approach is much
+slower than the Richardson-Lucy algorithm, but a comprehensive set of
+examples can be found
+[here](https://www.isid.ac.in/~deepayan/rip/html), with the
+corresponding code available
+[here](https://github.com/deepayan/rip.testing).
+
+Here, instead of performing Bayesian deconvolution on the original
+image, we give a simpler (and faster) example where the Bayesian image
+reconstruction approach is used as a post-processing step to denoise
+the output of the Richardson-Lucy algorithm. It uses a so-called
+"sparse" prior ($\alpha = 0.8$), with image gradient density
+proportional to $e^{-\lvert x \rvert^\alpha}$, with the gradients
+correlated according to a 2-D auto-regressive model. In addition, a
+robust (Huber) loss function comparing the input and estimated images
+is minimized instead of squared error loss.
 
 
 ```r
