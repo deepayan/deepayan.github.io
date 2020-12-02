@@ -1,0 +1,946 @@
+---
+layout: remark
+title: Expressions, Evaluation and Scoping in R
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+library(knitr)
+opts_chunk$set(cache = FALSE, autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               dev.args = list(pointsize = 16),
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/eval-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+set.seed(20191105)
+```
+
+
+---
+
+class: center, middle
+
+# {{ page.title }}
+
+
+---
+
+## REPL
+
+* R works using what is known as a REPL (Read-Eval-Print-Loop)
+
+	* R waits for user input when it starts
+	
+	* User types input _expression_ and presses `Enter`
+	
+	* R reads input and tries to _evaluate_
+	
+	* Evaluation is either successful or produces an error
+	
+	* R starts to wait again for further user input
+	
+* Today's talk takes a closer look at _how the evaluation step works_
+
+--
+
+* Useful links:
+
+	* [Source](eval-slides.rmd) of this talk (R + Markdown, similar to Rnw)
+	
+	* [Makefile](Makefile) containing conversion rules (using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/))
+
+	* Extracted [R code](eval-slides.R)
+
+
+---
+
+## Evaluation
+
+* Consider the following expression that we wish to evaluate
+
+
+```{r}
+sqrt(x)
+```
+
+* This expression involves two "symbols", `sqrt` and `x`
+
+* To be able to evaluate the expression, R must be able to "find" both symbols
+
+```{r}
+find("sqrt")
+find("x") # not found
+```
+
+
+---
+
+## Evaluation
+
+
+* So let us define `x` and try again
+
+```{r}
+x <- 10
+sqrt(x)
+x <- -1
+sqrt(x)
+```
+
+
+---
+
+## Evaluation
+
+
+```{r}
+x <- -1+0i
+sqrt(x)
+x <- "-1"
+sqrt(x)
+```
+
+
+
+---
+
+## Evaluation
+
+* Let us check again where `sqrt` and `x` are found
+
+```{r}
+find("sqrt")
+find("x")
+```
+
+---
+
+## Evaluation
+
+* Suppose we want to define a "smarter" `sqrt()`
+
+* First check what `sqrt()` does, so we can mimic:
+
+```{r}
+sqrt
+```
+
+* What does `.Primitive()` do?
+
+* Check `help(.Primitive)` (we don't need to understand details)
+
+---
+
+## Evaluation
+
+* define a "smart" `sqrt()` as follows:
+
+```{r}
+sqrt <- function(x)
+{
+    orig.sqrt <- .Primitive("sqrt")
+    if (is.character(x)) x <- as.numeric(x)
+    if (is.numeric(x) && any(x < 0)) x <- complex(real = x, imaginary = 0)
+    orig.sqrt(x)
+}
+```
+
+* We now have
+
+```{r}
+x <- -1
+sqrt(x)
+```
+
+---
+
+## Multiple symbol definitions
+
+* Where is R finding these symbols?
+
+```{r}
+find("x")
+find("sqrt")
+```
+
+
+
+* The "original" `sqrt()` is not overwritten; instead a new one is defined
+
+
+---
+
+## The search path
+
+* Why is it using the `sqrt` in `".GlobalEnv"` and not the one in `"package:base"`?
+
+```{r}
+search()
+```
+
+
+
+* R searches for symbols sequentially in the "search path"
+
+
+---
+
+## Environments
+
+* What exactly are the objects in the search path?
+
+* They are known as "environments", which are central to how evaluation works in R
+
+* In essence, an environment is a _collection of symbols_ (variables)
+  bound to _certain values_
+  
+* Each environment usually also has an associated "enclosing
+  environment" or "parent environment"
+
+* `.GlobalEnv` is the environment where user-defined variables are stored 
+
+---
+
+## Environments
+
+* The chain of enclosing environments starting from `.GlobalEnv` is
+  identical to the search path
+
+
+```{r}
+e <- .GlobalEnv
+while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
+search() # compare
+```
+
+
+---
+
+## Creating and manipulating environments
+
+* `new.env()` explicitly creates environments
+
+* Variables inside environments can be accessed using `$`
+
+
+```{r,fig.height = 5}
+e1 <- new.env()
+e1$x <- seq(0, 2 * pi, length.out = 101)
+e1$y <- cos(e1$x)
+plot(y ~ x, data = e1, type = "l", ylim = c(-1, 1))
+```
+
+
+
+---
+
+## Environments are not duplicated when copied
+
+* Environments are an exception to R's duplicate-on-copy rule
+
+* A copy of an environment is the same environment, not a new one
+
+```{r}
+e2 <- e1
+range(e1$y)
+e2$y <- abs(e2$y)
+range(e1$y) # changes even though e1$y has not been directly modified 
+```
+
+
+---
+
+## Inspecting the variables in an environment
+
+* The names of objects available in an environment can be obtained by `ls()`
+
+```{r}
+ls(e2)
+ls.str(e2) ## summary of all objects in e2
+```
+
+
+---
+
+## Environments and functions
+
+* Environments are central to how R functions work
+
+* Functions in R are actually ["closures"](https://en.wikipedia.org/wiki/Closure_(computer_programming)
+
+* In addition to the argument list and body (code), a function also
+  has an associated environment
+
+* This is usually the environment in which the function was defined
+
+  
+```{r}
+environment(sqrt)
+environment(base::sqrt) # special "primitive" (C) function, so no environment
+environment(hist)
+```
+
+
+---
+
+## What happens when a function is executed?
+
+* Every time a function is invoked, a new environment is created
+
+* This is the "evaluation environment" and contains the local variables of the function
+
+* The environment enclosing this "evaluation environment" is the
+  environment of the function
+--
+
+* While the function is running, evaluation tries to find symbols as follows:
+
+	* First, in the evaluation environment
+	
+	* Next, in its enclosing environment, the environment of the function
+	
+	* Then, in the enclosing environment of that environment, and so on
+
+* This behaviour is called "lexical scoping"
+--
+
+* Evaluation in the global environment follows the same rule (hence the search path)
+
+
+
+---
+
+## Why are these details important?
+
+* Depending on scoping rules (for non-local symbols) is often risky
+
+
+```{r}
+boxcox <- function(x) # applies Box-Cox transformation on data 'x'
+{
+	if (lambda == 0) log(x)
+	else (x^lambda - 1) / lambda
+}
+b <- function(x) # computes histogram bins given data 'x' 
+{
+    n <- sum(is.finite(x))
+    r <- extendrange(x)
+    seq(r[1], r[2], length.out = round(sqrt(n))+1)
+}
+```
+
+```{r}
+x <- rlnorm(1000)
+hist(boxcox(x), breaks = b)
+```
+
+
+---
+
+## Why are these details important?
+
+* Works if we define `lambda`
+
+
+```{r}
+lambda <- 0
+hist(boxcox(x), breaks = b)  # notice that 'b' is a function! (See ?hist)
+```
+
+
+
+
+---
+
+## Why are these details important?
+
+* Normally, depending on this kind of scoping behaviour should be unnecessary
+
+* In fact, a well-designed function should not depend on arbitrary variables
+
+* However, there is one situation where this evaluation rule becomes important
+
+* When a function creates and returns another function!
+
+
+---
+
+## Do we need functions that create functions?
+
+* Have you encountered such functions?
+--
+
+* Probably not very commonly observed...
+
+* But only because we are limited in our thinking
+
+* We have already used functions as arguments to other functions
+
+* Thinking "functionally" opens up many other interesting approaches
+
+* This is particularly useful for quick prototyping
+
+
+---
+
+## Do we need functions that create functions?
+
+* A somewhat silly extension of the example above:
+
+```{r}
+fboxcox <- function(lambda)
+{
+	f <- function(x)
+	{
+		if (lambda == 0) log(x)
+		else (x^lambda - 1) / lambda
+	}
+    return(f)
+}
+```
+
+```{r}
+boxcox.sqrt <- fboxcox(0.5)
+boxcox.log <- fboxcox(0)
+```
+
+
+
+---
+
+## Do we need functions that create functions?
+
+```{r}
+par(mfrow = c(1, 2))
+hist(boxcox.sqrt(x), breaks = b)
+hist(boxcox.log(x), breaks = b)
+```
+
+
+
+
+---
+
+## Functions returned by functions
+
+* Note that `boxcox.sqrt` and `boxcox.log` are both functions (created by
+  another function `fboxcox`)
+
+```{r}
+boxcox.sqrt
+boxcox.log
+```
+
+
+* ... that appear to be identical
+
+
+---
+
+## Functions returned by functions
+
+* But they have different "environments"
+
+```{r}
+environment(boxcox.sqrt)
+environment(boxcox.log)
+```
+
+
+---
+
+## Functions returned by functions
+
+* This is because they were created in different executions of `fboxcox()`
+
+* Although not immediately apparent, these environments retain the value of `lambda`
+
+```{r}
+ls.str(environment(boxcox.sqrt))
+ls.str(environment(boxcox.log))
+```
+
+---
+
+## Functions returned by functions
+
+* Without lexical scoping, this would not have been possible
+
+* Another example from [The R Paper](https://www.stat.auckland.ac.nz/~ihaka/downloads/R-paper.pdf):
+
+```{r}
+y <- 123
+f <- function(x) {
+    y <- x * x
+	g <- function() print(y)
+	g()
+}
+f(10)
+```
+
+
+
+* S, which is similar to R but does not have lexical scoping, would print `123`
+
+
+
+---
+
+## More serious examples
+
+* Functions are actually quite commonly encountered in probability and statistics
+
+* Examples: density function, CDF, likelihood function
+
+---
+
+## The empirical CDF
+
+* Consider the empirical cumulative distribution function (ECDF):
+
+```{r}
+ECDF <- function(x)
+{
+	x <- x[is.finite(x)]
+	function(u) {
+	    sum(x <= u) / length(x)
+	}
+}
+x <- rlnorm(50)
+F.sqrt <- ECDF(boxcox.sqrt(x))
+F.log <- ECDF(boxcox.log(x))
+```
+
+* Evalute ECDF at certain values
+
+```{r}
+sapply(-5:5, F.sqrt)
+sapply(-5:5, F.log)
+```
+
+---
+
+## The empirical CDF
+
+* Many R tools are designed to work with vectorized functions
+
+* The `Vectorize()` function creates a vectorized function from a non-vectorized one
+
+
+```{r}
+FF.log <- Vectorize(F.log)
+plot(FF.log, from = -4, to = 4, n = 1000)
+```
+
+
+
+---
+
+## The empirical CDF
+
+* But where is the data `x`?
+
+```{r}
+F.log
+```
+
+
+
+* It is still available in the environment that _created_ `F.log`
+
+```{r}
+environment(F.log)$x
+```
+
+* In fact, R has has a built-in `ecdf()` function that works similarly
+
+
+
+---
+
+## Objective functions (to be optimized)
+
+* Another common use case: optimization of a loss function
+
+* Consider the following general approach to linear regression given data $(x_i, y_i), i = 1,\dotsc,n$
+
+<div>
+$$\hat{\beta} = \arg \min_{\beta} \sum_{i=1}^n L(y_i - \beta_0 - \beta_1 x_i) = \arg \min_{\beta} f(\beta)$$
+</div>
+
+* Common choices for $L$ are
+
+	* $L(u) = u^2$
+
+	* $L(u) = | u |$
+
+	* <div>$L(u) = \begin{cases} 
+	             u^2 & \lvert u \rvert \leq c \\ 
+	             c (2 | u | - c) & \text{otherwise} 
+			  \end{cases}$</div>
+
+
+---
+
+## Objective functions (to be optimized)
+
+* The following functions takes data and $L$, and creates a suitable objective function
+
+```{r}
+make.objective <- function(x, y, L = abs)
+{
+	function(beta) {
+	    sum(L(y - beta[1] - beta[2] * x))
+	}
+}
+data(phones, package = "MASS")
+obj.lad <- with(phones, make.objective(year, calls, L = abs))
+obj.lse <- with(phones, make.objective(year, calls, L = function(u) u*u))
+```
+
+
+---
+
+## Objective functions (to be optimized)
+
+
+```{r}
+obj.lad
+environment(obj.lse)$L
+environment(obj.lad)$L
+```
+
+---
+
+## Objective functions (to be optimized)
+
+
+```{r}
+fm.lad <- optim(obj.lad, par = c(0,0))
+fm.lse <- optim(obj.lse, par = c(0,0))
+str(fm.lad)
+str(fm.lse)
+```
+
+
+---
+
+## Objective functions (to be optimized)
+
+
+```{r,fig.height=7}
+plot(calls ~ year, phones)
+abline(fm.lad$par, col = "blue")
+abline(fm.lse$par, col = "red")
+```
+
+
+
+
+---
+
+## A more complex example
+
+* Suppose we want to plot a histogram
+
+* One important parameter is the bin width $h$
+
+* Fixing starting point, what is an optimal choice?
+
+* One option: [cross validation](http://onlinestatbook.com/stat_sim/histogram/index.html)
+
+
+---
+
+## Cross validation: summary
+
+
+$\newcommand{\fhath}{\hat{f_h}}$
+
+* Denote the histogram for bin width $h$ by $\fhath$, and the unknown density by $f$
+
+* Want to choose $h$ to minimize integrated square error
+
+$$
+\int \left[ \fhath(x) - f(x) \right]^2 dx = 
+\int \fhath(x)^2 dx - 2 \int \fhath(x)\, f(x)\, dx + \int f(x)^2 dx
+$$
+
+* The third term is unknown but constant (as $h$ varies), so can be dropped
+
+* The first term can be calculated from $\fhath$ (which is piecewise constant)
+
+* The second term involves the unknown $f$, but the integral can be viewed as $E(\fhath(X))$ when $X \sim f$
+
+
+---
+
+## Cross validation: summary
+
+* Leave-one-out estimator: average of ${\fhath}_{(-i)}(x_i)$
+
+* The estimated integrated square error (without the constant term) simplifies to
+
+$$
+\frac{2}{(n-1) h} - \frac{n+1}{(n-1) n^2 h} \sum_{k} c_k^2
+$$
+
+* where $c_k$ are bin counts
+
+
+---
+
+## Cross validation: implementation
+
+
+```{r}
+chooseBins <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    CVE <- function(B)
+    {
+        h <- d / B
+        breaks <- seq(r[1], r[2], length.out = B+1)
+        k <- findInterval(x, breaks) # runtime O(n * log(B))
+        counts <- table(factor(k, levels = 1:B))
+        2 / ((n-1)*h) - sum(counts^2) * (n+1) / ((n-1) * n^2 * h)
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, CVE = unname(sapply(Bvec, CVE)))
+}
+```
+
+
+---
+
+## Cross validation: implementation
+
+
+```{r}
+xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
+ll <- chooseBins(xx, p = 0.125)
+str(ll)
+```
+
+
+---
+
+## Cross validation: implementation
+
+
+```{r}
+with(ll, {
+    plot(CVE ~ B, type = "o")
+    abline(v = B[which.min(CVE)])
+})
+```
+
+
+
+---
+
+## Cross validation: comparison with other "rules"
+
+
+```{r}
+(nclass.cv <- with(ll, B[which.min(CVE)]))
+nclass.Sturges(xx)
+nclass.FD(xx)
+nclass.scott(xx)
+```
+
+
+---
+
+## Cross validation: Resulting histogram
+
+
+```{r,fig.height=5.5}
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
+hist(xx, breaks = breaks)
+```
+
+* For more interesting examples, see Gentleman and Ihaka,
+  [Lexical Scope and Statistical Computing](https://www.stat.auckland.ac.nz/~ihaka/downloads/lexical.pdf)
+
+
+
+
+---
+
+## Related topic: non-standard evaluation
+
+
+* Again, consider an expression that will cause an error when evaluated
+
+
+```{r}
+rm(list = c("x", "y")) # remove x, y if defined earlier
+plot(x, y, type = "l")
+```
+
+
+
+---
+
+## Quoted (unevaluated) expressions
+
+* R can actually work with an expression without evaluating it
+
+
+```{r}
+e <- quote(plot(x, y, type = "l"))
+e
+e[[1]]
+e[[2]]
+e[[3]]
+```
+
+---
+
+## Evaluating Quoted expressions
+
+* A quoted expression can be evaluated using `eval()`
+
+
+```{r}
+eval(e)
+```
+
+* Fails because current environment (`.GlobalEnv`) does not contain variables `x` and `y`
+
+* But Recall: Environment `e2` defined earlier contains 
+
+```{r}
+ls.str(e2)
+```
+
+
+---
+
+## Evaluating Quoted expressions
+
+```{r}
+eval(e, envir = e2)
+```
+
+
+
+---
+
+## Can we re-implement the `replicate()` function?
+
+* This is how functions like `replicate()` and `with()` work
+
+```{r}
+my.replicate <- function(N, e)
+{
+    ans <- numeric(N)
+    for (i in 1:N) ans[[i]] <- eval(e)
+    ans
+}
+```
+
+
+* But we have to be careful to use it
+
+```{r}
+my.replicate(5, max(rnorm(10))) # not what we wanted
+my.replicate(5, quote(max(rnorm(10))))
+```
+
+---
+
+## Non-standard evaluation
+
+* The `substitute()` trick: non-standard evaluation (using lazy argument evaluation)
+
+```{r}
+my.replicate <- function(N, e)
+{
+    expr <- substitute(e) # avoids the need to quote()
+    ans <- numeric(N)
+    for (i in 1:N) ans[[i]] <- eval(expr)
+    ans
+}
+str(x <- my.replicate(1000, max(rnorm(20))))
+```
+
+---
+
+## Lazy evaluation
+
+* Lazy evaluation: function arguments are only evaluated when needed
+
+
+```{r}
+set.seed(20191105)
+rm(sqrt) # remove the sqrt() we defined earlier
+chooseOne <- function(a, b, u = runif(1))
+{
+    if (u < 0.5) a else b
+}
+chooseOne(sqrt(2), sqrt(-2)) # no warning message
+chooseOne(sqrt(2), sqrt(-2)) # warning message
+```
+
+
+---
+
+## Further reading
+
+```{r, eval=FALSE}
+? environment
+? eval
+? expression
+? quote
+? bquote
+? substitute
+? with
+```
+
+```{r}
+with.default
+replicate
+```
+
+
+    </textarea>
+
+
+    <script src='https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' type="text/javascript"></script>
+    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+      var slideshow = remark.create(
+	  {
+	      navigation: { scroll: false,},
+	      ratio: '16:9',
+	      countIncrementalSlides: false
+	  });
+
+      // Setup MathJax
+      MathJax.Hub.Config({
+          tex2jax: {
+          inlineMath: [['$','$'], ['\\(','\\)']],
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+          }
+      });
+      MathJax.Hub.Queue(function() {
+          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
+              return(elem.SourceElement());
+          }).parent().addClass('has-jax');
+      });
+
+      MathJax.Hub.Configured();
+    </script>
+  </body>
+</html>
+
+
+
+
