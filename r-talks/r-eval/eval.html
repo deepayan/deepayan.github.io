@@ -8,14 +8,6 @@ mathjax: true
 
 
 
-
----
-
-class: center, middle
-
-# {{ page.title }}
-
-
 ---
 
 ## REPL
@@ -302,7 +294,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x5642deacd850> 
+<environment: 0x5583c1dce850> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -606,7 +598,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x5642df094aa0>
+<environment: 0x5583c2491a00>
 ```
 
 ```r
@@ -619,8 +611,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x5642e058fcd8>
-<environment: 0x5642df462488>
+<bytecode: 0x5583c3880d48>
+<environment: 0x5583c33b8d90>
 ```
 
 
@@ -639,7 +631,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x5642df094aa0>
+<environment: 0x5583c2491a00>
 ```
 
 ```r
@@ -647,7 +639,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x5642df462488>
+<environment: 0x5583c33b8d90>
 ```
 
 
@@ -788,8 +780,8 @@ F.log
 function(u) {
 	    sum(x <= u) / length(x)
 	}
-<bytecode: 0x5642df319138>
-<environment: 0x5642e0fbc228>
+<bytecode: 0x5583c267b640>
+<environment: 0x5583c428ff08>
 ```
 
 
@@ -873,7 +865,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x5642df4afa88>
+<environment: 0x5583c280fe60>
 ```
 
 ```r
@@ -882,7 +874,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x5642df315e90>
+<environment: 0x5583c267cda8>
 ```
 
 ```r
@@ -1341,7 +1333,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x5642df4b51e8>
+<bytecode: 0x5583c280efb8>
 <environment: namespace:base>
 ```
 
@@ -1353,43 +1345,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x5642e0e335d0>
+<bytecode: 0x5583c3e97a20>
 <environment: namespace:base>
 ```
-
-
-    </textarea>
-
-
-    <script src='https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML' type="text/javascript"></script>
-    <script src="https://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript"></script>
-
-	<script type="text/javascript">
-      var slideshow = remark.create(
-	  {
-	      navigation: { scroll: false,},
-	      ratio: '16:9',
-	      countIncrementalSlides: false
-	  });
-
-      // Setup MathJax
-      MathJax.Hub.Config({
-          tex2jax: {
-          inlineMath: [['$','$'], ['\\(','\\)']],
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-          }
-      });
-      MathJax.Hub.Queue(function() {
-          $(MathJax.Hub.getAllJax()).map(function(index, elem) {
-              return(elem.SourceElement());
-          }).parent().addClass('has-jax');
-      });
-
-      MathJax.Hub.Configured();
-    </script>
-  </body>
-</html>
-
-
-
 
