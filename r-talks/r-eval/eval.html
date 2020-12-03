@@ -39,7 +39,11 @@ mathjax: true
 
 ---
 
+layout: true
+
 ## Evaluation
+
+---
 
 * Consider the following expression that we wish to evaluate
 
@@ -77,9 +81,6 @@ character(0)
 
 ---
 
-## Evaluation
-
-
 * So let us define `x` and try again
 
 
@@ -108,9 +109,6 @@ Warning in sqrt(x): NaNs produced
 
 ---
 
-## Evaluation
-
-
 
 ```r
 x <- -1+0i
@@ -130,11 +128,7 @@ sqrt(x)
 Error in sqrt(x): non-numeric argument to mathematical function
 ```
 
-
-
 ---
-
-## Evaluation
 
 * Let us check again where `sqrt` and `x` are found
 
@@ -157,8 +151,6 @@ find("x")
 
 ---
 
-## Evaluation
-
 * Suppose we want to define a "smarter" `sqrt()`
 
 * First check what `sqrt()` does, so we can mimic:
@@ -177,8 +169,6 @@ function (x)  .Primitive("sqrt")
 * Check `help(.Primitive)` (we don't need to understand details)
 
 ---
-
-## Evaluation
 
 * define a "smart" `sqrt()` as follows:
 
@@ -204,6 +194,10 @@ sqrt(x)
 ```
 [1] 0+1i
 ```
+
+---
+
+layout: false
 
 ---
 
@@ -294,7 +288,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x55cd30b1e850> 
+<environment: 0x55ea7a577850> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -598,7 +592,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x55cd311e1a00>
+<environment: 0x55ea7ac39c00>
 ```
 
 ```r
@@ -611,8 +605,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x55cd325d0d48>
-<environment: 0x55cd32108d90>
+<bytecode: 0x55ea7c028e30>
+<environment: 0x55ea7bb60f90>
 ```
 
 
@@ -631,7 +625,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x55cd311e1a00>
+<environment: 0x55ea7ac39c00>
 ```
 
 ```r
@@ -639,7 +633,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x55cd32108d90>
+<environment: 0x55ea7bb60f90>
 ```
 
 
@@ -780,8 +774,8 @@ F.log
 function(u) {
 	    sum(x <= u) / length(x)
 	}
-<bytecode: 0x55cd313cb640>
-<environment: 0x55cd32fdff08>
+<bytecode: 0x55ea7ae1bbb8>
+<environment: 0x55ea7ca42098>
 ```
 
 
@@ -865,7 +859,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x55cd3155fe60>
+<environment: 0x55ea7af75a90>
 ```
 
 ```r
@@ -874,7 +868,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x55cd313ccda8>
+<environment: 0x55ea7ae19af8>
 ```
 
 ```r
@@ -1333,7 +1327,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x55cd3155efb8>
+<bytecode: 0x55ea7af79778>
 <environment: namespace:base>
 ```
 
@@ -1345,7 +1339,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x55cd32be7a20>
+<bytecode: 0x55ea7c8cbe98>
 <environment: namespace:base>
 ```
 

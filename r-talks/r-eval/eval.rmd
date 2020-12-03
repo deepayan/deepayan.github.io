@@ -47,7 +47,11 @@ set.seed(20191105)
 
 ---
 
+layout: true
+
 ## Evaluation
+
+---
 
 * Consider the following expression that we wish to evaluate
 
@@ -68,9 +72,6 @@ find("x") # not found
 
 ---
 
-## Evaluation
-
-
 * So let us define `x` and try again
 
 ```{r}
@@ -83,9 +84,6 @@ sqrt(x)
 
 ---
 
-## Evaluation
-
-
 ```{r}
 x <- -1+0i
 sqrt(x)
@@ -93,11 +91,7 @@ x <- "-1"
 sqrt(x)
 ```
 
-
-
 ---
-
-## Evaluation
 
 * Let us check again where `sqrt` and `x` are found
 
@@ -107,8 +101,6 @@ find("x")
 ```
 
 ---
-
-## Evaluation
 
 * Suppose we want to define a "smarter" `sqrt()`
 
@@ -123,8 +115,6 @@ sqrt
 * Check `help(.Primitive)` (we don't need to understand details)
 
 ---
-
-## Evaluation
 
 * define a "smart" `sqrt()` as follows:
 
@@ -144,6 +134,10 @@ sqrt <- function(x)
 x <- -1
 sqrt(x)
 ```
+
+---
+
+layout: false
 
 ---
 
