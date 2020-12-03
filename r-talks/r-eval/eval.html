@@ -294,7 +294,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x5583c1dce850> 
+<environment: 0x55cd30b1e850> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -598,7 +598,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x5583c2491a00>
+<environment: 0x55cd311e1a00>
 ```
 
 ```r
@@ -611,8 +611,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x5583c3880d48>
-<environment: 0x5583c33b8d90>
+<bytecode: 0x55cd325d0d48>
+<environment: 0x55cd32108d90>
 ```
 
 
@@ -631,7 +631,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x5583c2491a00>
+<environment: 0x55cd311e1a00>
 ```
 
 ```r
@@ -639,7 +639,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x5583c33b8d90>
+<environment: 0x55cd32108d90>
 ```
 
 
@@ -780,8 +780,8 @@ F.log
 function(u) {
 	    sum(x <= u) / length(x)
 	}
-<bytecode: 0x5583c267b640>
-<environment: 0x5583c428ff08>
+<bytecode: 0x55cd313cb640>
+<environment: 0x55cd32fdff08>
 ```
 
 
@@ -865,7 +865,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x5583c280fe60>
+<environment: 0x55cd3155fe60>
 ```
 
 ```r
@@ -874,7 +874,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x5583c267cda8>
+<environment: 0x55cd313ccda8>
 ```
 
 ```r
@@ -957,7 +957,7 @@ abline(fm.lse$par, col = "red")
 ## Cross validation: summary
 
 
-$\newcommand{\fhath}{\hat{f_h}}$
+$\newcommand{\fhath}{\hat{f}_h}$
 
 * Denote the histogram for bin width $h$ by $\fhath$, and the unknown density by $f$
 
@@ -1333,7 +1333,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x5583c280efb8>
+<bytecode: 0x55cd3155efb8>
 <environment: namespace:base>
 ```
 
@@ -1345,7 +1345,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x5583c3e97a20>
+<bytecode: 0x55cd32be7a20>
 <environment: namespace:base>
 ```
 

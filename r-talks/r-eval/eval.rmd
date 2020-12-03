@@ -648,7 +648,7 @@ abline(fm.lse$par, col = "red")
 ## Cross validation: summary
 
 
-$\newcommand{\fhath}{\hat{f_h}}$
+$\newcommand{\fhath}{\hat{f}_h}$
 
 * Denote the histogram for bin width $h$ by $\fhath$, and the unknown density by $f$
 
