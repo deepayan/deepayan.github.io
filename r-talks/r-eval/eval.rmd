@@ -16,8 +16,6 @@ options(warnPartialMatchDollar = FALSE, width = 100)
 set.seed(20191105)
 ```
 
----
-
 ## REPL
 
 * R works using what is known as a REPL (Read-Eval-Print-Loop)
