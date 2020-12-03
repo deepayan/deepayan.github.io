@@ -139,8 +139,6 @@ sqrt(x)
 
 layout: false
 
----
-
 ## Multiple symbol definitions
 
 * Where is R finding these symbols?

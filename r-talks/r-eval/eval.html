@@ -199,8 +199,6 @@ sqrt(x)
 
 layout: false
 
----
-
 ## Multiple symbol definitions
 
 * Where is R finding these symbols?
@@ -288,7 +286,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x55ea7a577850> 
+<environment: 0x55b57c3ca850> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -592,7 +590,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x55ea7ac39c00>
+<environment: 0x55b57ca8d568>
 ```
 
 ```r
@@ -605,8 +603,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x55ea7c028e30>
-<environment: 0x55ea7bb60f90>
+<bytecode: 0x55b57de7c798>
+<environment: 0x55b57d9b48f8>
 ```
 
 
@@ -625,7 +623,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x55ea7ac39c00>
+<environment: 0x55b57ca8d568>
 ```
 
 ```r
@@ -633,7 +631,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x55ea7bb60f90>
+<environment: 0x55b57d9b48f8>
 ```
 
 
@@ -774,8 +772,8 @@ F.log
 function(u) {
 	    sum(x <= u) / length(x)
 	}
-<bytecode: 0x55ea7ae1bbb8>
-<environment: 0x55ea7ca42098>
+<bytecode: 0x55b57cc75418>
+<environment: 0x55b57e88fe88>
 ```
 
 
@@ -859,7 +857,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x55ea7af75a90>
+<environment: 0x55b57cdd3b70>
 ```
 
 ```r
@@ -868,7 +866,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x55ea7ae19af8>
+<environment: 0x55b57cc6f520>
 ```
 
 ```r
@@ -1327,7 +1325,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x55ea7af79778>
+<bytecode: 0x55b57cdd8678>
 <environment: namespace:base>
 ```
 
@@ -1339,7 +1337,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x55ea7c8cbe98>
+<bytecode: 0x55b57e51ff70>
 <environment: namespace:base>
 ```
 
