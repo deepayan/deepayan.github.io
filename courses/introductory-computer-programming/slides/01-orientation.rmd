@@ -1,13 +1,9 @@
-
-class: center, middle
-
-# Orientation
-
-## Welcome to Introductory Computer Programming
-
-
 ---
-
+layout: remark
+title: Orientation
+subtitle: Welcome to Introductory Computer Programming
+mathjax: true
+---
 
 # About this course
 
@@ -36,7 +32,7 @@ class: center, middle
 
 - Usual plan:
 
-	- Regular classes during first sememster
+	- Regular classes during first semester
 	
 	- Projects during the second semester
 	
