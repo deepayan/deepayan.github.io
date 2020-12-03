@@ -8,8 +8,6 @@ mathjax: true
 
 
 
----
-
 ## REPL
 
 * R works using what is known as a REPL (Read-Eval-Print-Loop)
@@ -286,7 +284,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x55b57c3ca850> 
+<environment: 0x561c9f4df850> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -590,7 +588,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x55b57ca8d568>
+<environment: 0x561c9fba1ae8>
 ```
 
 ```r
@@ -603,8 +601,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x55b57de7c798>
-<environment: 0x55b57d9b48f8>
+<bytecode: 0x561ca0f90d18>
+<environment: 0x561ca0ac87b0>
 ```
 
 
@@ -623,7 +621,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x55b57ca8d568>
+<environment: 0x561c9fba1ae8>
 ```
 
 ```r
@@ -631,7 +629,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x55b57d9b48f8>
+<environment: 0x561ca0ac87b0>
 ```
 
 
@@ -772,8 +770,8 @@ F.log
 function(u) {
 	    sum(x <= u) / length(x)
 	}
-<bytecode: 0x55b57cc75418>
-<environment: 0x55b57e88fe88>
+<bytecode: 0x561c9fd876f0>
+<environment: 0x561ca19aa1e8>
 ```
 
 
@@ -857,7 +855,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x55b57cdd3b70>
+<environment: 0x561c9fedd5c0>
 ```
 
 ```r
@@ -866,7 +864,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x55b57cc6f520>
+<environment: 0x561c9fd814d8>
 ```
 
 ```r
@@ -1325,7 +1323,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x55b57cdd8678>
+<bytecode: 0x561c9fee1200>
 <environment: namespace:base>
 ```
 
@@ -1337,7 +1335,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x55b57e51ff70>
+<bytecode: 0x561ca1834640>
 <environment: namespace:base>
 ```
 
