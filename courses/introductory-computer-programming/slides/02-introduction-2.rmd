@@ -41,6 +41,9 @@ layout: true
 
 * Usually a programming language will already have many built-in functions
 
+* These can be called by other functions
+
+
 <!-- * Additional libraries or packages will provide more standard functions -->
 
 
@@ -279,23 +282,22 @@ int is_prime_c(int n)
 {
     int i = 2;
     while (i * i <= n) {
-	if (n % i == 0) {
-	    return 0;
-	}
-	i = i + 1;
+		if (n % i == 0) {
+			return 0;
+		}
+		i = i + 1;
     }
     return 1;
 }
-
 
 int main(int argc, char *argv[])
 {
     int i, n;
     if (argc > 1) {    /* one or more arguments supplied  */
-	for (i = 1; i < argc; i++) {
-	    n = atoi(argv[i]); 	/* converts string to integer */
-	    printf("%d -> %d\n", n, is_prime_c(n));
-	}
+		for (i = 1; i < argc; i++) {
+			n = atoi(argv[i]); 	/* converts string to integer */
+			printf("%d -> %d\n", n, is_prime_c(n));
+		}
     }
     else printf("Usage: %s <n1> <n2> ...\n", argv[0]);
     return 0;
@@ -339,8 +341,11 @@ gcc -o is_prime cdemo/is_prime_wrapper.c
 * However, compiled languages have several disadvantages:
 
 	* They are not interactive!
+
 	* Trying out ideas (edit-compile-run) takes longer 
+
 	* Most importantly: limited initial set of tools
+
 	* For example, you will need to write your own functions to import data, make plots, etc.
 
 * Ultimately, choice depends on the purpose of the program
@@ -398,6 +403,10 @@ int is_prime_c(int n)
 
 ")
 ```
+
+---
+
+# An example of using Rcpp
 
 * Alternatively, compile code in a [file](cdemo/is_prime_rcpp.cpp)
 
