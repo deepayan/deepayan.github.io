@@ -314,8 +314,21 @@ print(is_prime_py(101))
 
 ---
 
+layout: true
+
 # How can we run C / C++ code?
 
+---
+
+* The code needs to be "compiled" before it is run
+
+* It also needs a `main()` function to be defined
+
+* `main()` is run first when the program is executed
+
+* Here is a [complete file](cdemo/is_prime_wrapper.c) that can be compiled 
+
+---
 
 ```c
 #include <stdio.h>
@@ -349,18 +362,9 @@ int main(int argc, char *argv[])
 
 ---
 
-# How can we run C / C++ code?
-
-
-* The code needs to be "compiled" before it is run
-
-* It also needs a `main()` function to be defined
-
-* `main()` is run first when the program is executed
-
-* Here is a [complete file](cdemo/is_prime_wrapper.c) that can be compiled 
-
 * How to compile & run depends on the operating system
+
+* For example, on Linux / Mac, something like the following should work
 
 
 ```bash
@@ -386,6 +390,8 @@ Usage: ./is_prime <n1> <n2> ...
 
 ---
 
+layout: false
+
 # Compiled code vs interpreted code
 
 * R, Python, etc., are "interpreted" languages that read and evaluate code interactively
@@ -405,8 +411,6 @@ Usage: ./is_prime <n1> <n2> ...
 	* For example, you will need to write your own functions to import data, make plots, etc.
 
 * Ultimately, choice depends on the purpose of the program
-
-
 
 ---
 
@@ -529,7 +533,7 @@ system.time(r_primes <- sapply(1:1000000, is_prime_r))
 
 ```
    user  system elapsed 
- 20.384   0.006  20.427 
+ 11.252   0.005  11.257 
 ```
 
 ```r
@@ -538,7 +542,7 @@ system.time(c_primes <- sapply(1:1000000, is_prime_c))
 
 ```
    user  system elapsed 
-  3.400   0.008   3.408 
+  2.313   0.000   2.312 
 ```
 
 * The C version is clearly faster
@@ -564,7 +568,7 @@ sum(r_primes == TRUE)   # counts number of TRUE in a logical vector
 ```
 
 ```r
-sum(c_primes == TRUE)
+sum(c_primes == 1)
 ```
 
 ```
@@ -634,5 +638,11 @@ plot(cumsum(c_primes) / (n / log(n)), type = "l", ylim = c(1, 1.4))
 * Over the next few classes, we will learn R more formally
 
 * We will then come back to study algorithms in more detail
+
+---
+
+class: center middle
+
+# Questions?
 
 

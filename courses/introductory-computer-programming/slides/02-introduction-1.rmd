@@ -251,7 +251,9 @@ layout: true
 
 ---
 
-- There are no fixed rules that pseudo-code must follow
+- The general structure of algorithms is derived from a language called [ALGOL](https://en.wikipedia.org/wiki/ALGOL)
+
+- However, there are no fixed rules that pseudo-code must follow
 
 - An alternative form of our `is_prime` algorithm could be:
 
