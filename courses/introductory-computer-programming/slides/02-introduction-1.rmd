@@ -364,7 +364,7 @@ your progress and allow me to discuss common mistakes.
 
 2. Write an algorithm to compute $\log k!$ given $k$
 
-3. Write an algorithm to compute $n \choose k$ given n, $k$
+3. Write an algorithm to compute $n \choose k$ given $n, k$
 
 4. Briefly describe two simple tasks that cannot be easily done
    without a computer. This may be related or unrelated to what you
