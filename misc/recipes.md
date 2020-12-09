@@ -35,6 +35,8 @@ cooking something in oil on low heat).
 
 - Broccoli - 5 mins
 
+- Carrots - 5 mins
+
 - Capsicum - 5 mins
 
 

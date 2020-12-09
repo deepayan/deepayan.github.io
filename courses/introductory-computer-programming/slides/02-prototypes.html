@@ -1,0 +1,135 @@
+---
+layout: remark
+title: Prototype Exercise Problems
+subtitle: Introductory Computer Programming
+mathjax: true
+---
+
+
+# Outline
+
+This set of slides outline a few prototype problems that we will use
+as exercises throughout the course. The goal is the same in all cases,
+namely, to go through the following steps:
+
+1. Broadly outline a procedure to solve the problem
+
+2. Write one or more algorithms to implement the procedure
+
+3. Write an actual program to implement the procedure
+
+4. Compare various solutions and improve upon them if possible
+
+I will assign these steps as exercises at the appropriate time as we
+go along.
+
+
+---
+
+
+# 1. Compute a probability
+
+Given an integer $N$, choose two distinct numbers between $1$ and $N$
+using [simple random
+sampling](https://en.wikipedia.org/wiki/Simple_random_sample) without
+replacement. What is the probability that the smaller number exactly
+divides the larger number?
+
+---
+
+
+# 2. Obtain maximum likelihood estimator
+
+In many athletic events, such as javelin throw, the "performance" of
+an athlete is measured by the best outcome of several attempts.
+
+Suppose a javelin thrower participates in $n$ events in a year, and in
+each event makes three attempts. Denote by $X\_{ik}$ the distance
+thrown in the $k$-th attempt in the $i$-th event. However, only the
+maximum $$ M\_i = \max \lbrace X\_{i1}, X\_{i2}, X\_{i3} \rbrace $$ is
+observed for each event $i$.
+
+Assume that $X_{ik}$ are distributed independently as $N(\mu,
+\sigma^2)$. How would you find the MLEs of $\mu$ and $\sigma^2$?
+
+
+---
+
+
+# 3. Estimate power curve
+
+Suppose we want to compare the power of the two-sample $t$-test and
+the Wilcoxon rank-sum test for a very specific model:
+
+<div>
+\begin{eqnarray*}
+X_1, X_2, \dotsc, X_n &\sim& U(0, 1) \\
+X_1, X_2, \dotsc, X_n &\sim& U(\theta, 1) \\
+H_0 : \theta = 0 &\text{ vs }& H_0 : \theta > 0
+\end{eqnarray*}
+</div>
+
+To do this, we conduct a simulation study where we take $n = 20, 50,
+100$ and $\theta = 0, 0.1, 0.2, 0.3, 0.4, 0.5$, and replicate the
+experiment 1000 times for each combination. For each such replication,
+we compute and report the $p$-value of both tests.
+
+A. Design such a simulation study. This is the more difficult part of
+this exercise, so you can leave it till later, and instead use the
+result from one such experiment, available [here](extra/simulation-study.csv).
+
+B. Given the result of such a simulation study, compute and plot the
+power curve of the two tests, at nominal level $\alpha = 0.05$, as a
+function of $\theta$.
+
+
+---
+
+# 4. The Mandelbrot set
+
+Finally, a fun exercise. $\newcommand{\CC}{\mathbb{C}}$ Consider the
+function $f\_c: \CC \to \CC$ given by $f\_c(z) = z^2 + c$.  For any $c
+\in \CC$, consider the recursively defined sequence given by
+
+<div>
+$$
+z_0 = 0 + 0i,\quad
+z_{n} = f_c(z_{n-1}), n \geq 1
+$$
+</div>
+
+The [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set) $M$
+consists of all $c \in \CC$ such that this sequence does not
+diverge. For a concrete practical definition, we can approximate $M$
+by
+
+<div>
+$$
+M_K = \lbrace c \in \CC : \lvert z_n \rvert \leq 2 \text{ after $K$ iterations } \rbrace
+$$
+</div>
+
+Notice that the sequence is guaranteed to diverge if $\lvert z_n
+\rvert > 2$ for some $n$.
+
+The problem is as follows: Given $K$, $x_1 < x_2$, $y_1 < y_2$, and $M$
+
+- Compute $M$ equally spaced numbers within the intervals $[x_1, x_2]$
+  and $[y_1, y_2]$.
+  
+- For each resulting pair $(x, y)$, define $c = x + yi$, and record
+  the first $n \leq K$ such that $\lvert z_n \rvert > 2$. If $\lvert
+  z_K \rvert \leq 2$, record the result as $K$. Create a matrix
+  storing these results.
+  
+- Create an image from this matrix.
+
+The next slide shows what you might get for $[-2, 0.5] \times
+[-1.25, 1.25]$ with $K = 200$.
+
+---
+
+background-image: url(extra/mandelbrot.png)
+
+<!-- ![](mandelbrot.png) -->
+
