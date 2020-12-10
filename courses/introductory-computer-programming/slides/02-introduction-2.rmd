@@ -43,6 +43,8 @@ layout: true
 
 * These can be called by other functions
 
+* Knowing what is available is an essential part of "learning" a language
+
 
 <!-- * Additional libraries or packages will provide more standard functions -->
 
@@ -249,7 +251,11 @@ def is_prime_py(n):
 	return 1
 ```
 
-* The main difference is that indentation defines code blocks
+* The main difference is in how code blocks are defined: 
+
+	- start with a colon (`:`) 
+	
+	- end is defined by indentation (amount of space in the beginning)
 
 * Changing indentation will change meaning of code, which does not happen in C or R
 
