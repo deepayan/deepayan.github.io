@@ -1,0 +1,303 @@
+---
+layout: remark
+title: An Overview of R - 1
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-roverview-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6,
+               dpi = 96, fig.path='figures/roverview-1-')
+library(lattice)
+lattice.options(default.args = list(as.table = TRUE), 
+                default.theme = list(grid.pars = list(cex = 1.5)))
+options(warnPartialMatchDollar = FALSE, width = 120)
+```
+
+# Software for Statistics
+
+- Computation is an essential part of modern statistics
+
+    - Handling large datasets 
+
+    - Visualization
+
+    - Simulation
+
+    - Iterative methods 
+
+- Many softwares are available for such computation, but we will focus on R
+--
+
+- Why R?
+
+    - Available as [Free](https://en.wikipedia.org/wiki/Free_software_movement) / 
+    	  [Open Source](https://en.wikipedia.org/wiki/The_Open_Source_Definition) Software
+
+    - Very popular (both academia and industry)
+
+    - Easy to try out on your own
+--
+
+- Also because I know R better than other languages
+
+- Python and Julia are other good alternatives
+
+
+---
+
+# Outline
+
+- Installing R (hopefully most of you have already done this)
+
+- Basics of using R
+
+- Some examples
+
+
+---
+
+# Installing R
+
+* R is most commonly used as a [REPL](https://en.wikipedia.org/wiki/Read-eval-print_loop) (Read-Eval-Print-Loop)
+
+	* When it is started, R Waits for user input
+
+	* Evaluates and prints result
+
+	* Waits for more input
+--
+
+* There are several different _interfaces_ to do this
+
+* R itself works on many platforms (Windows, Mac, UNIX, Linux)
+
+* Some interfaces are platform-specific, some work on most
+--
+
+* R and the interface may need to be installed separately
+
+
+---
+
+# Installing R
+
+* Go to <https://cran.r-project.org/> (or choose a [mirror](https://cran.r-project.org/mirrors.html) first)
+
+* Follow instructions depending on your platform (Windows for most of you)
+--
+
+* This will install R, as well as a default graphical interface on Windows and Mac
+--
+
+* I will recommend a different interface called
+  [R Studio](https://www.rstudio.com/) that needs to be installed separately
+  
+* I personally use yet another interface called
+  [ESS](https://ess.r-project.org/) with a general-purpose
+  editor called [Emacs](https://www.gnu.org/software/emacs/)
+
+
+---
+
+# Running R
+
+* Once installed, you can start the appropriate interface (or R directly) to get something like this:
+
+```
+R version 4.0.3 (2020-10-10) -- "Bunny-Wunnies Freak Out"
+Copyright (C) 2020 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin19.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> 
+```
+
+* The `>` represents a _prompt_ indicating that R is waiting for input.
+
+* The difficult part is to learn what to do next
+
+
+---
+
+# The R REPL essentially works like a calculator
+
+```{r}
+34 * 23
+27 / 7
+exp(2)
+2^10
+```
+
+---
+
+# R has standard mathematical functions
+
+```{r}
+sqrt(5 * 125)
+log(120)
+factorial(10)
+log(factorial(10))
+```
+
+---
+
+# R has standard mathematical functions
+
+```{r}
+choose(15, 5)
+factorial(15) / (factorial(10) * factorial(5))
+```
+--
+
+```{r}
+choose(1500, 2)
+factorial(1500) / (factorial(1498) * factorial(2))
+```
+
+
+
+---
+
+# R supports variables
+
+```{r}
+x <- 2
+y <- 10
+x^y
+y^x
+factorial(y)
+log(factorial(y), base = x)
+```
+
+---
+
+# R can compute on vectors
+
+```{r}
+N <- 15
+x <- seq(0, N)
+N
+x
+choose(N, x)
+```
+
+
+---
+
+# R has functions for statistical calculations
+
+```{r}
+p <- 0.25
+choose(N, x) * p^x * (1-p)^(N-x)
+dbinom(x, size = N, prob = p)
+```
+
+---
+
+# R has functions that work on vectors
+
+```{r}
+p.x <- dbinom(x, size = N, prob = p)
+sum(x * p.x) / sum(p.x)
+N * p
+```
+
+
+---
+
+# R can draw graphs
+
+```{r}
+plot(x, p.x, ylab = "Probability", pch = 16)
+title(main = sprintf("Binomial(%g, %g)", N, p))
+abline(h = 0, col = "grey")
+```
+\
+
+
+
+---
+
+# R can simulate random variables
+
+```{r}
+cards <- as.vector(outer(c("H", "D", "C", "S"), 1:13, paste))
+cards
+```
+--
+
+```{r}
+sample(cards, 13)
+sample(cards, 13)
+```
+
+
+---
+
+# R can simulate random variables
+
+```{r}
+z <- rnorm(50, mean = 0, sd = 1)
+z
+```
+
+
+
+---
+
+# Example: random walk
+
+```{r}
+plot(1:100, type = "n", ylim = c(-25, 25), ylab = "")
+for (i in 1:20) {
+    z <- rnorm(100, mean = 0, sd = 1)
+    lines(cumsum(z), col = sample(colors(), 1))
+}
+```
+\
+
+
+
+---
+
+# R is in fact a full programming language
+
+* Variables
+
+* Functions
+
+* Control flow structures
+
+	* For loops, while loops
+
+	* If-then-else (branching)
+--
+
+* Distinguishing features
+
+	* Focus on _vectors_ and _vectorized operations_ 
+
+	* Treatment of _functions_ at par with other object types
+
+
+* We will see a few examples to illustrate what I mean by this in the next class
+
+* First, a demo of using R using an [R script]() and an [R Markdown]() file 
+
