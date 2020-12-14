@@ -10,7 +10,7 @@ mathjax: true
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
 opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-intro-2/', autodep = TRUE,
                comment = "", warning = TRUE, message = TRUE,
-			   engine.path = list(python = "/usr/bin/python3"),
+			   ## engine.path = list(python = "/usr/bin/python3"),
                ## knitr.table.format = "html",
                fig.width = 15, fig.height = 7, dpi = 96, 
 			   fig.path='figures/intro-2-')

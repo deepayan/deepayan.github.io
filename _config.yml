@@ -1,6 +1,6 @@
 ## Jekyll build settings
 markdown: kramdown
-kramdown:
-  math_engine: +nil+
+## kramdown:
+##  math_engine: +nil+
 
 
