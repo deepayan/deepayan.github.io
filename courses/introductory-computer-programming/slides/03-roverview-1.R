@@ -3,10 +3,7 @@ opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-roverview-1/', autode
                knitr.table.format = "html",
                fig.width = 15, fig.height = 6,
                dpi = 96, fig.path='figures/roverview-1-')
-library(lattice)
-lattice.options(default.args = list(as.table = TRUE), 
-                default.theme = list(grid.pars = list(cex = 1.5)))
-options(warnPartialMatchDollar = FALSE, width = 120)
+options(warnPartialMatchDollar = FALSE, width = 100)
 
 34 * 23
 27 / 7
