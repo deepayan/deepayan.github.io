@@ -1,0 +1,338 @@
+---
+layout: remark
+title: An Overview of R - 2
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+# Before we start, an experiment!
+
+
+<!-- https://developer.mozilla.org/en-US/docs/Web/CSS/cursor -->
+
+<p><img src="the_dress.png" style="width:25%;" alt="the dress" /><br />
+
+<!-- ![the dress](the_dress_small.png) -->
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-roverview-2/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 7, dpi = 96, fig.path='figures/roverview-2-')
+library(lattice)
+lattice.options(default.args = list(as.table = TRUE), 
+                default.theme = list(grid.pars = list(cex = 1.5)))
+options(warnPartialMatchDollar = FALSE, width = 120)
+```
+
+--
+
+Color combination: Is it __white & gold__  or __blue & black__ ? Let's count!
+
+```{r}
+NN <- 18 + 8 # total
+XX <- 18     # white and gold
+```
+
+
+---
+
+# Question: What proportion of population sees white & gold?
+
+- Statistics uses data to make inferences 
+
+- Model: 
+
+    - Let $p$ be the probability of seeing white & gold
+
+    - Assume that individuals are independent
+--
+
+- Data:
+
+    - Suppose $X$ out of $N$ sampled individuals see white & gold; 
+	  e.g., $N = `r {NN}`$, $X = `r {XX}`$.
+
+    - According to model, $X \sim Bin(N, p)$
+--
+
+- "Obvious" estimate of $p = X / N = `r {XX}` / `r {NN}` = `r {round(XX/NN, 4)}`$
+
+- But how is this estimate derived?
+
+
+
+
+---
+
+# Generally useful method: maximum likelihood
+
+- Likelihood function: probability of observed data as function of $p$
+
+$$
+L(p) = P(X = `r {XX}`) = {`r {NN}` \choose `r {XX}`}  p^{`r {XX}`} (1-p)^{(`r {NN}`-`r {XX}`)}, p \in (0, 1)
+$$
+
+- Intuition: $p$ that gives higher $L(p)$ is more "likely" to be correct
+
+- Maximum likelihood estimate $\hat{p} = \arg \max L(p)$
+--
+
+- By differentiating 
+$$
+\log L(p) = c + `r {XX}` \log p + `r {NN-XX}` \log (1-p)
+$$
+we get
+$$
+\frac{d}{dp} \log L(p) = \frac{`r {XX}`}{p} - \frac{`r {NN-XX}`}{1-p} = 0 \implies `r {XX}` (1-p) - `r {NN-XX}` p = 0 \implies p = \frac{`r {XX}`}{`r {NN}`}
+$$
+
+
+---
+
+# How could we do this numerically?
+
+- Pretend for the moment that we did not know how to do this. 
+
+- How could we arrive at the same solution numerically?
+
+- Basic idea: Compute $L(p)$ for various values of $p$ and find minimum.
+--
+
+- To do this in R, remember that R works like a calculator:
+
+	- The user types in an expression, R calculates the answer
+
+    - The expression can involve numbers, variables, and functions
+
+- For example:
+
+```{r}
+N = NN
+x = XX
+p = 0.5
+choose(N, x) * p^x * (1-p)^(N-x)
+```
+
+
+---
+
+# "Vectorized" computations
+
+- One important distinguishing feature of R is that it operates on "vectors"
+
+```{r}
+pvec = seq(0, 1, by = 0.01)
+pvec
+Lvec = choose(N, x) * pvec^x * (1-pvec)^(N-x)
+Lvec
+```
+
+---
+
+# Plotting is very easy
+
+```{r}
+plot(x = pvec, y = Lvec, type = "l")
+```
+
+
+---
+
+# Functions
+
+- Functions can be used to encapsulate repetitive computations
+
+- Like mathematical functions, they take arguments as input and "returns" an output
+
+```{r}
+L = function(p) choose(N, x) * p^x * (1-p)^(N-x)
+L(0.5)
+L(x/N)
+```
+
+---
+
+# Functions can be plotted directly
+
+```{r}
+plot(L, from = 0, to = 1)
+```
+
+
+
+---
+
+# ...and they can be numerically "optimized"
+
+```{r}
+optimize(L, interval = c(0, 1), maximum = TRUE)
+```
+
+- Compare with
+
+```{r}
+XX / NN
+```
+
+---
+
+# Another example: Linear regression
+
+```{r}
+data(Davis, package = "carData")        # Davis height and weight data
+str(Davis)                              # Summarize structure of data
+fm <- lm(weight ~ height, data = Davis) # Regression of weight on height
+fm
+```
+
+
+---
+
+# You should always plot the data first!
+
+
+```{r}
+library(lattice) # A different way to plot data
+xyplot(weight ~ height, data = Davis, grid = TRUE, type = c("p", "r"))
+```
+
+---
+
+# The regression model is fit by minimizing least squares
+
+
+```{r}
+coef(fm) # estimated regression coefficients
+```
+--
+
+- We can confirm using a general optimizer:
+
+```{r}
+SSE = function(beta)
+{
+    with(Davis,
+         sum((weight - beta[1] - beta[2] * height)^2))
+}
+optim(c(0, 0), fn = SSE)
+```
+
+---
+
+# Fitting the regression model
+
+- `lm()` gives exact solution and more statistically relevant details
+
+```{r}
+summary(fm)
+```
+
+
+---
+
+# Changing the model-fitting criteria
+
+- Suppose we wanted to minimize _sum of absolute errors_ instead of sum of squares
+
+- No closed form solution any more, but general optimizer will still work:
+
+
+```{r}
+SAE = function(beta)
+{
+    with(Davis,
+         sum(abs(weight - beta[1] - beta[2] * height)))
+}
+opt = optim(c(0, 0), fn = SAE)
+opt
+```
+
+
+---
+
+# This is an example of _robust regression_
+
+```{r,fig.height=6}
+xyplot(weight ~ height, data = Davis, grid = TRUE,
+       panel = function(x, y, ...) {
+           panel.abline(fm, col = "red") # squared errors
+           panel.abline(opt$par, col = "blue") # absolute errors
+           panel.xyplot(x, y, ...)
+       })
+```
+
+---
+
+# Another way to plot the data and model fits
+
+```{r,fig.height=6}
+library(ggplot2)
+qplot(x = height, y = weight, data = Davis) + 
+	    geom_abline(intercept = coef(fm)[1], slope = coef(fm)[2], col = 2) + 
+        geom_abline(intercept = opt$par[1], slope = opt$par[2], col = 3)
+```
+
+---
+
+# With an easy way to make the plot interactive
+
+```{r,eval=FALSE}
+library(plotly)
+ggplotly(qplot(x = height, y = weight, data = Davis) + 
+	       geom_abline(intercept = coef(fm)[1], slope = coef(fm)[2], col = 2) + 
+           geom_abline(intercept = opt$par[1], slope = opt$par[2], col = 3))
+```
+
+```{r echo=FALSE,message=FALSE,warning=FALSE,results="hide"}
+library(plotly)
+w <- ggplotly(qplot(x = height, y = weight, data = Davis) + 
+              geom_abline(intercept = coef(fm)[1], slope = coef(fm)[2], col = 2) + 
+              geom_abline(intercept = opt$par[1], slope = opt$par[2], col = 3))
+htmlwidgets::saveWidget(w, "davis-plotly.html", selfcontained = FALSE, 
+                        libdir = "plotly-files")
+```
+
+
+<iframe src="davis-plotly.html" height="400px" width="99%"></iframe>
+
+
+
+
+---
+
+# R gives access to an extensive toolset
+
+* Most standard data analysis methods are already implemented
+
+* Can be extended by writing add-on packages
+
+* Thousands of add-on packages are available
+
+	- The last few plots are all created using add-on packages
+
+---
+
+# Drawbacks
+
+* Learning R needs some effort 
+
+* Not point-and-click software
+
+* Command-line interface
+
+
+
+---
+
+# Good practices
+
+* Use a good interface (R Studio is the most popular one)
+
+* Save your code in a script file (makes it easier to reproduce later)
+
+* Use "literate programming" approaches (notebooks, R Markdown, etc.)
+
