@@ -1,0 +1,467 @@
+---
+layout: remark
+title: Basic usage of R - 1
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+
+## Basics of using R
+
+R is more flexible than a regular calculator
+
+* In fact, R is a full programming language
+
+* Most standard data analysis methods are already implemented
+
+* Can be extended by writing add-on packages
+
+* Thousands of add-on packages are available
+
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-rbasics-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/rbasics-1-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+
+
+
+---
+
+## Major concepts
+
+* Variables (in the context of programming)
+
+* Data structures needed for data analyis
+
+* Functions (set of instructions for performing a procedure)
+---
+
+## Variables
+
+* Variables are symbols that may be associated with different values
+
+* Computations involving variables are done using their current value
+
+```{r}
+x <- 10 # assignment
+sqrt(x)
+x <- -1
+sqrt(x)
+x <- -1+0i
+sqrt(x)
+```
+---
+
+## Data structures for data analysis
+
+
+* Vectors
+
+* Matrices 
+
+* Data frames (a spreadsheet-like data set)
+
+* Lists (general collection of objects)
+
+---
+
+## Atomic vectors
+
+* Indexed collection of homogeneous scalars, can be 
+
+    * Numeric / Integer
+
+    * Categorical (factor)
+
+    * Character
+
+    * Logical (`TRUE` / `FALSE`)
+	
+* Missing values are allowed, indicated as `NA`
+
+* Elements are indexed starting from 1
+
+* $i$th element of vector `x` can be extracted using `x[i]`
+
+* There are also more sophisticated forms of (vector) indexing
+
+---
+
+## Atomic vectors: examples
+
+```{r}
+month.name # built-in 
+x <- rnorm(10)
+x
+```
+--
+
+
+```{r}
+str(x) # useful function
+str(month.name)
+```
+---
+
+## Atomic vectors: examples
+
+```{r}
+m <- sample(1:12, 30, rep = TRUE)
+m
+mf <- factor(m, levels = 1:12, labels = month.name)
+mf
+str(m)
+str(mf)
+```
+
+---
+
+## Atomic vectors
+
+* "Scalars" are just vectors of length 1
+
+```{r}
+str(numeric(2))
+str(numeric(1))
+str(0)
+```
+---
+
+## Atomic vectors
+
+
+* Vectors can have length zero 
+
+```{r}
+numeric(0)
+logical(0)
+```
+
+
+
+
+---
+
+## Types of indexing
+
+* Indexing refers to extracting subsets of vectors (or other kinds of data)
+
+* R supports several kinds of indexing:
+
+	* Indexing by a vector of positive integers
+
+	* Indexing by a vector of negative integers
+	
+	* Indexing by a logical vector
+
+	* Indexing by a vector of names
+
+---
+
+## Types of indexing
+
+* The "standard" C-like indexing with a scalar (vector of length 1):
+
+```{r}
+month.name[2] # the first index is 1, not 0
+```
+
+* The "index" can also be an integer vector
+
+```{r}
+month.name[c(2, 4, 6, 9, 11)]
+```
+
+* Elements can be repeated
+
+```{r}
+month.name[c(2, 2, 6, 4, 6, 11)]
+```
+
+
+---
+
+## Types of indexing
+
+* "Out-of-bounds" indexing give `NA` (missing)
+
+```{r}
+month.name[13]
+seq(1, by = 2, length.out = 8)
+month.name[seq(1, by = 2, length.out = 8)]
+```
+
+
+---
+
+## Types of indexing
+
+* Negative integers omit the specified entries
+
+```{r}
+month.name[-2]
+month.name[-c(2, 4, 6, 9, 11)]
+```
+
+
+* Cannot be mixed with positive integers
+
+```{r}
+month.name[c(2, -3)]
+```
+---
+
+## Types of indexing
+
+* Zero has a special meaning - doesn't select anything
+
+```{r}
+month.name[0]
+month.name[integer(0)] ## same as empty index
+month.name[c(1, 2, 0, 11, 12)]
+month.name[-c(1, 2, 0, 11, 12)]
+```
+---
+
+## Types of indexing
+
+* Indexing by logical vector: select `TRUE` elements
+
+```{r}
+month.name[c(TRUE, FALSE, FALSE)] # index replicated
+i <- substring(month.name, 1, 1) == "J"
+i
+month.name[i]
+```
+
+---
+
+## Types of indexing
+
+* Common use: extract subset satisfying a certain condition (also called "filtering")
+
+```{r}
+(x <- rnorm(20))
+x > 0
+x[x > 0]
+mean(x[x > 0])
+```
+
+
+---
+
+## Types of indexing
+
+* Sometimes logical indexing can be replaced by integer indexing using `which()`
+
+```{r}
+i
+which(i)
+month.name[ which(i) ]
+month.name[ -which(i) ] # same as month.name[ !i ]
+```
+---
+
+## Types of indexing
+
+* But be careful about zero-length indices
+
+```{r}
+which(substring(month.name, 1, 1) == "B")
+month.name[ which( substring(month.name, 1, 1) == "B") ]
+-which(substring(month.name, 1, 1) == "B") 
+month.name[ -which( substring(month.name, 1, 1) == "B") ]
+```
+
+
+---
+
+## Lists
+
+* Lists are vectors with arbitrary types of components
+
+* May or may not have names
+
+* Usual vector indexing by `[` works in the usual way
+
+* Individual elements can be extracted either by name (`$`) or by position `x[[i]]`
+
+---
+
+## Lists: examples
+
+```{r}
+ml <- list(imonth = m, fmonth = mf)
+str(ml)
+```
+--
+
+
+```{r}
+ml$imonth
+```
+--
+
+
+```{r}
+ml[[2]]
+```
+
+<!-- ml[["fmonth"]] -->
+
+
+---
+
+## Most common structures for statistical data
+
+* Vectors, matrices / arrays: vectors with dimension
+
+```{r}
+VADeaths
+dim(VADeaths)
+```
+---
+
+## Most common structures for statistical data
+
+* Indexing works in same way, but in two dimensions
+
+```{r}
+VADeaths[1:2, c(2, 3)]
+```
+
+* Example: Indexing by "empty" index (selects all) and name
+
+```{r}
+VADeaths[, c("Rural Male", "Rural Female")]
+```
+
+
+---
+
+## Most common structures for statistical data
+
+* Data frames: lists that also behave like a matrix
+
+```{r}
+str(iris)
+dim(iris)
+```
+---
+
+## Most common structures for statistical data
+
+```{r}
+iris
+```
+---
+
+## Data Frames
+
+* Rectangular (matrix-like) structure
+
+* Each column is a vector
+
+* Different columns can have different types
+
+* Every column must have a name
+--
+
+* Most built-in data sets in R are data frames
+
+---
+
+## Data input / output
+
+* Statistical data are usually structured like a spreadsheet (e.g., Excel)
+
+* Typical approach: read data from spreadsheet file into data frame
+
+* Easiest route:
+
+    * R itself cannot read Excel files directly
+
+    * Save as CSV file from Excel
+
+    * Read with `read.csv()` or `read.table()` (more flexible)
+
+* Alternative option:
+
+    * Use "Import Dataset" menu item in R Studio (requires add-on packages)
+
+---
+
+## Data input / output
+
+* Data frames can be exported as a spreadsheet file using
+  `write.csv()` or `write.table()`
+
+```{r eval=FALSE}
+data(Cars93, package = "MASS")
+write.csv(Cars93, file = "cars93.csv") # export
+cars <- read.csv("cars93.csv") # import (path relative to working directory)
+```
+
+
+
+---
+
+## Functions
+
+* Most useful things in R happen by calling functions
+
+* Functions have one or more arguments
+
+    * All arguments have names
+
+	* Arguments may be compulsory or optional
+
+	* Optional arguments have "default" values 
+
+	* Arguments may or may no be named
+
+	* Optional arguments are usually named
+	
+* Functions normally also have a useful "return" value	
+
+* For example, linear models are fit using the function `lm()`
+
+
+---
+
+## Other important features
+
+* Getting help
+
+* Generic functions and methods
+
+* How matrices and arrays are implemented in R
+
+* Homework --- read the following tutorials
+
+	* [Introduction and Language Overview I](https://www.isid.ac.in/~deepayan/R-tutorials/labs/01_introduction_lab.pdf)
+
+	* [Language Overview II](https://www.isid.ac.in/~deepayan/R-tutorials/labs/02_language_lab.pdf)
+
+	* Supplementary files:
+      [Gcsemv.txt](https://www.isid.ac.in/~deepayan/R-tutorials/data/Gcsemv.txt),
+      [iris.xls](https://www.isid.ac.in/~deepayan/R-tutorials/data/iris.xls),
+
+
+---
+
+class: center middle
+
+# Questions?
+
+
+
