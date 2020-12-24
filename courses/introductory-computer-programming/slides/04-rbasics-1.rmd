@@ -8,7 +8,7 @@ mathjax: true
 
 
 
-## Basics of using R
+# Basics of using R
 
 R is more flexible than a regular calculator
 
@@ -36,7 +36,7 @@ options(warnPartialMatchDollar = FALSE, width = 100)
 
 ---
 
-## Major concepts
+# Major concepts
 
 * Variables (in the context of programming)
 
@@ -45,7 +45,7 @@ options(warnPartialMatchDollar = FALSE, width = 100)
 * Functions (set of instructions for performing a procedure)
 ---
 
-## Variables
+# Variables
 
 * Variables are symbols that may be associated with different values
 
@@ -61,7 +61,7 @@ sqrt(x)
 ```
 ---
 
-## Data structures for data analysis
+# Data structures for data analysis
 
 
 * Vectors
@@ -74,7 +74,7 @@ sqrt(x)
 
 ---
 
-## Atomic vectors
+# Atomic vectors
 
 * Indexed collection of homogeneous scalars, can be 
 
@@ -96,7 +96,7 @@ sqrt(x)
 
 ---
 
-## Atomic vectors: examples
+# Atomic vectors: examples
 
 ```{r}
 month.name # built-in 
@@ -112,7 +112,7 @@ str(month.name)
 ```
 ---
 
-## Atomic vectors: examples
+# Atomic vectors: examples
 
 ```{r}
 m <- sample(1:12, 30, rep = TRUE)
@@ -125,7 +125,7 @@ str(mf)
 
 ---
 
-## Atomic vectors
+# Atomic vectors
 
 * "Scalars" are just vectors of length 1
 
@@ -136,7 +136,7 @@ str(0)
 ```
 ---
 
-## Atomic vectors
+# Atomic vectors
 
 
 * Vectors can have length zero 
@@ -151,7 +151,7 @@ logical(0)
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Indexing refers to extracting subsets of vectors (or other kinds of data)
 
@@ -167,7 +167,7 @@ logical(0)
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * The "standard" C-like indexing with a scalar (vector of length 1):
 
@@ -190,7 +190,7 @@ month.name[c(2, 2, 6, 4, 6, 11)]
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * "Out-of-bounds" indexing give `NA` (missing)
 
@@ -203,7 +203,7 @@ month.name[seq(1, by = 2, length.out = 8)]
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Negative integers omit the specified entries
 
@@ -220,7 +220,7 @@ month.name[c(2, -3)]
 ```
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Zero has a special meaning - doesn't select anything
 
@@ -232,7 +232,7 @@ month.name[-c(1, 2, 0, 11, 12)]
 ```
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Indexing by logical vector: select `TRUE` elements
 
@@ -245,7 +245,7 @@ month.name[i]
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Common use: extract subset satisfying a certain condition (also called "filtering")
 
@@ -259,7 +259,7 @@ mean(x[x > 0])
 
 ---
 
-## Types of indexing
+# Types of indexing
 
 * Sometimes logical indexing can be replaced by integer indexing using `which()`
 
@@ -271,7 +271,7 @@ month.name[ -which(i) ] # same as month.name[ !i ]
 ```
 ---
 
-## Types of indexing
+# Types of indexing
 
 * But be careful about zero-length indices
 
@@ -281,181 +281,6 @@ month.name[ which( substring(month.name, 1, 1) == "B") ]
 -which(substring(month.name, 1, 1) == "B") 
 month.name[ -which( substring(month.name, 1, 1) == "B") ]
 ```
-
-
----
-
-## Lists
-
-* Lists are vectors with arbitrary types of components
-
-* May or may not have names
-
-* Usual vector indexing by `[` works in the usual way
-
-* Individual elements can be extracted either by name (`$`) or by position `x[[i]]`
-
----
-
-## Lists: examples
-
-```{r}
-ml <- list(imonth = m, fmonth = mf)
-str(ml)
-```
---
-
-
-```{r}
-ml$imonth
-```
---
-
-
-```{r}
-ml[[2]]
-```
-
-<!-- ml[["fmonth"]] -->
-
-
----
-
-## Most common structures for statistical data
-
-* Vectors, matrices / arrays: vectors with dimension
-
-```{r}
-VADeaths
-dim(VADeaths)
-```
----
-
-## Most common structures for statistical data
-
-* Indexing works in same way, but in two dimensions
-
-```{r}
-VADeaths[1:2, c(2, 3)]
-```
-
-* Example: Indexing by "empty" index (selects all) and name
-
-```{r}
-VADeaths[, c("Rural Male", "Rural Female")]
-```
-
-
----
-
-## Most common structures for statistical data
-
-* Data frames: lists that also behave like a matrix
-
-```{r}
-str(iris)
-dim(iris)
-```
----
-
-## Most common structures for statistical data
-
-```{r}
-iris
-```
----
-
-## Data Frames
-
-* Rectangular (matrix-like) structure
-
-* Each column is a vector
-
-* Different columns can have different types
-
-* Every column must have a name
---
-
-* Most built-in data sets in R are data frames
-
----
-
-## Data input / output
-
-* Statistical data are usually structured like a spreadsheet (e.g., Excel)
-
-* Typical approach: read data from spreadsheet file into data frame
-
-* Easiest route:
-
-    * R itself cannot read Excel files directly
-
-    * Save as CSV file from Excel
-
-    * Read with `read.csv()` or `read.table()` (more flexible)
-
-* Alternative option:
-
-    * Use "Import Dataset" menu item in R Studio (requires add-on packages)
-
----
-
-## Data input / output
-
-* Data frames can be exported as a spreadsheet file using
-  `write.csv()` or `write.table()`
-
-```{r eval=FALSE}
-data(Cars93, package = "MASS")
-write.csv(Cars93, file = "cars93.csv") # export
-cars <- read.csv("cars93.csv") # import (path relative to working directory)
-```
-
-
-
----
-
-## Functions
-
-* Most useful things in R happen by calling functions
-
-* Functions have one or more arguments
-
-    * All arguments have names
-
-	* Arguments may be compulsory or optional
-
-	* Optional arguments have "default" values 
-
-	* Arguments may or may no be named
-
-	* Optional arguments are usually named
-	
-* Functions normally also have a useful "return" value	
-
-* For example, linear models are fit using the function `lm()`
-
-
----
-
-## Other important features
-
-* Getting help
-
-* Generic functions and methods
-
-* How matrices and arrays are implemented in R
-
-* Homework --- read the following tutorials
-
-	* [Introduction and Language Overview I](https://www.isid.ac.in/~deepayan/R-tutorials/labs/01_introduction_lab.pdf)
-
-	* [Language Overview II](https://www.isid.ac.in/~deepayan/R-tutorials/labs/02_language_lab.pdf)
-
-	* Supplementary files:
-      [Gcsemv.txt](https://www.isid.ac.in/~deepayan/R-tutorials/data/Gcsemv.txt),
-      [iris.xls](https://www.isid.ac.in/~deepayan/R-tutorials/data/iris.xls),
-
 
 ---
 

@@ -1,0 +1,466 @@
+---
+layout: remark
+title: Basic usage of R - 2
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+# Lists
+
+* Lists are vectors with arbitrary types of components
+
+* May or may not have names
+
+* Usual vector indexing by `[` works in the usual way
+
+* Individual elements can be extracted either by name (`$`) or by position `x[[i]]`
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-rbasics-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/rbasics-1-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+---
+
+# Lists: examples
+
+```{r}
+m <- sample(1:12, 30, rep = TRUE)
+mf <- factor(m, levels = 1:12, labels = month.name)
+ml <- list(imonth = m, fmonth = mf)
+str(ml)
+```
+--
+
+
+```{r}
+ml$imonth
+```
+--
+
+
+```{r}
+ml[[2]]
+```
+
+<!-- ml[["fmonth"]] -->
+
+---
+
+# Lists: examples
+
+* Lists are commonly used to return analysis results (more details later)
+
+```{r}
+tt <- t.test(rnorm(100))
+str(tt, give.attr = FALSE)
+tt$p.value
+```
+
+
+---
+
+layout: true
+
+# Common structures for statistical data
+
+---
+
+* Vectors, matrices / arrays: vectors with dimension
+
+```{r}
+VADeaths
+dim(VADeaths)
+```
+---
+
+* Indexing works in same way, but in two dimensions
+
+```{r}
+VADeaths[1:2, c(2, 3)]
+```
+
+* Example: Indexing by "empty" index (selects all) and name
+
+```{r}
+VADeaths[, c("Rural Male", "Rural Female")]
+```
+
+---
+
+* Data frames: lists that also behave like a matrix
+
+```{r}
+str(mtcars)
+dim(mtcars)
+```
+
+---
+
+layout: true
+
+# Data Frames
+
+---
+
+* Rectangular (matrix-like) structure
+
+* Each column is (usually) a vector
+
+* Different columns can have different types (unlike a matrix)
+
+* Every column must have the same length
+
+* Every column must have a name
+--
+
+* Most built-in data sets in R are data frames
+
+---
+
+* List-like behaviour: Columns can be extracted like a list
+	
+```{r}
+mtcars$mpg
+```
+
+* Vector indexing extracts list elements
+
+```{r}
+head(mtcars[c(1, 4, 7)])
+```
+
+---
+
+* Matrix-like behaviour: Two-dimensional indexing
+
+```{r}
+mtcars[1:6, c(1, 4, 7)]
+mtcars[sample(nrow(mtcars), 6), c("mpg", "wt", "am", "gear")]
+```
+
+---
+
+layout: true
+
+# Data input / output
+
+---
+
+* Statistical data are usually structured like a spreadsheet (e.g., Excel)
+
+* Typical approach: read data from spreadsheet file into data frame
+
+* Easiest route:
+
+    * R itself cannot read Excel files directly
+
+    * Save as CSV file from Excel
+
+    * Read with `read.csv()` or `read.table()` (more flexible)
+
+* Alternative option:
+
+    * Use "Import Dataset" menu item in R Studio (requires add-on packages)
+
+---
+
+* Data frames can be exported as a spreadsheet file using
+  `write.csv()` or `write.table()`
+
+```{r}
+data(Cars93, package = "MASS")
+write.csv(Cars93, file = "temp/cars93.csv") # export
+```
+
+* This creates a [text file](temp/cars93.csv) (that can be easily edited in Excel / LibreOffice)
+
+.scrollable300[
+
+```{bash,echo=FALSE}
+cat cars93.csv
+```
+
+]
+
+---
+
+* We can use `read.csv()` to import it again
+
+.scrollable400[
+
+```{r}
+cars <- read.csv("temp/cars93.csv") # import (path relative to working directory)
+str(cars)
+```
+
+]
+
+---
+
+* These are the most basic data input / output functions
+
+* There are many other other specialized functions
+
+* Low-level utilties: `scan()`, `readLines()`, `readChar()`, `readBin()`
+
+* Various packages provide import / export to formats used by other software
+
+* R has its own "serialization" format using `save()` and `load()`
+
+
+---
+
+layout: true
+
+# Functions
+
+---
+
+* Most useful things in R happen by calling functions
+
+* Functions have one or more arguments
+
+    * All arguments have names (available as variables inside the function)
+--
+
+	* Arguments may be compulsory or optional
+
+	* Optional arguments usually have "default" values 
+--
+
+	* Arguments may or may not be named when the function is called
+	
+	* Unnamed arguments are matched by position
+
+	* Optional arguments are usually named
+	
+* Functions normally also have a useful "return" value
+
+---
+
+* For example, linear models are fit using the function `lm()`
+
+```{r}
+str(lm)
+```
+
+* These calls are equivalent
+
+```{r}
+fm1 <- lm(mpg ~ wt, mtcars, (am == 0))
+fm2 <- lm(mpg ~ wt, data = mtcars, method = "qr", subset = (am == 0))
+coef(fm1)
+coef(fm2)
+```
+
+* Rule: named arguments are matched by name, remaining by position
+
+---
+
+* The return value of `lm()` is a list
+
+.scrollable400[
+
+```{r}
+str(fm2)
+```
+
+]
+
+---
+
+* Individual elements can be extracted using list indexing
+
+```{r}
+fm2$coefficients
+fm2$residuals
+```
+
+---
+
+layout: true
+
+# Attributes
+
+---
+
+* The names (derived from row names of the data) can be used as index 
+
+```{r}
+fm2$residuals["Chrysler Imperial"]
+```
+
+* The names associated with a vector can be obtained using `names()`
+
+```{r}
+names(fm2$residuals)
+```
+
+---
+
+* These names are actually stored as an _attribute_ called "names"
+
+```{r}
+attr(fm2$residuals, "names")
+```
+
+* Attributes are arbitrary R objects that can be attached to any other object
+
+* Typically used for programming convenience, normally not seen by users
+
+* However, some attributes are "special"
+
+---
+
+* The "names" attribute can be extracted using the function `names()`
+
+* `dimnames()` similarly gives row / column names for matrices and arrays
+
+```{r}
+dimnames(VADeaths)
+attr(VADeaths, "dimnames")
+```
+
+---
+
+* For example, column names can be obtained as
+
+```{r}
+dimnames(VADeaths)[[2]]
+```
+
+* There are convenient shortcuts called `rownames()` and `colnames()`
+
+```{r}
+colnames(VADeaths)
+```
+
+---
+
+* In fact, we can easily verify that this is what `colnames()` is doing by printing it
+
+```{r}
+colnames
+```
+
+* All R functions can be easily inspected in this way
+
+---
+
+* Another very important attribute is "class"
+
+* For example, the return value of `lm()` has class "lm"
+
+```{r}
+attr(fm2, "class")
+```
+
+* The class of an object can also be obtained using the function `class()`
+
+```{r}
+class(fm2)
+```
+
+---
+
+layout: true
+
+# Class, generic functions, and methods
+
+---
+
+* The class of an object is fundamental to how R works
+
+* Every object in R must have a class
+
+* This is true even if the object does not have a class attribute
+
+```{r}
+class(colnames)
+attr(colnames, "class")
+class(VADeaths)
+attr(VADeaths, "class")
+```
+
+---
+
+* The main use of the class of an object is in how _generic functions_ behave
+
+* Generic functions are intended to perform general tasks, like
+
+	- `print()`
+
+	- `plot()`
+
+	- `summary()`
+
+* But details of what these functions should do depends on the input
+
+
+---
+
+```{r}
+print(VADeaths) 
+print(fm2)
+```
+
+---
+
+```{r}
+summary(VADeaths) 
+```
+
+---
+
+```{r}
+summary(fm2)
+```
+
+* This kind of customized output is achieved by _methods_
+
+---
+
+* Methods are specific implementations of a generic function customized to its input
+
+* The appropriate method is chosen by looking at the _class_ of the input argument
+--
+
+* The methods available for a generic function can be obtained using the `methods()` function
+
+```{r}
+methods("summary")
+```
+
+
+---
+
+layout: false
+
+# Other important features
+
+* Getting help
+
+* Help for generic functions and methods
+
+* How matrices and arrays are implemented in R
+
+<!-- 
+
+* Homework --- read the following tutorials
+
+	* [Introduction and Language Overview I](https://www.isid.ac.in/~deepayan/R-tutorials/labs/01_introduction_lab.pdf)
+
+	* [Language Overview II](https://www.isid.ac.in/~deepayan/R-tutorials/labs/02_language_lab.pdf)
+
+	* Supplementary files:
+      [Gcsemv.txt](https://www.isid.ac.in/~deepayan/R-tutorials/data/Gcsemv.txt),
+      [iris.xls](https://www.isid.ac.in/~deepayan/R-tutorials/data/iris.xls),
+
+-->
