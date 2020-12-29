@@ -1,0 +1,75 @@
+
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+@import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+body { font-family: 'Droid Serif'; }
+
+h1, h2, h3
+{
+    font-family: 'Yanone Kaffeesatz';
+    font-weight: normal;
+}
+h1, a
+{
+    color: #2a76dd;
+}
+.remark-code, .remark-inline-code
+{
+    font-family: 'Ubuntu Mono';
+}
+pre
+{
+    margin-left: 2em;
+}
+code.r
+{
+    border-left: 10px solid #6ca0e8;
+    padding-left: 20px;
+}
+code.remark-code
+{
+    color: #3c50e8;
+}
+img
+{
+    width: 90%;
+    margin-left: 5%;
+}
+.algorithm
+{
+    margin-left: 2em;
+    white-space: pre;
+    !border-left: 10px solid #6ca0e8;
+    padding-left: 20px;
+    font-family: 'Ubuntu Mono';
+    background: #eeeeee;
+    padding-bottom: 0px;
+    padding-top: 0px;
+    border-top: 2px solid #6ca0e8;
+    border-bottom: 2px solid #6ca0e8;
+}
+.algorithm .name
+{
+    display: block;
+    !border-bottom: 2px solid #6ca0e8;
+    color: #3c50e8;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    font-weight: bold;
+}
+.scrollable300
+{
+    height: 300px;
+    overflow: scroll;
+}
+.scrollable400
+{
+    height: 400px;
+    overflow: scroll;
+}
+.scrollable500
+{
+    height: 500px;
+    overflow: scroll;
+}
