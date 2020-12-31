@@ -1,0 +1,363 @@
+---
+layout: remark
+title: Basic usage of R - 2
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+layout: true
+
+# Functions
+
+---
+
+* Most useful things in R happen by calling functions
+
+* Functions have one or more arguments
+
+    * All arguments have names (available as variables inside the function)
+--
+
+	* Arguments may be compulsory or optional
+
+	* Optional arguments usually have "default" values 
+--
+
+	* Arguments may or may not be named when the function is called
+	
+	* Unnamed arguments are matched by position
+
+	* Optional arguments are usually named
+	
+* Functions normally also have a useful "return" value
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-rbasics-3/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/rbasics-3-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+
+---
+
+* For example, linear models are fit using the function `lm()`
+
+```{r}
+str(lm)
+```
+
+* These calls are equivalent
+
+```{r}
+fm1 <- lm(mpg ~ wt, mtcars, (am == 0))
+fm2 <- lm(mpg ~ wt, data = mtcars, method = "qr", subset = (am == 0))
+coef(fm1)
+coef(fm2)
+```
+
+* Rule: named arguments are matched by name, remaining by position
+
+---
+
+* The return value of `lm()` is a list
+
+.scrollable400[
+
+```{r}
+str(fm2)
+```
+
+]
+
+---
+
+* Individual elements can be extracted using list indexing
+
+```{r}
+fm2$coefficients
+fm2$residuals
+```
+
+---
+
+layout: true
+
+# Attributes
+
+---
+
+* The names (derived from row names of the data) can be used as index 
+
+```{r}
+fm2$residuals["Chrysler Imperial"]
+```
+
+* The names associated with a vector can be obtained using `names()`
+
+```{r}
+names(fm2$residuals)
+```
+
+---
+
+* These names are actually stored as an _attribute_ called "names"
+
+```{r}
+attr(fm2$residuals, "names")
+```
+
+* Attributes are arbitrary R objects that can be attached to any other object
+
+* Typically used for programming convenience, normally not seen by users
+
+* However, some attributes are "special"
+
+---
+
+* The "names" attribute can be extracted using the function `names()`
+
+* `dimnames()` similarly gives row / column names for matrices and arrays
+
+```{r}
+dimnames(VADeaths)
+attr(VADeaths, "dimnames")
+```
+
+---
+
+* For example, column names can be obtained as
+
+```{r}
+dimnames(VADeaths)[[2]]
+```
+
+* There are convenient shortcuts called `rownames()` and `colnames()`
+
+```{r}
+colnames(VADeaths)
+```
+
+---
+
+* In fact, we can easily verify that this is what `colnames()` is doing by printing it
+
+```{r}
+colnames
+```
+
+* All R functions can be easily inspected in this way
+
+---
+
+* Another very important attribute is "class"
+
+* For example, the return value of `lm()` has class "lm"
+
+```{r}
+attr(fm2, "class")
+```
+
+* The class of an object can also be obtained using the function `class()`
+
+```{r}
+class(fm2)
+```
+
+---
+
+* The class of an object can (usually) be "removed" by setting it to
+  `NULL` 
+  
+* This is not something you should actually do!
+
+```{r}
+class(fm2) <- NULL
+```
+
+* Such objects will no longer have a "class" attribute
+
+```{r}
+attr(fm2, "class")
+```
+
+* However, it will still have a class (implicitly)
+
+```{r}
+class(fm2)
+```
+
+---
+
+layout: true
+
+# Class, generic functions, and methods
+
+---
+
+* The class of an object is fundamental to how R works
+
+* Every object in R must have a class
+
+* This is true even if the object does not have a class attribute
+
+```{r}
+class(colnames)
+attr(colnames, "class")
+class(VADeaths)
+attr(VADeaths, "class")
+```
+
+---
+
+* The main use of the class of an object is in how _generic functions_ behave
+
+* Generic functions are intended to perform general tasks, like
+
+	- `print()`
+
+	- `plot()`
+
+	- `summary()`
+
+* But details of what these functions should do depends on the input
+
+
+---
+
+```{r}
+print(VADeaths) 
+print(fm1)
+```
+
+---
+
+```{r}
+summary(VADeaths) 
+```
+
+---
+
+```{r}
+summary(fm1)
+```
+
+---
+
+* But recall that we removed the class attribute from `fm2`
+
+```{r}
+class(fm1)
+class(fm2)
+```
+
+* Otherwise they represent the same model fit
+
+* But the different class means that `print()` and `summary()` behave
+  differently
+
+---
+
+```{r}
+summary(fm2)
+```
+
+---
+
+.scrollable400[
+
+```{r}
+print(fm2)
+```
+
+]
+
+* This kind of customized output is achieved by _methods_
+
+---
+
+* Methods are specific implementations of a generic function customized to its input
+
+* The appropriate method is chosen by looking at the _class_ of the input argument
+--
+
+* The methods available for a generic function can be obtained using the `methods()` function
+
+```{r}
+methods("summary")
+```
+
+```{r, eval=FALSE}
+methods("print") # similar but much longer list
+```
+
+---
+
+layout: false
+
+# Getting help
+
+* R has an extensive collection of functions (even excluding add-on packages)
+
+* It is impossible for anyone to know them all, or remember details
+
+* Fortunately, R also has an excellent help system
+--
+
+* Every function and dataset in R must be documented
+
+* The documentation can be accessed by `help(name)` or `?name`
+
+* For example: `help(seq)`, `help(summary)`, etc.
+
+---
+
+# Getting help
+
+* How the help is shown depends on the _interface_ being used
+
+* RStudio has a separate help tab which also allows searching
+--
+
+* However, before using the help system, you should know a bit about
+  how methods are documented
+
+---
+
+# Help for generic functions and methods
+
+
+
+---
+
+# Other important features
+
+* Getting help
+
+* Help for generic functions and methods
+
+* How matrices and arrays are implemented in R
+
+<!-- 
+
+* Homework --- read the following tutorials
+
+	* [Introduction and Language Overview I](https://www.isid.ac.in/~deepayan/R-tutorials/labs/01_introduction_lab.pdf)
+
+	* [Language Overview II](https://www.isid.ac.in/~deepayan/R-tutorials/labs/02_language_lab.pdf)
+
+	* Supplementary files:
+      [Gcsemv.txt](https://www.isid.ac.in/~deepayan/R-tutorials/data/Gcsemv.txt),
+      [iris.xls](https://www.isid.ac.in/~deepayan/R-tutorials/data/iris.xls),
+
+-->
+
+class: center middle
+
+# Questions?
+
+
