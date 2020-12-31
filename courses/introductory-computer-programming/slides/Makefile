@@ -1,7 +1,7 @@
 
 all: 01-orientation.html 02-introduction-1.html 02-introduction-2.html \
      03-roverview-1.html 03-roverview-1.R 03-roverview-2.html       \
-     04-rbasics-1.html 04-rbasics-2.html 05-rbasics-3.html
+     04-rbasics-1.html 04-rbasics-2.html 05-rbasics-3.html 06-rbasics-4.html
 
 %.md: %.rmd
 	Rscript -e "library(knitr); knit('$<')"
