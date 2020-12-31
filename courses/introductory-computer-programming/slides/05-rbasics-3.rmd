@@ -1,6 +1,6 @@
 ---
 layout: remark
-title: Basic usage of R - 2
+title: Basic usage of R - 3
 subtitle: Introductory Computer Programming
 author: Deepayan Sarkar
 mathjax: true
@@ -60,7 +60,22 @@ coef(fm1)
 coef(fm2)
 ```
 
+---
+
 * Rule: named arguments are matched by name, remaining by position
+
+* Convention: 
+
+	- Named arguments are usually not followed by unnamed arguments
+
+	- First few "standard" arguments are usually unnamed (matched by position)
+	
+* The following call is equivalent to previous two, but not recommended
+
+```{r}
+fm3 <- lm(mpg ~ wt, data = mtcars, (am == 0))
+coef(fm3)
+```
 
 ---
 
@@ -301,14 +316,15 @@ layout: false
 
 # Getting help
 
-* R has an extensive collection of functions (even excluding add-on packages)
+* R has an extensive collection of functions (even more if we include
+  add-on packages)
 
 * It is impossible for anyone to know them all, or remember details
 
 * Fortunately, R also has an excellent help system
 --
 
-* Every function and dataset in R must be documented
+* Every function and dataset in R (and add-on packages) must be documented
 
 * The documentation can be accessed by `help(name)` or `?name`
 
@@ -330,9 +346,55 @@ layout: false
 
 # Help for generic functions and methods
 
+* Generic functions and methods are distinct functions
 
+* They often have different help pages
+
+* In fact, many add-on packages define new methods for generics in
+  another package
+
+* These are always documented in a separate help page
 
 ---
+
+# Help for generic functions and methods
+
+* To get help for the generic function `summary()`, type `help(summary)`
+
+* To get help for the `summary()` method for "matrix" objects, type `help(summary.matrix)`
+
+* To get help for the `summary()` method for "lm" objects, type `help(summary.lm)`
+
+* The first two happen to be the same help page, but the third is different
+--
+
+* This is slightly confusing because you are __not__ supposed to call
+  `summary.lm()` directly
+
+* More importantly, there may not actually be a `summary()` method for
+  all classes 
+  
+* For example, "list" objects are handled by a _fallback_ method `summary.default()`
+--
+
+* The list of available methods need to be obtained by
+  `methods("summary")` as shown above
+
+---
+
+# Help for generic functions and methods
+
+- The system we described is called S3
+
+- The documentation refers to specific methods as "S3 methods"
+
+- To make things more complicated, there is a different system of
+  defining classes and methods
+  
+- We will skip the details of this system (called S4) for now
+
+
+<!-- 
 
 # Other important features
 
@@ -342,19 +404,10 @@ layout: false
 
 * How matrices and arrays are implemented in R
 
-<!-- 
-
-* Homework --- read the following tutorials
-
-	* [Introduction and Language Overview I](https://www.isid.ac.in/~deepayan/R-tutorials/labs/01_introduction_lab.pdf)
-
-	* [Language Overview II](https://www.isid.ac.in/~deepayan/R-tutorials/labs/02_language_lab.pdf)
-
-	* Supplementary files:
-      [Gcsemv.txt](https://www.isid.ac.in/~deepayan/R-tutorials/data/Gcsemv.txt),
-      [iris.xls](https://www.isid.ac.in/~deepayan/R-tutorials/data/iris.xls),
 
 -->
+
+---
 
 class: center middle
 
