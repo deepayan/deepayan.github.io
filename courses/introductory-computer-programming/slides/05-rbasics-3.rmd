@@ -205,9 +205,13 @@ attr(fm2, "class")
 ```{r}
 class(fm2)
 ```
+--
+
+* We will discuss the class attribute in more details next day
 
 ---
 
+layout: false
 class: center middle
 
 # Questions?
