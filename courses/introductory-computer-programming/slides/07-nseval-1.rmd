@@ -235,12 +235,15 @@ layout: true
 
 * Lazy evaluation allows a special trick
 
-* An R function can quote an argument withut evaluating it
+* An R function can quote an argument without evaluating it
 
 * This is done using the function `substitute()`
 
 ```{r}
-getExpression <- function(x) return(substitute(x))
+getExpression <- function(x)
+{
+    return(substitute(x))
+}
 getExpression(sqrt(10))
 getExpression(a + b)
 ```
@@ -294,6 +297,7 @@ layout: true
 
 ```{r}
 g <- expand.grid(a = 1:5, b = 1:5)
+g$b > g$a
 g[ g$b > g$a , ]
 ```
 
