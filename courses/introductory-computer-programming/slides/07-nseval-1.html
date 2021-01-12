@@ -1,0 +1,764 @@
+---
+title: Non-Standard Evaluation
+author: Deepayan Sarkar
+---
+
+
+# R is not C
+
+* R syntax is superficially similar to C
+
+* This makes it easy to start using R if you are already familiar with C
+
+* However, the internals of how R works is very different (even apart from vectorized arithmetic)
+
+* We will try to go over some of these differences and highlight R "good practices" 
+
+
+
+
+---
+
+<!--
+
+# Some important features of R
+
+* Lazy evaluation
+
+* Working with "expressions"
+
+* Non-standard evaluation
+
+* Functions can be arguments of other functions
+
+* The `*apply` family of functions
+
+* Working with matrices
+
+* Basic linear models
+
+-->
+
+
+# Topics we will cover today
+
+* Lazy evaluation
+
+* Working with "expressions"
+
+* Non-standard evaluation
+
+<!--  
+
+# Example: the probability problem discussed in class
+
+
+```r
+probdiv1 <- function(n, nrep)
+{
+    count <- 0
+    for (i in seq_len(nrep)) { # or i in 1:nrep
+        s <- sort(sample(n, 2))
+        if (s[2] %% s[1] == 0) count <- count + 1
+    }
+    return (count / nrep)
+}
+probdiv3 <- function(n)
+{
+    a <- seq_len(floor(n/2))
+    counts <- floor(n / a) - 1
+    return (sum(counts) / choose(n, 2))
+}
+```
+
+-->
+
+---
+
+layout: true
+
+# Lazy evaluation
+
+---
+
+* Arguments passed as function arguments are _not_ evaluated until they are used
+
+* This might seem like a very minor difference
+
+* This feature allows for some interesting behaviour in R
+
+---
+
+
+```r
+rchoose1 <- function(u, a, b)
+{
+    if (u < 0.5) a else b
+}
+set.seed(20210101) # makes subsequent "random" numbers reproducible
+rchoose1(runif(1), sqrt(2), sqrt(-2))
+```
+
+```
+[1] 1.414214
+```
+
+```r
+rchoose1(0.25, sqrt(2), sqrt(-2))
+```
+
+```
+[1] 1.414214
+```
+
+```r
+rchoose1(0.75, sqrt(2), sqrt(-2))
+```
+
+```
+Warning in sqrt(-2): NaNs produced
+```
+
+```
+[1] NaN
+```
+
+---
+
+* Compare with a similar function written in C++
+
+
+```cpp
+#include <Rcpp.h>
+
+double cchoose1(double u, double a, double b)
+{
+    if (u < 0.5) return a;
+	else return b;
+}
+
+double wsqrt(double x)
+{
+	if (x < 0) Rcpp::warning("negative input: NaN produced");
+	return sqrt(x);
+}
+
+// [[Rcpp::export]]
+double cchooseSqrt(double u, double a, double b)
+{
+	return cchoose1(u, wsqrt(a), wsqrt(b));
+}
+```
+
+---
+
+
+```r
+set.seed(20210101)
+cchooseSqrt(runif(1), 2, -2)
+```
+
+```
+Warning in cchooseSqrt(runif(1), 2, -2): negative input: NaN produced
+```
+
+```
+[1] 1.414214
+```
+
+```r
+cchooseSqrt(0.25, 2, -2)
+```
+
+```
+Warning in cchooseSqrt(0.25, 2, -2): negative input: NaN produced
+```
+
+```
+[1] 1.414214
+```
+
+```r
+cchooseSqrt(0.75, 2, -2)
+```
+
+```
+Warning in cchooseSqrt(0.75, 2, -2): negative input: NaN produced
+```
+
+```
+[1] NaN
+```
+
+---
+
+layout: true
+
+# Quoted expressions and evaluation
+
+---
+
+* Remember that R works by evaluating "expressions" typed at the prompt
+
+* Consider the following expression:
+
+
+```r
+a < b
+```
+
+```
+Error in eval(expr, envir, enclos): object 'a' not found
+```
+
+* This fails because the variables `a` and `b` used in the expression are not defined
+
+---
+
+* It is possible to store an expression without _evaluating_ it in R
+
+* This can be done is several ways; for example
+
+
+```r
+e1 <- quote(a < b)
+e2 <- expression(a < b)
+```
+
+---
+
+* We can explore the nature of these objects in the usual ways
+
+
+```r
+class(e1)
+```
+
+```
+[1] "call"
+```
+
+```r
+length(e1)
+```
+
+```
+[1] 3
+```
+
+```r
+str(e1)
+```
+
+```
+ language a < b
+```
+
+---
+
+* `expression()` essentially allows a multiple quoted expressions to be stored (as a vector)
+
+
+```r
+class(e2)
+```
+
+```
+[1] "expression"
+```
+
+```r
+length(e2)
+```
+
+```
+[1] 1
+```
+
+```r
+length(e2[[1]])
+```
+
+```
+[1] 3
+```
+
+```r
+str(e2[[1]])
+```
+
+```
+ language a < b
+```
+
+---
+
+* Why is this useful?
+
+* Among other things, expressions can be evaluated using the `eval()` function
+
+
+```r
+x <- 10
+eval(quote(sqrt(x)))
+```
+
+```
+[1] 3.162278
+```
+
+---
+
+* Trying to evaluate `e1` again gives the same error because `a` and `b` are not defined
+
+
+```r
+e1
+```
+
+```
+a < b
+```
+
+```r
+eval(e1)
+```
+
+```
+Error in eval(e1): object 'a' not found
+```
+
+--
+
+
+* However, `eval()` has an optional `envir` argument that can be used to provide missing variables
+
+
+```r
+d <- list(a = rnorm(10), b = rexp(10))
+eval(e1, envir = d)
+```
+
+```
+ [1]  TRUE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE
+```
+
+---
+
+layout: true
+
+# Lazy evaluation and `substitute()`
+
+---
+
+* Lazy evaluation allows a special trick
+
+* An R function can quote an argument withut evaluating it
+
+* This is done using the function `substitute()`
+
+
+```r
+getExpression <- function(x) return(substitute(x))
+getExpression(sqrt(10))
+```
+
+```
+sqrt(10)
+```
+
+```r
+getExpression(a + b)
+```
+
+```
+a + b
+```
+
+---
+
+* This can be often quite useful
+
+* For example, the following function attaches an attribute storing
+  the call to the result of any evaluation
+
+
+```r
+withCall <- function(e)
+{
+    ans <- eval(e)
+    attr(ans, "call") <- substitute(e)
+    return(ans)
+}
+withCall(sqrt(10))
+```
+
+```
+[1] 3.162278
+attr(,"call")
+sqrt(10)
+```
+
+```r
+withCall(rbind(rnorm(5), rexp(5)))
+```
+
+```
+          [,1]      [,2]       [,3]      [,4]      [,5]
+[1,] -1.412479 0.3771837 -0.5326313 1.0322354 0.6610746
+[2,]  2.578773 0.8482034  0.2733861 0.3399451 3.1885165
+attr(,"call")
+rbind(rnorm(5), rexp(5))
+```
+
+---
+
+* This is how `plot()` can construct nice axis labels 
+
+
+```r
+x <- seq(-10, 10, length.out = 201)
+plot(x = x, y = x * sin(x), type = "l") 
+```
+
+![plot of chunk unnamed-chunk-14](figures/nseval-1-unnamed-chunk-14-1.png)
+
+---
+
+* And how `curve()` determines what function to plot
+
+
+```r
+curve(x * sin(x), from = -10, to = 10)
+```
+
+![plot of chunk unnamed-chunk-15](figures/nseval-1-unnamed-chunk-15-1.png)
+
+---
+
+layout: true
+
+# Non-standard evaluation
+
+---
+
+* Another common use of this technique is to simplify variable references
+
+* Consider the following method to list all `choose(5, 2)` combinations
+
+
+```r
+g <- expand.grid(a = 1:5, b = 1:5)
+g[ g$b > g$a , ]
+```
+
+```
+   a b
+6  1 2
+11 1 3
+12 2 3
+16 1 4
+17 2 4
+18 3 4
+21 1 5
+22 2 5
+23 3 5
+24 4 5
+```
+
+---
+
+* Referring to all variables in `g` using `g$...` is cumbersome
+
+* We can in principle simplify this (referring to `g` only once) using
+
+
+```r
+g[ eval(quote(b > a), g), ]
+```
+
+```
+   a b
+6  1 2
+11 1 3
+12 2 3
+16 1 4
+17 2 4
+18 3 4
+21 1 5
+22 2 5
+23 3 5
+24 4 5
+```
+
+---
+
+* Several R functions make this even simpler
+
+* A general purpose (generic) function is `with()` 
+
+
+```r
+with
+```
+
+```
+function (data, expr, ...) 
+UseMethod("with")
+<bytecode: 0x55bf7f7268e0>
+<environment: namespace:base>
+```
+
+```r
+with.default
+```
+
+```
+function (data, expr, ...) 
+eval(substitute(expr), data, enclos = parent.frame())
+<bytecode: 0x55bf7f7d24d8>
+<environment: namespace:base>
+```
+
+```r
+with(g, b > a) # equivalent to eval(quote(b > a), envir = g)
+```
+
+```
+ [1] FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE FALSE  TRUE
+[17]  TRUE  TRUE FALSE FALSE  TRUE  TRUE  TRUE  TRUE FALSE
+```
+
+---
+
+* This can be used as follows
+
+
+```r
+g[ with(g, b > a), ]
+```
+
+```
+   a b
+6  1 2
+11 1 3
+12 2 3
+16 1 4
+17 2 4
+18 3 4
+21 1 5
+22 2 5
+23 3 5
+24 4 5
+```
+
+---
+
+* For this particular purpose, there is an even more convenient function
+
+
+```r
+subset(g, b > a)
+```
+
+```
+   a b
+6  1 2
+11 1 3
+12 2 3
+16 1 4
+17 2 4
+18 3 4
+21 1 5
+22 2 5
+23 3 5
+24 4 5
+```
+
+---
+
+* A popular add-on package for data manipulation, called
+  [dplyr](https://dplyr.tidyverse.org/), has a similar function
+
+
+```r
+dplyr::filter(g, b > a)
+```
+
+```
+   a b
+1  1 2
+2  1 3
+3  2 3
+4  1 4
+5  2 4
+6  3 4
+7  1 5
+8  2 5
+9  3 5
+10 4 5
+```
+
+* [dplyr](https://dplyr.tidyverse.org/) has several other similar functions
+
+* It is highly recommended for routine data manipulation tasks
+
+---
+
+* Other functions that support similar features are 
+
+	- `transform()`, `dplyr::mutate()` to add new variables that are
+      functions of existing variables
+	  
+	- `dplyr::select()` to select a subset of columns (which `subset()` can also do)
+
+	- `lm()` and many other modeling functions
+	
+	- `xtabs()` for creating cross-tabulations
+	
+	- Data visulization packages like lattice and ggplot2 
+
+
+---
+
+* Another example:
+
+
+```r
+suppressMessages(library(dplyr))
+mtcars <- mutate(mtcars, am = factor(am))
+summarise(group_by(mtcars, am), mean_mpg = mean(mpg))
+```
+
+```
+`summarise()` ungrouping output (override with `.groups` argument)
+```
+
+```
+# A tibble: 2 x 2
+  am    mean_mpg
+  <fct>    <dbl>
+1 0         17.1
+2 1         24.4
+```
+
+* Equivalent calculation without using add-on packages
+
+
+```r
+with(mtcars, tapply(mpg, am, FUN = mean))
+```
+
+```
+       0        1 
+17.14737 24.39231 
+```
+
+---
+
+* A more complicated example:
+
+
+```r
+summarise(group_by(mtcars, am), ols_coef = coef(lm(mpg ~ wt)), which = c("intercept", "slope"))
+```
+
+```
+`summarise()` regrouping output by 'am' (override with `.groups` argument)
+```
+
+```
+# A tibble: 4 x 3
+# Groups:   am [2]
+  am    ols_coef which    
+  <fct>    <dbl> <chr>    
+1 0        31.4  intercept
+2 0        -3.79 slope    
+3 1        46.3  intercept
+4 1        -9.08 slope    
+```
+
+* Equivalent calculation without using add-on packages
+
+
+```r
+sapply(split(mtcars, mtcars$am), function(d) coef(lm(mpg ~ wt, data = d)))
+```
+
+```
+                    0         1
+(Intercept) 31.416055 46.294478
+wt          -3.785908 -9.084268
+```
+
+---
+
+* Of course, all these can be done using C-type loops, but that is
+  much more complicated and error-prone
+
+* I will not exlore dplyr any further, but you should learn more about it online
+
+* The `*apply()` type functions are generally useful, and we will discuss them soon
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
+
+<!--  
+
+
+
+```r
+e1[[1]]
+```
+
+```
+`<`
+```
+
+```r
+e1[[2]]
+```
+
+```
+a
+```
+
+```r
+e1[[3]]
+```
+
+```
+b
+```
+
+
+
+```r
+e1[[1]] <- quote(rbind)
+e1
+```
+
+```
+rbind(a, b)
+```
+
+```r
+eval(e1, envir = d)
+```
+
+```
+       [,1]       [,2]       [,3]      [,4]         [,5]      [,6]      [,7]       [,8]     [,9]
+a 0.3556914 -0.4913036 -0.6801197 -1.068554 -0.440427551 1.2370412 -1.215399 -0.2744189 1.556999
+b 0.8630517  1.1707217  1.0798985  1.101444  0.004995799 0.5066633  1.264804  0.7895531 2.279978
+      [,10]
+a -1.243647
+b  2.419367
+```
+
+-->
