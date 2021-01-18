@@ -18,9 +18,6 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/icp-nseval-2/', autodep 
                comment = "", warning = TRUE, message = TRUE,
                knitr.table.format = "html",
                fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/nseval-2-')
-library(lattice)
-lattice.options(default.args = list(as.table = TRUE), 
-                default.theme = list(grid.pars = list(cex = 1.5)))
 options(warnPartialMatchDollar = FALSE, width = 100)
 ```
 

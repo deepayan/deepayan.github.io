@@ -1,0 +1,338 @@
+---
+layout: remark
+title: Replicate and the Apply Family of Functions
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+# Topics we will cover today
+
+* Replicating a simulation experiment
+
+* The `*apply()` family of functions
+
+* Functions can be arguments of other functions
+
+* `do.call()`
+
+---
+
+# Loop alternatives
+
+* R has several general purpose functions that provide alternatives to loops
+
+* We will discuss two of the main approaches today: 
+
+	- `replicate()` for repeating a simulation experiment
+	
+	- Various `*apply()` functions to loop over varying function arguments 
+
+* These are not necessarily more efficient than loops (unlike true vectorized operations)
+
+* However, they are conceptually clearer (and easier to parallelize)
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/icp-rapply-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/rapply-1-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+---
+
+layout: true
+
+# Replicating a simulation experiment
+
+---
+
+* Consider this example from our previous assignment:
+
+```{r}
+n <- 20
+x <- sample(n, 2)
+max(x) %% min(x) == 0
+```
+
+* To estimate the probability of this event, we want to run it several
+  times and compute proportion
+
+---
+
+* We have seen how to do this using a loop
+
+* An alternative approach is to use the `replicate()` function
+
+```{r}
+replicate(10, {
+    x <- sample(n, 2)
+    max(x) %% min(x) == 0
+})
+```
+
+* `replicate()` takes the _expression_ supplied as its second argument
+  and evauates it multiple times
+
+```{r}
+s <- replicate(5000, {
+    x <- sample(n, 2)
+    max(x) %% min(x) == 0
+})
+sum(s) / length(s) # estimated probability of success
+```
+
+---
+
+layout: true
+
+# Return value of `replicate()`
+
+---
+
+* The return value of `replicate()` depends on what the expression returns when evaluated
+
+* In the above example, each evaluation results in a scalar logical
+
+* In that case, the results are aggregated to produce a vector
+--
+
+* If the result is always a vector of same length (greater than one), the result is combined into a matrix
+
+```{r}
+quantile(rnorm(500), probs = c(0.25, 0.5, 0.75))
+replicate(6, quantile(rnorm(500), probs = c(0.25, 0.5, 0.75)))
+```
+
+---
+
+* If the result has inconsistent length, the result is a list
+
+```{r}
+set.seed(20200101)
+replicate(6, unique(sample(10, 5, replace = TRUE)))
+```
+
+---
+
+* This may sometimes lead to unanticipated behaviour
+
+```{r}
+set.seed(20200101)
+replicate(2, unique(sample(10, 5, replace = TRUE)))
+```
+--
+
+* When output length is known to be variable, it is better to
+  explicitly disable simplification
+
+```{r}
+set.seed(20200101)
+replicate(2, unique(sample(10, 5, replace = TRUE)), simplify = FALSE) # always return list
+```
+
+---
+
+layout: false
+
+# The `*apply()` family of functions
+
+* `replicate()` re-evaluates the same expression multiple times
+
+* We often want to something similar:
+
+	- Evaluate the same expression multiple times, but with different arguments
+	
+* This is what the various `*apply()` functions are intended for
+
+---
+
+layout: true
+
+# The `lapply()` function
+
+---
+
+* The most basic apply-type function is `lapply()`
+
+* It takes two mandatory arguments: `lapply(X, FUN)`
+
+	- `X` is a vector object, with `i`-th element given by `X[[i]]`
+
+	- `FUN` is a function
+	
+* The result is a _list_ object, with the same length as `X`
+
+* The `i`-th element of the result is `FUN(X[[i]])`
+
+---
+
+* Example: 
+
+```{r}
+lapply(1:5, sample)
+```
+
+* This is essentially a "vectorized" version of the for loop
+
+```{r}
+ans <- list()
+for (i in 1:5) ans[[i]] <- sample(i) # sample(n) produces a random permutation of 1:n
+```
+
+---
+
+* Unlike `replicate()`, the second argument of `lapply()` is not an expression
+	
+* In other words, `lapply()` does not do non-standard evaluation — whereas `replicate()` does
+	
+* `lapply()` _always_ returns a list — similar to `simplify = FALSE` in `replicate()`
+--
+
+* The somewhat novel feature of `lapply()` is that the `FUN` argument must be a _function_
+
+* This is actually another important difference between R and C: 
+
+	- Functions are not "special"
+	
+	- They can be assigned to variables
+	
+	- They can be supplied as arguments to other functions
+	
+	- They can even be "anonymous", i.e., they don't need to be
+      associated with a name
+	  
+	- In short, they behave just as any other conventional object (vectors, lists, etc.)
+	
+---
+
+* In fact, it is expected that R users will be able to write short functions when necessary
+
+* Consider our previous example:
+
+```{r,eval=FALSE}
+lapply(1:5, sample)
+```
+
+* This is conceptually equivalent to 
+
+```{r, eval=FALSE}
+ans <- list()
+for (i in 1:5)
+    ans[[i]] <- sample(i)
+```
+
+* But suppose we instead want
+
+```{r, eval=FALSE}
+for (i in 1:5)
+    ans[[i]] <- sample(10, i, replace = TRUE)
+```
+
+---
+
+* `FUN = sample` will no longer serve our purpose, but we can instead define
+
+```{r}
+sample_of_size <- function(i)
+{
+    return(sample(10, i, replace = TRUE))
+}
+lapply(1:5, FUN = sample_of_size)
+```
+
+---
+
+* In fact, there is no need to _name_ the function by storing it in a variable
+
+```{r}
+lapply(1:5, FUN = function(i) sample(10, i, replace = TRUE))
+```
+
+* This idea is often a big conceptual stumbling block for new R users
+
+---
+
+* A potentially useful feature of `lapply()`:
+
+```{r,eval=FALSE}
+lapply(X, FUN, ...) # with further arguments
+```
+
+* is equivalent to
+
+```{r, eval=FALSE}
+for (i in seq_len(length(X)))
+    ans[[i]] <- FUN(X[[i]], ...)
+```
+
+---
+
+* For example, this allows
+
+```{r}
+str(sample)
+lapply(1:5, FUN = sample, size = 20, replace = TRUE)
+```
+
+---
+
+* As named arguments match in preference to position, we can even do
+
+```{r}
+lapply(1:6, FUN = sample, x = month.abb, replace = TRUE) # sample(x = month.abb, size = i, replace = TRUE)
+```
+
+---
+
+* Another example: $N(0, \sigma^2)$ variates with varying $\sigma$
+
+```{r}
+str(rnorm)
+str(lapply(1:5, FUN = rnorm, n = 1, mean = 0))
+```
+
+* But much easier to do directly using vectorization
+
+```{r}
+rnorm(5, mean = 0, sd = 1:5)
+```
+
+---
+
+* A more complicated example: IQR of 1000 $N(0, \sigma^2)$ variates with varying $\sigma$
+
+```{r}
+str(lapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s))))
+```
+
+---
+
+layout: true
+
+# `sapply()` : simplifying results to vector / array
+
+---
+
+* `sapply()` is essentially the same as `lapply()`, but simplifies result if possible
+
+```{r}
+sapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s)))
+```
+
+```{r}
+sapply(1:6, function(s) quantile(rnorm(n = 1000, mean = 0, sd = s)))
+```
+
+
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+

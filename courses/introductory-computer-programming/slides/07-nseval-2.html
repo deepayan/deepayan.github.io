@@ -37,9 +37,9 @@ withCall(rbind(rnorm(5), rexp(5)))
 
 ```
 $value
-           [,1]      [,2]     [,3]       [,4]      [,5]
-[1,] -0.7879692 0.3171686 0.205621 -0.6221789 0.2021104
-[2,]  1.6117549 1.1486720 2.943588  2.0161146 1.2034573
+           [,1]        [,2]     [,3]       [,4]      [,5]
+[1,] -0.2111153 -0.06793764 1.189678 0.06567616 0.9932661
+[2,]  0.3719345  0.84920208 1.885201 1.47168561 4.1290767
 
 $call
 rbind(rnorm(5), rexp(5))
@@ -137,7 +137,7 @@ with
 ```
 function (data, expr, ...) 
 UseMethod("with")
-<bytecode: 0x5570485f5d50>
+<bytecode: 0x7fdb501ae2a0>
 <environment: namespace:base>
 ```
 
@@ -148,7 +148,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x5570486e4e80>
+<bytecode: 0x7fdb5028d548>
 <environment: namespace:base>
 ```
 
@@ -346,7 +346,7 @@ max(x) %% min(x) == 0
 ```
 
 ```
-[1] TRUE
+[1] FALSE
 ```
 
 * To estimate the probability of this event, we want to run it several
@@ -367,7 +367,7 @@ replicate(10, {
 ```
 
 ```
- [1] FALSE FALSE FALSE  TRUE  TRUE FALSE FALSE  TRUE  TRUE FALSE
+ [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE
 ```
 
 * `replicate()` takes the _expression_ supplied as its second argument and evauates it multiple times
@@ -382,7 +382,7 @@ sum(s) / length(s) # estimated probability of success
 ```
 
 ```
-[1] 0.249
+[1] 0.2402
 ```
 
 ---
@@ -408,8 +408,8 @@ quantile(rnorm(500), probs = c(0.25, 0.5, 0.75))
 ```
 
 ```
-         25%          50%          75% 
--0.702808139 -0.002276398  0.665647040 
+        25%         50%         75% 
+-0.61233300  0.04772787  0.66176972 
 ```
 
 ```r
@@ -417,10 +417,10 @@ replicate(6, quantile(rnorm(500), probs = c(0.25, 0.5, 0.75)))
 ```
 
 ```
-           [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
-25% -0.68870713 -0.69191772 -0.69278339 -0.73923964 -0.75623401 -0.57924938
-50%  0.03048848 -0.07158648 -0.04418099 -0.04573097 -0.03000628  0.06520286
-75%  0.75822470  0.54225323  0.56965756  0.61200126  0.68320268  0.77058196
+          [,1]        [,2]       [,3]        [,4]        [,5]        [,6]
+25% -0.6465869 -0.64019043 -0.6402106 -0.71666089 -0.66217588 -0.69065654
+50%  0.0543367  0.05821707  0.1592666  0.04837475  0.02085983 -0.01637232
+75%  0.6885536  0.69380202  0.7960084  0.75286852  0.71655121  0.70818662
 ```
 
 ---
