@@ -1,12 +1,14 @@
 ---
 layout: remark
-title: Replicate and the Apply Family of Functions
+title: Replicate and the Apply Family of Functions - 1
 subtitle: Introductory Computer Programming
 author: Deepayan Sarkar
 mathjax: true
 ---
 
-# Topics we will cover today
+<!--  
+
+# Topics 
 
 * Replicating a simulation experiment
 
@@ -16,7 +18,8 @@ mathjax: true
 
 * `do.call()`
 
----
+-->
+
 
 # Loop alternatives
 
@@ -74,7 +77,7 @@ replicate(10, {
 ```
 
 ```
- [1] FALSE FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE
+ [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
 ```
 
 * `replicate()` takes the _expression_ supplied as its second argument
@@ -90,7 +93,7 @@ sum(s) / length(s) # estimated probability of success
 ```
 
 ```
-[1] 0.239
+[1] 0.247
 ```
 
 ---
@@ -117,7 +120,7 @@ quantile(rnorm(500), probs = c(0.25, 0.5, 0.75))
 
 ```
         25%         50%         75% 
--0.60981589  0.08784166  0.80887272 
+-0.75265972  0.03947837  0.77064099 
 ```
 
 ```r
@@ -125,10 +128,10 @@ replicate(6, quantile(rnorm(500), probs = c(0.25, 0.5, 0.75)))
 ```
 
 ```
-           [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
-25% -0.64725846 -0.55572480 -0.60926921 -0.70582592 -0.68156818 -0.70520592
-50%  0.06029929  0.04228453 -0.01076609 -0.01126007  0.01670919 -0.05178401
-75%  0.76291792  0.68882310  0.65137056  0.66310835  0.58522587  0.72891330
+          [,1]       [,2]        [,3]        [,4]        [,5]       [,6]
+25% -0.6079280 -0.5713379 -0.65439243 -0.71881653 -0.65383832 -0.7047550
+50%  0.1102361  0.0160377 -0.06546112  0.02669952  0.01825581 -0.0654410
+75%  0.7187132  0.7002812  0.68018121  0.61500181  0.69690695  0.5951717
 ```
 
 ---
@@ -546,6 +549,246 @@ sapply(1:6, function(s) quantile(rnorm(n = 1000, mean = 0, sd = s)))
 100%  2.89843111  7.9386912   8.7524743  16.57510944  14.8181359  20.4662170
 ```
 
+---
+
+layout: true
+
+# `apply()` : Apply function to rows / columns of a matrix
+
+---
+
+* We will talk about matrix operations in R in more detail later
+
+* It is often useful to apply a function on rows or columns of a matrix
+
+
+```r
+m1 <- matrix(0, nrow = 1000, ncol = 8)
+for (i in 1:8)
+    m1[, i] <- rnorm(1000, mean = 0, sd = i)
+str(m1)
+```
+
+```
+ num [1:1000, 1:8] -0.207 0.11 1.109 -0.434 -0.284 ...
+```
+
+* Note that this is essentially the same as
+
+
+```r
+m2 <- sapply(1:8, function(s) rnorm(n = 1000, mean = 0, sd = s))
+str(m2)
+```
+
+```
+ num [1:1000, 1:8] -0.819 0.156 -0.93 1.145 -0.601 ...
+```
+
+---
+
+* Suppose we want to compute the mean for each column of `m1`
+
+* There are several ways to do this:
+
+	- Loop over columns
+	
+	- Write this as a matrix operation (will discuss later)
+	
+	- Use the `colMeans()` or `colSums()` function
+	
+
+```r
+colMeans(m1)
+```
+
+```
+[1] -0.004457624 -0.109893585 -0.072194233 -0.025676205  0.015111769 -0.302844079 -0.252410061
+[8] -0.123560718
+```
+
+```r
+colSums(m1) / nrow(m1)
+```
+
+```
+[1] -0.004457624 -0.109893585 -0.072194233 -0.025676205  0.015111769 -0.302844079 -0.252410061
+[8] -0.123560718
+```
+
+---
+
+* However, `colMeans()` / `colSums()` and `rowMeans()` / `rowSums()` are special
+
+* Other summary functions do not have a built-in row-wise / column-wise versions
+
+* `apply()` allows arbitrary functions to be called per row (`MARGIN=1`) or column (`MARGIN=2`) 
+
+
+```r
+apply(m1, 2, mean)
+```
+
+```
+[1] -0.004457624 -0.109893585 -0.072194233 -0.025676205  0.015111769 -0.302844079 -0.252410061
+[8] -0.123560718
+```
+
+```r
+apply(m1, 2, sd)
+```
+
+```
+[1] 1.022618 1.932372 3.019592 4.038631 5.200633 6.184044 6.874712 7.767629
+```
+
+```r
+apply(m1, 2, IQR)
+```
+
+```
+[1]  1.344224  2.558548  4.061610  5.655623  6.745589  8.085373  9.239304 10.573359
+```
+
+---
+
+* `apply()` also allows additional arguments to be specified
+
+
+```r
+apply(m1, 2, quantile, probs = c(0.25, 0.75))
+```
+
+```
+          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]      [,8]
+25% -0.6521793 -1.359109 -2.112339 -2.763942 -3.435196 -4.441023 -4.858535 -5.332361
+75%  0.6920444  1.199439  1.949271  2.891681  3.310393  3.644350  4.380769  5.240998
+```
+
+* As well as unnamed functions
+
+
+```r
+apply(m1, 2, function(x) median(abs(x)))
+```
+
+```
+[1] 0.6786068 1.2588601 2.0411513 2.8178597 3.3824512 4.0650801 4.6527861 5.2765122
+```
+
+---
+
+* Applying a function row-wise
+
+
+```r
+apply(m1, 1, function(x) which.max(abs(x)))
+```
+
+```
+   [1] 5 8 4 5 6 7 8 4 8 8 7 8 7 6 7 7 4 6 8 8 6 7 8 4 6 8 8 6 7 5 8 8 7 7 8 8 4 7 6 7 5 7 7 3 8 7 8
+  [48] 8 8 6 6 7 6 7 6 7 7 6 7 5 8 8 8 8 5 7 7 5 8 6 8 7 5 8 6 8 7 7 8 8 7 6 5 7 6 5 3 6 7 7 8 7 8 5
+  [95] 7 7 4 7 8 5 4 4 8 5 6 6 5 8 3 3 7 6 5 8 7 7 5 8 5 6 6 8 8 7 6 7 7 5 4 6 7 8 8 5 4 8 8 8 7 6 8
+ [142] 6 7 6 7 6 8 5 7 5 5 5 7 8 8 5 7 7 5 3 8 7 8 7 7 3 7 7 5 8 8 8 8 4 5 8 8 3 5 8 6 6 5 7 6 7 7 8
+ [189] 8 7 7 7 8 7 7 7 5 6 7 7 8 8 7 8 8 7 4 5 6 7 7 7 3 8 7 8 6 6 6 8 6 7 6 8 8 8 7 8 5 6 6 6 8 7 8
+ [236] 6 5 7 8 5 6 8 3 7 8 4 8 8 5 7 6 8 7 7 6 6 6 5 4 8 6 8 7 8 8 7 6 6 4 8 6 6 8 6 4 8 8 7 7 7 8 7
+ [283] 6 6 6 6 3 8 6 8 8 7 5 6 8 5 6 7 5 8 5 6 8 4 5 8 8 5 7 7 6 5 8 7 7 2 8 8 7 6 6 8 8 6 6 8 7 5 5
+ [330] 8 7 5 6 5 4 6 5 8 5 8 6 7 8 4 8 4 7 4 6 6 5 7 6 5 4 8 3 8 7 6 7 6 8 8 7 5 6 7 7 4 6 4 8 6 7 8
+ [377] 3 8 6 7 7 8 8 7 5 8 8 7 5 7 8 8 7 7 8 8 7 4 6 5 6 8 8 6 6 7 6 8 7 6 6 5 6 7 8 7 8 7 7 4 5 4 4
+ [424] 5 4 5 5 5 8 7 8 6 8 7 8 7 5 6 8 5 6 6 3 8 4 6 6 3 6 8 7 8 8 6 8 8 7 8 7 8 7 8 8 7 6 7 5 8 8 8
+ [471] 7 7 8 5 6 8 4 6 5 6 8 8 6 6 8 5 7 7 5 6 6 8 8 8 8 6 8 4 6 5 7 8 5 8 7 8 7 6 7 6 5 8 7 8 8 7 5
+ [518] 5 5 8 8 2 7 8 7 8 4 7 4 7 4 7 7 7 4 8 8 7 6 8 5 8 6 6 5 8 8 7 7 7 8 7 8 7 8 7 7 8 8 6 7 8 7 8
+ [565] 7 5 6 7 7 8 7 5 4 5 5 6 7 7 5 6 8 8 7 6 7 8 7 5 5 7 6 6 5 6 5 6 8 8 8 6 8 5 8 4 7 8 6 4 3 8 8
+ [612] 7 8 8 6 8 7 5 8 6 7 6 8 7 8 3 7 7 3 8 8 8 6 7 8 7 8 6 8 5 5 7 7 6 8 8 8 4 7 8 8 7 2 5 6 5 7 4
+ [659] 4 8 8 8 5 8 5 8 5 7 6 8 8 8 7 7 8 5 7 7 8 4 5 8 8 7 6 6 6 6 6 5 8 4 6 6 8 8 8 7 6 7 7 6 8 8 4
+ [706] 7 7 4 8 5 8 7 7 7 6 7 7 5 5 8 6 7 5 8 7 6 8 7 7 5 8 8 6 8 7 6 6 8 8 8 5 4 8 5 8 6 8 6 4 6 6 6
+ [753] 6 5 5 5 7 7 7 8 7 8 4 7 7 7 3 4 3 5 6 8 8 8 7 8 6 6 5 7 8 8 7 8 7 6 8 8 8 7 6 6 4 7 8 5 6 5 5
+ [800] 6 8 7 7 6 7 7 4 8 7 4 6 8 8 4 7 7 8 7 8 6 8 6 8 8 6 4 6 7 6 6 6 8 8 7 8 5 8 7 7 8 7 7 7 5 8 8
+ [847] 7 7 8 8 3 6 7 7 6 6 7 6 5 8 6 7 6 6 6 7 3 8 8 6 8 5 7 6 7 5 7 7 6 7 7 8 7 6 7 5 7 8 7 8 8 5 7
+ [894] 8 5 4 4 4 7 6 6 4 6 7 6 8 7 6 8 6 6 7 5 5 6 8 5 8 7 7 5 6 7 3 7 8 5 8 8 7 8 6 5 6 8 7 5 6 6 5
+ [941] 8 5 8 8 7 8 5 4 7 8 8 8 6 5 5 6 3 8 8 8 6 8 5 8 8 6 5 7 7 8 3 8 8 6 7 7 8 8 6 7 8 7 5 8 8 6 7
+ [988] 3 8 7 8 7 7 6 7 7 8 8 7 8
+```
+
+---
+
+* Applying a function row-wise
+
+
+```r
+wmax <- apply(m1, 1, function(x) which.max(abs(x)))
+table(wmax)
+```
+
+```
+wmax
+  2   3   4   5   6   7   8 
+  3  25  60 135 199 266 312 
+```
+
+```r
+barplot(table(wmax))
+```
+
+![plot of chunk unnamed-chunk-31](figures/rapply-1-unnamed-chunk-31-1.png)
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+
+```r
+Titanic[,,2,]
+```
+
+```
+, , Survived = No
+
+      Sex
+Class  Male Female
+  1st   118      4
+  2nd   154     13
+  3rd   387     89
+  Crew  670      3
+
+, , Survived = Yes
+
+      Sex
+Class  Male Female
+  1st    57    140
+  2nd    14     80
+  3rd    75     76
+  Crew  192     20
+```
+
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+
+```r
+apply(Titanic[,,2,], MARGIN = 3, sum)
+```
+
+```
+  No  Yes 
+1438  654 
+```
+
+* More interestingly, the summary can happen over multiple dimensions
+
+
+```r
+apply(Titanic[,,2,], MARGIN = c(2, 3), sum)
+```
+
+```
+        Survived
+Sex        No Yes
+  Male   1329 338
+  Female  109 316
+```
 
 
 

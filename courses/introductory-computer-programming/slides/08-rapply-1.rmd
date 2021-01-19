@@ -1,12 +1,14 @@
 ---
 layout: remark
-title: Replicate and the Apply Family of Functions
+title: Replicate and the Apply Family of Functions - 1
 subtitle: Introductory Computer Programming
 author: Deepayan Sarkar
 mathjax: true
 ---
 
-# Topics we will cover today
+<!--  
+
+# Topics 
 
 * Replicating a simulation experiment
 
@@ -16,7 +18,8 @@ mathjax: true
 
 * `do.call()`
 
----
+-->
+
 
 # Loop alternatives
 
@@ -326,6 +329,117 @@ sapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s)))
 sapply(1:6, function(s) quantile(rnorm(n = 1000, mean = 0, sd = s)))
 ```
 
+---
+
+layout: true
+
+# `apply()` : Apply function to rows / columns of a matrix
+
+---
+
+* We will talk about matrix operations in R in more detail later
+
+* It is often useful to apply a function on rows or columns of a matrix
+
+```{r}
+m1 <- matrix(0, nrow = 1000, ncol = 8)
+for (i in 1:8)
+    m1[, i] <- rnorm(1000, mean = 0, sd = i)
+str(m1)
+```
+
+* Note that this is essentially the same as
+
+```{r}
+m2 <- sapply(1:8, function(s) rnorm(n = 1000, mean = 0, sd = s))
+str(m2)
+```
+
+---
+
+* Suppose we want to compute the mean for each column of `m1`
+
+* There are several ways to do this:
+
+	- Loop over columns
+	
+	- Write this as a matrix operation (will discuss later)
+	
+	- Use the `colMeans()` or `colSums()` function
+	
+```{r}
+colMeans(m1)
+colSums(m1) / nrow(m1)
+```
+
+---
+
+* However, `colMeans()` / `colSums()` and `rowMeans()` / `rowSums()` are special
+
+* Other summary functions do not have a built-in row-wise / column-wise versions
+
+* `apply()` allows arbitrary functions to be called per row (`MARGIN=1`) or column (`MARGIN=2`) 
+
+```{r}
+apply(m1, 2, mean)
+apply(m1, 2, sd)
+apply(m1, 2, IQR)
+```
+
+---
+
+* `apply()` also allows additional arguments to be specified
+
+```{r}
+apply(m1, 2, quantile, probs = c(0.25, 0.75))
+```
+
+* As well as unnamed functions
+
+```{r}
+apply(m1, 2, function(x) median(abs(x)))
+```
+
+---
+
+* Applying a function row-wise
+
+```{r}
+apply(m1, 1, function(x) which.max(abs(x)))
+```
+
+---
+
+* Applying a function row-wise
+
+```{r,fig.height=4}
+wmax <- apply(m1, 1, function(x) which.max(abs(x)))
+table(wmax)
+barplot(table(wmax))
+```
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+```{r}
+Titanic[,,2,]
+```
+
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+```{r}
+apply(Titanic[,,2,], MARGIN = 3, sum)
+```
+
+* More interestingly, the summary can happen over multiple dimensions
+
+```{r}
+apply(Titanic[,,2,], MARGIN = c(2, 3), sum)
+```
 
 
 
