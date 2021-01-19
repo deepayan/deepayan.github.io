@@ -33,7 +33,7 @@ mathjax: true
 
 * These are not necessarily more efficient than loops (unlike true vectorized operations)
 
-* However, they are conceptually clearer (and easier to parallelize)
+* However, they are conceptually simpler (and easier to parallelize)
 
 
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
