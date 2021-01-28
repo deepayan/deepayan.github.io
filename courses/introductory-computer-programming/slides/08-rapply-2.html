@@ -66,16 +66,16 @@ lapply(1:5, sample)
 [1] 1
 
 [[2]]
-[1] 1 2
+[1] 2 1
 
 [[3]]
-[1] 1 2 3
+[1] 3 2 1
 
 [[4]]
-[1] 4 1 3 2
+[1] 1 2 3 4
 
 [[5]]
-[1] 5 2 1 3 4
+[1] 5 4 3 1 2
 ```
 
 * This is essentially a "vectorized" version of the for loop
@@ -153,19 +153,19 @@ lapply(1:5, FUN = sample_of_size)
 
 ```
 [[1]]
-[1] 9
+[1] 10
 
 [[2]]
-[1] 9 4
+[1] 6 2
 
 [[3]]
-[1] 2 9 7
+[1] 6 3 2
 
 [[4]]
-[1] 10  7  8  2
+[1] 9 6 7 6
 
 [[5]]
-[1]  8 10  3  9  5
+[1] 7 5 9 4 9
 ```
 
 ---
@@ -182,16 +182,16 @@ lapply(1:5, FUN = function(i) sample(10, i, replace = TRUE))
 [1] 2
 
 [[2]]
-[1] 2 1
+[1] 10  6
 
 [[3]]
-[1] 6 7 5
+[1] 3 8 7
 
 [[4]]
-[1] 7 2 7 3
+[1]  7 10  7  8
 
 [[5]]
-[1] 4 1 7 9 9
+[1] 8 8 1 9 4
 ```
 
 * This idea is often a big conceptual stumbling block for new R users
@@ -202,7 +202,7 @@ lapply(1:5, FUN = function(i) sample(10, i, replace = TRUE))
 
 
 ```r
-lapply(X, FUN, ...) # with further arguments
+ans <- lapply(X, FUN, ...) # with further arguments
 ```
 
 * is equivalent to
@@ -235,16 +235,16 @@ lapply(1:5, FUN = sample, size = 20, replace = TRUE)
  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 
 [[2]]
- [1] 2 2 2 1 2 1 2 2 2 1 2 1 1 1 2 2 1 1 1 2
+ [1] 2 2 2 1 2 1 1 2 1 2 2 2 1 1 2 2 1 2 2 1
 
 [[3]]
- [1] 2 2 1 3 3 1 3 1 2 1 1 2 3 2 1 2 2 1 3 3
+ [1] 1 3 3 2 1 2 3 1 2 2 1 3 1 1 3 2 3 1 2 3
 
 [[4]]
- [1] 1 1 4 2 4 4 1 1 3 2 3 1 3 4 1 4 3 1 3 2
+ [1] 2 2 1 1 2 2 4 1 2 2 2 2 4 3 2 1 4 1 4 1
 
 [[5]]
- [1] 3 1 4 1 3 4 1 4 3 5 3 3 4 5 5 1 4 4 3 1
+ [1] 5 2 5 4 1 1 1 2 1 5 3 3 4 2 5 4 2 4 5 1
 ```
 
 ---
@@ -258,354 +258,23 @@ lapply(1:6, FUN = sample, x = month.abb, replace = TRUE) # sample(x = month.abb,
 
 ```
 [[1]]
-[1] "Jan"
+[1] "Mar"
 
 [[2]]
-[1] "Jan" "Mar"
+[1] "Jun" "Oct"
 
 [[3]]
-[1] "Feb" "Jul" "Jul"
+[1] "Dec" "Sep" "Sep"
 
 [[4]]
-[1] "Dec" "Nov" "Jun" "Aug"
+[1] "Oct" "Jul" "Mar" "Jul"
 
 [[5]]
-[1] "Mar" "Nov" "Feb" "Feb" "Jun"
+[1] "May" "Jun" "Apr" "Jan" "Sep"
 
 [[6]]
-[1] "Apr" "Sep" "Jun" "Mar" "Mar" "Mar"
+[1] "Sep" "Jan" "Jan" "Jun" "Jan" "Jul"
 ```
-
----
-
-* Another example: $N(0, \sigma^2)$ variates with varying $\sigma$
-
-
-```r
-str(rnorm)
-```
-
-```
-function (n, mean = 0, sd = 1)  
-```
-
-```r
-str(lapply(1:5, FUN = rnorm, n = 1, mean = 0))
-```
-
-```
-List of 5
- $ : num -0.509
- $ : num 1.52
- $ : num -6.76
- $ : num -0.412
- $ : num 10.6
-```
-
-* But much easier to do directly using vectorization
-
-
-```r
-rnorm(5, mean = 0, sd = 1:5)
-```
-
-```
-[1] -0.18130233 -0.56050193  0.03501977 -6.60081903 -4.35784439
-```
-
----
-
-* A more complicated example: IQR of 1000 $N(0, \sigma^2)$ variates with varying $\sigma$
-
-
-```r
-str(lapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s))))
-```
-
-```
-List of 8
- $ : num 1.45
- $ : num 2.76
- $ : num 3.98
- $ : num 5.37
- $ : num 6.58
- $ : num 7.81
- $ : num 10.4
- $ : num 10.1
-```
-
----
-
-layout: true
-
-# `sapply()` : simplifying results to vector / array
-
----
-
-* `sapply()` is essentially the same as `lapply()`, but simplifies result if possible
-
-
-```r
-sapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s)))
-```
-
-```
-[1]  1.388749  2.506995  3.947976  5.320945  7.128539  8.321645  9.751118 10.648638
-```
-
-
-```r
-sapply(1:6, function(s) quantile(rnorm(n = 1000, mean = 0, sd = s)))
-```
-
-```
-             [,1]        [,2]        [,3]         [,4]         [,5]        [,6]
-0%   -3.520048927 -7.03419411 -8.84685695 -12.56672558 -17.97581403 -23.4805504
-25%  -0.726548121 -1.34003516 -2.06964031  -2.75761252  -3.25205777  -4.2981495
-50%   0.009563652  0.02259215  0.08926826   0.02749872   0.06903365  -0.3015013
-75%   0.711638594  1.35697846  2.15096596   2.91385148   3.23513098   3.7581535
-100%  2.777546715  6.03838125 10.65775591  16.53567963  19.79837091  19.0102682
-```
-
----
-
-layout: true
-
-# `apply()` : Apply function to rows / columns of a matrix
-
----
-
-* We will talk about matrix operations in R in more detail later
-
-* It is often useful to apply a function on rows or columns of a matrix
-
-
-```r
-m1 <- matrix(0, nrow = 1000, ncol = 8)
-for (i in 1:8)
-    m1[, i] <- rnorm(1000, mean = 0, sd = i)
-str(m1)
-```
-
-```
- num [1:1000, 1:8] -1.248 0.559 -1.134 0.312 -0.569 ...
-```
-
-* Note that this is essentially the same as
-
-
-```r
-m2 <- sapply(1:8, function(s) rnorm(n = 1000, mean = 0, sd = s))
-str(m2)
-```
-
-```
- num [1:1000, 1:8] -0.722 0.586 -1.304 -0.213 0.145 ...
-```
-
----
-
-* Suppose we want to compute the mean for each column of `m1`
-
-* There are several ways to do this:
-
-	- Loop over columns
-	
-	- Write this as a matrix operation (will discuss later)
-	
-	- Use the `colMeans()` or `colSums()` function
-	
-
-```r
-colMeans(m1)
-```
-
-```
-[1]  0.03003992 -0.02398165  0.10796791 -0.02098432 -0.06065374  0.32369693  0.55728538 -0.06472377
-```
-
-```r
-colSums(m1) / nrow(m1)
-```
-
-```
-[1]  0.03003992 -0.02398165  0.10796791 -0.02098432 -0.06065374  0.32369693  0.55728538 -0.06472377
-```
-
----
-
-* However, `colMeans()` / `colSums()` and `rowMeans()` / `rowSums()` are special
-
-* Other summary functions do not have a built-in row-wise / column-wise versions
-
-* `apply()` allows arbitrary functions to be called per row (`MARGIN=1`) or column (`MARGIN=2`) 
-
-
-```r
-apply(m1, 2, mean)
-```
-
-```
-[1]  0.03003992 -0.02398165  0.10796791 -0.02098432 -0.06065374  0.32369693  0.55728538 -0.06472377
-```
-
-```r
-apply(m1, 2, sd)
-```
-
-```
-[1] 1.012982 1.997493 2.861434 4.226835 4.612591 6.116127 6.890905 8.226337
-```
-
-```r
-apply(m1, 2, IQR)
-```
-
-```
-[1]  1.422119  2.679329  3.919593  5.649090  6.188356  8.365541  9.060822 10.800257
-```
-
----
-
-* `apply()` also allows additional arguments to be specified
-
-
-```r
-apply(m1, 2, quantile, probs = c(0.25, 0.75))
-```
-
-```
-          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]      [,8]
-25% -0.6895770 -1.360524 -1.920343 -2.866503 -3.093419 -3.855031 -4.071460 -5.426257
-75%  0.7325416  1.318805  1.999250  2.782588  3.094937  4.510510  4.989362  5.374000
-```
-
-* As well as unnamed functions
-
-
-```r
-apply(m1, 2, function(x) median(abs(x)))
-```
-
-```
-[1] 0.7136349 1.3442696 1.9594780 2.8209359 3.0958540 4.1676898 4.4735572 5.4350942
-```
-
----
-
-* Applying a function row-wise
-
-
-```r
-apply(m1, 1, function(x) which.max(abs(x)))
-```
-
-```
-   [1] 8 8 7 5 8 4 8 7 8 8 7 7 8 8 7 4 8 5 7 8 8 4 6 7 7 8 7 7 6 8 6 7 8 8 8 5 7 8 2 5 7 8 6 8 7 7 7
-  [48] 7 8 6 7 5 7 7 7 5 6 7 7 6 7 8 7 4 8 6 8 7 7 7 7 7 3 8 5 8 5 6 6 5 8 8 7 6 6 8 6 8 6 6 8 6 8 7
-  [95] 7 7 6 7 4 8 8 8 7 6 5 6 8 8 7 6 8 5 5 6 8 6 8 6 8 8 7 8 7 3 6 6 7 8 6 7 8 6 7 4 6 6 7 7 7 8 5
- [142] 7 6 6 6 7 8 7 6 7 4 7 7 8 6 8 6 4 8 7 5 8 3 8 8 6 6 3 8 8 6 8 7 7 7 8 7 7 8 5 8 7 7 7 7 8 6 7
- [189] 6 7 6 6 7 6 8 8 8 6 7 7 7 7 7 8 7 7 7 6 3 7 8 6 8 7 6 6 8 5 8 7 5 8 8 6 4 8 7 4 8 4 8 8 8 5 8
- [236] 5 7 5 3 6 7 6 6 8 5 8 3 5 7 8 7 7 7 4 6 6 7 7 7 4 7 7 8 4 8 8 8 8 5 6 7 7 4 5 7 8 8 7 6 8 6 7
- [283] 8 8 6 4 8 8 4 4 7 6 8 8 4 8 8 7 5 7 6 8 4 5 5 8 6 8 7 8 8 6 5 4 7 8 8 5 8 6 8 7 5 7 6 7 8 4 4
- [330] 8 5 6 8 8 7 8 6 6 8 7 8 8 5 4 6 8 8 8 7 5 8 7 7 8 5 8 5 6 7 7 6 7 7 8 7 8 6 4 6 7 8 7 4 5 6 4
- [377] 2 8 7 5 7 7 8 6 6 8 6 4 4 8 7 7 6 5 3 3 8 5 8 8 4 8 8 8 4 8 6 7 8 7 6 7 4 8 8 8 6 7 5 8 8 8 4
- [424] 8 8 7 8 7 6 7 5 7 4 4 8 5 7 7 7 7 8 8 8 5 8 6 7 6 2 5 8 5 7 6 6 6 3 5 8 8 4 8 8 7 8 7 6 8 7 4
- [471] 5 8 8 8 6 6 7 7 4 4 8 7 8 8 6 8 8 3 7 8 6 3 7 7 7 4 8 6 6 8 8 5 6 7 4 8 4 8 6 8 7 4 3 6 6 5 7
- [518] 8 6 8 4 8 3 8 8 4 6 8 4 6 8 7 5 6 8 6 4 5 7 8 4 6 8 5 6 8 8 6 8 5 5 8 7 4 8 8 8 5 5 8 8 6 6 8
- [565] 7 8 6 7 7 8 8 7 8 8 8 8 7 8 5 7 7 7 5 4 8 7 7 4 8 8 7 4 8 8 8 6 4 6 5 8 8 6 7 6 4 8 6 7 8 5 8
- [612] 7 7 4 5 8 8 8 4 8 7 7 7 4 4 8 6 5 8 7 6 8 6 8 6 8 7 8 6 5 8 8 4 6 8 7 5 5 6 8 8 3 7 4 7 8 7 4
- [659] 8 8 7 7 8 5 6 4 8 7 5 5 6 6 8 4 3 8 5 8 4 6 6 6 8 6 7 6 8 8 8 6 5 8 8 5 6 8 8 6 7 5 6 7 7 6 5
- [706] 8 8 3 6 7 6 5 4 8 6 6 8 7 3 5 8 8 7 7 8 7 5 4 7 8 8 6 7 8 8 6 5 7 5 7 8 8 8 8 6 8 6 4 7 6 6 7
- [753] 6 7 8 8 5 8 6 6 7 7 7 6 8 8 4 8 8 6 7 8 8 8 8 8 6 7 7 7 6 6 8 7 4 4 7 6 7 8 6 8 8 4 8 6 7 7 8
- [800] 7 6 6 6 6 4 6 6 7 7 6 8 8 8 8 8 6 8 6 8 2 8 6 5 6 8 8 6 6 7 8 6 7 7 4 8 6 5 7 5 8 8 4 5 4 8 7
- [847] 7 6 6 6 6 7 5 6 8 8 4 4 3 5 4 6 8 5 6 8 7 7 6 8 8 8 7 8 6 5 7 5 7 3 8 8 8 7 8 8 7 8 5 7 8 8 4
- [894] 8 5 7 8 8 4 7 6 7 8 7 8 7 5 7 8 6 8 4 5 8 8 6 6 8 7 8 4 4 8 7 7 4 8 8 4 6 7 8 8 7 8 6 5 4 7 4
- [941] 6 6 8 8 7 7 4 7 4 6 6 8 7 7 5 7 5 6 7 8 7 4 7 7 8 7 7 8 6 8 7 6 8 8 6 6 6 8 4 8 6 8 8 6 8 6 7
- [988] 8 8 5 6 6 4 5 8 7 7 8 7 8
-```
-
----
-
-* Applying a function row-wise
-
-
-```r
-wmax <- apply(m1, 1, function(x) which.max(abs(x)))
-table(wmax)
-```
-
-```
-wmax
-  2   3   4   5   6   7   8 
-  4  20  92  97 199 249 339 
-```
-
-```r
-barplot(table(wmax))
-```
-
-![plot of chunk unnamed-chunk-24](figures/rapply-2-unnamed-chunk-24-1.png)
-
----
-
-* `apply()` can also summarize over margins of higher-dimensional arrays
-
-
-```r
-Titanic[,,2,]
-```
-
-```
-, , Survived = No
-
-      Sex
-Class  Male Female
-  1st   118      4
-  2nd   154     13
-  3rd   387     89
-  Crew  670      3
-
-, , Survived = Yes
-
-      Sex
-Class  Male Female
-  1st    57    140
-  2nd    14     80
-  3rd    75     76
-  Crew  192     20
-```
-
-
----
-
-* `apply()` can also summarize over margins of higher-dimensional arrays
-
-
-```r
-apply(Titanic[,,2,], MARGIN = 3, sum)
-```
-
-```
-  No  Yes 
-1438  654 
-```
-
-* More interestingly, the summary can happen over multiple dimensions
-
-
-```r
-apply(Titanic[,,2,], MARGIN = c(2, 3), sum)
-```
-
-```
-        Survived
-Sex        No Yes
-  Male   1329 338
-  Female  109 316
-```
-
-
 
 ---
 

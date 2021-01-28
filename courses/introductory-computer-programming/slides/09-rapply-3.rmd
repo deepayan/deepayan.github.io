@@ -280,7 +280,7 @@ layout: false
 apropos("apply") # objects with 'apply' in their names
 ```
 
-* Will not discuss in detail:
+* Will not discuss in detail (see documentation):
 
 	* `vapply()`: Safer version of `sapply()` with pre-specified return type
 
