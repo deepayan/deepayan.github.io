@@ -20,19 +20,14 @@ mathjax: true
 
 -->
 
-layout: true
 
-# The `lapply()` function
+# Recap
 
----
-
-* Recap:
-
-	* `lapply(X, FUN)` applies the function `FUN` on each element of `X`
+* `lapply(X, FUN)` applies the function `FUN` on each element of `X`
 	
-	* Extra arguments to `FUN` can also be supplied (but these remain fixed for each call)
+* Extra arguments to `FUN` can also be supplied (but these remain fixed for each call)
 	
-	* These extra arguments can be named to control which argument of `FUN` varies
+* These extra arguments can be named to control which argument of `FUN` varies
 
 
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
@@ -42,6 +37,12 @@ opts_chunk$set(cache = FALSE, cache.path='~/knitr-cache/icp-rapply-3/', autodep 
                fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/rapply-3-')
 options(warnPartialMatchDollar = FALSE, width = 100)
 ```
+
+---
+
+layout: true
+
+# The `lapply()` function
 
 ---
 
@@ -279,13 +280,17 @@ layout: false
 apropos("apply") # objects with 'apply' in their names
 ```
 
-* `vapply()`: Safer version of `sapply()` with pre-specified return type
+* Will not discuss in detail:
 
-* `mapply()`: Vectorized apply, where multiple arguments can be varied
+	* `vapply()`: Safer version of `sapply()` with pre-specified return type
 
-* `eapply()`: Apply over elements in an environment, which we can ignore for now
+	* `mapply()`: Vectorized apply, where multiple arguments can be varied
 
-* `rapply()`: Recursive apply (over complex lists), which we can also ignore for now
+	* `eapply()`: Apply over elements in an environment, which we can ignore for now
+
+	* `rapply()`: Recursive apply (over complex lists), which we can also ignore for now
+
+* Others are even more specialized
 
 ---
 
