@@ -1,0 +1,541 @@
+---
+layout: remark
+title: Replicate and the Apply Family of Functions - 3
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+<!--  
+
+# Topics 
+
+* Replicating a simulation experiment
+
+* The `*apply()` family of functions
+
+* Functions can be arguments of other functions
+
+* `do.call()`
+
+-->
+
+layout: true
+
+# The `lapply()` function
+
+---
+
+* Recap:
+
+	* `lapply(X, FUN)` applies the function `FUN` on each element of `X`
+	
+	* Extra arguments to `FUN` can also be supplied (but these remain fixed for each call)
+	
+	* These extra arguments can be named to control which argument of `FUN` varies
+
+
+
+
+---
+
+* Example: $N(0, \sigma^2)$ variates with varying $\sigma$
+
+
+```r
+str(rnorm)
+```
+
+```
+function (n, mean = 0, sd = 1)  
+```
+
+```r
+str(lapply(1:5, FUN = rnorm, n = 1, mean = 0))
+```
+
+```
+List of 5
+ $ : num -0.0719
+ $ : num 0.144
+ $ : num -0.101
+ $ : num 0.479
+ $ : num -4.75
+```
+--
+
+
+* But much easier to do directly using vectorization
+
+
+```r
+rnorm(5, mean = 0, sd = 1:5)
+```
+
+```
+[1] -0.1784805  0.6632259  2.4897465 -0.2026332 -2.6879149
+```
+
+---
+
+* A more complicated example: IQR of 1000 $N(0, \sigma^2)$ variates with varying $\sigma$
+
+
+```r
+str(lapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s))))
+```
+
+```
+List of 8
+ $ : num 1.16
+ $ : num 3.05
+ $ : num 4.13
+ $ : num 5.29
+ $ : num 6.74
+ $ : num 7.63
+ $ : num 9.56
+ $ : num 10.7
+```
+
+---
+
+layout: true
+
+# `sapply()` : simplifying results to vector / array
+
+---
+
+* `sapply()` is essentially the same as `lapply()`, but simplifies result if possible
+
+
+```r
+sapply(1:8, function(s) IQR(rnorm(n = 1000, mean = 0, sd = s)))
+```
+
+```
+[1]  1.313640  2.631882  3.988291  5.392397  6.946055  7.811937  9.601411 10.948800
+```
+
+
+```r
+sapply(1:6, function(s) quantile(rnorm(n = 1000, mean = 0, sd = s)))
+```
+
+```
+            [,1]         [,2]       [,3]       [,4]       [,5]       [,6]
+0%   -3.14735295 -5.578174064 -8.4018331 -14.400185 -20.349719 -17.105913
+25%  -0.73655370 -1.410418439 -1.8743388  -2.453415  -3.160600  -4.332324
+50%  -0.07412215  0.001351075  0.1528226   0.265138  -0.117841  -0.159386
+75%   0.63507176  1.345615313  2.2607078   2.907374   3.240142   3.881283
+100%  3.36913341  7.064352650  9.1814567  12.087214  14.196931  16.164054
+```
+
+---
+
+layout: true
+
+# `apply()` : Apply function to rows / columns of a matrix
+
+---
+
+* We will talk about matrix operations in R in more detail later
+
+* It is often useful to apply a function on rows or columns of a matrix
+
+
+```r
+m1 <- matrix(0, nrow = 1000, ncol = 8)
+for (i in 1:8)
+    m1[, i] <- rnorm(1000, mean = 0, sd = i)
+str(m1)
+```
+
+```
+ num [1:1000, 1:8] 0.0255 -1.517 -0.0895 0.9967 -0.1302 ...
+```
+
+* Note that this is essentially the same as
+
+
+```r
+m2 <- sapply(1:8, function(s) rnorm(n = 1000, mean = 0, sd = s))
+str(m2)
+```
+
+```
+ num [1:1000, 1:8] -0.69 0.966 0.556 -0.753 0.484 ...
+```
+
+---
+
+* Suppose we want to compute the mean for each column of `m1`
+
+* There are several ways to do this:
+
+	- Loop over columns
+	
+	- Write this as a matrix operation (will discuss later)
+	
+	- Use the `colMeans()` or `colSums()` function
+	
+
+```r
+colMeans(m1)
+```
+
+```
+[1]  0.03437047 -0.08332619 -0.19352819  0.03650738 -0.11624173 -0.16529956  0.08605806 -0.09065975
+```
+
+```r
+colSums(m1) / nrow(m1)
+```
+
+```
+[1]  0.03437047 -0.08332619 -0.19352819  0.03650738 -0.11624173 -0.16529956  0.08605806 -0.09065975
+```
+
+---
+
+* However, `colMeans()` / `colSums()` and `rowMeans()` / `rowSums()` are special
+
+* Other summary functions do not have a built-in row-wise / column-wise versions
+
+* `apply()` allows arbitrary functions to be called per row (`MARGIN=1`) or column (`MARGIN=2`) 
+
+
+```r
+apply(m1, 2, mean)
+```
+
+```
+[1]  0.03437047 -0.08332619 -0.19352819  0.03650738 -0.11624173 -0.16529956  0.08605806 -0.09065975
+```
+
+```r
+apply(m1, 2, sd)
+```
+
+```
+[1] 0.973961 2.007993 2.961974 3.997365 5.135379 5.572814 6.743065 7.959145
+```
+
+```r
+apply(m1, 2, IQR)
+```
+
+```
+[1]  1.294936  2.719780  3.852696  5.477830  6.952658  7.098822  9.041420 10.815642
+```
+
+---
+
+* `apply()` also allows additional arguments to be specified
+
+
+```r
+apply(m1, 2, quantile, probs = c(0.25, 0.75))
+```
+
+```
+          [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]      [,8]
+25% -0.6001764 -1.399354 -2.146904 -2.542861 -3.543185 -3.686030 -4.309807 -5.428353
+75%  0.6947600  1.320425  1.705792  2.934969  3.409472  3.412792  4.731613  5.387289
+```
+
+* As well as unnamed functions
+
+
+```r
+apply(m1, 2, function(x) median(abs(x)))
+```
+
+```
+[1] 0.6602236 1.3591198 1.9806799 2.7673879 3.4647200 3.6195444 4.5282706 5.4043778
+```
+
+---
+
+* Applying a function row-wise
+
+
+```r
+apply(m1, 1, function(x) which.max(abs(x)))
+```
+
+```
+   [1] 7 7 7 5 7 7 8 5 8 6 4 7 7 6 8 6 8 6 6 8 8 7 5 8 8 5 7 7 7 6 7 6 8 8 7 7 7 8 7 8 6 5 6 4 8 5 8
+  [48] 6 3 7 7 8 6 8 3 8 8 5 7 7 8 8 8 7 7 6 8 7 6 7 5 8 6 7 7 8 5 8 5 7 4 5 6 8 5 6 8 6 6 7 7 8 7 8
+  [95] 8 6 7 5 6 8 6 7 5 5 7 7 8 6 6 4 6 8 7 8 3 8 8 8 7 8 6 7 8 6 7 7 8 6 7 8 6 7 4 5 8 7 5 7 8 5 7
+ [142] 2 7 6 8 7 8 8 8 5 7 7 8 7 8 3 8 8 2 8 5 8 4 5 8 4 5 8 8 6 3 8 6 6 7 5 6 6 8 6 8 6 8 6 5 4 8 5
+ [189] 5 5 4 8 4 4 8 6 6 6 7 7 8 7 8 8 8 7 5 6 6 8 8 8 8 4 6 6 8 7 7 7 8 8 7 5 7 6 5 5 6 8 6 8 8 7 3
+ [236] 8 7 6 5 6 5 8 7 7 3 7 7 7 6 8 6 8 7 6 3 7 7 8 8 8 8 8 4 8 8 6 6 6 6 6 7 7 8 6 7 8 5 7 6 7 8 6
+ [283] 7 7 8 7 6 8 6 8 5 8 4 5 7 4 5 6 7 8 4 8 7 8 7 8 5 8 6 5 8 7 6 6 8 4 7 4 6 5 8 8 5 4 6 8 8 6 6
+ [330] 8 8 4 6 8 5 5 8 8 7 5 8 6 7 5 8 8 8 6 7 8 5 8 7 7 6 7 8 6 8 5 8 8 4 7 7 8 7 4 7 8 7 5 8 8 8 6
+ [377] 7 5 8 6 7 8 8 8 8 5 7 7 5 8 8 8 7 8 7 8 5 6 7 8 5 7 7 6 8 7 8 7 6 7 5 7 8 6 7 8 8 6 7 8 4 8 3
+ [424] 7 3 8 8 4 4 4 8 8 5 8 7 7 5 7 8 8 7 7 7 5 4 7 6 8 2 8 6 8 7 8 7 8 7 5 7 4 7 8 6 7 7 5 3 7 6 6
+ [471] 6 7 6 6 8 7 7 7 7 8 8 8 7 5 3 7 8 5 5 8 8 5 8 4 8 8 8 8 7 3 8 6 8 4 6 7 5 8 5 8 8 3 5 4 5 4 8
+ [518] 8 5 8 4 8 8 8 7 6 8 6 8 5 4 4 7 8 5 8 8 7 7 8 4 8 6 4 5 7 7 8 8 7 8 6 4 6 8 6 6 8 6 6 7 7 8 8
+ [565] 8 4 5 8 7 5 8 5 8 5 6 5 7 5 6 6 7 8 6 8 8 6 5 5 5 4 8 8 6 6 3 6 7 8 7 7 6 7 8 6 7 5 5 8 4 7 8
+ [612] 8 8 7 6 7 8 8 8 8 8 8 8 7 8 8 5 8 7 8 7 7 5 5 3 5 6 5 7 6 8 5 8 8 7 4 8 8 7 7 5 8 7 5 7 6 4 8
+ [659] 8 7 5 8 7 8 8 5 8 5 6 8 7 8 8 6 5 6 8 5 7 7 8 6 4 8 6 8 6 6 8 4 7 8 7 6 6 4 8 8 8 8 6 6 7 7 5
+ [706] 4 5 7 6 5 8 6 7 8 7 8 7 8 5 8 8 7 5 7 5 6 8 7 8 6 4 5 7 6 7 7 3 7 7 6 5 7 7 5 5 8 7 8 7 7 6 7
+ [753] 6 5 6 8 8 7 7 8 3 5 4 8 5 6 6 8 7 7 4 7 6 5 6 4 6 8 7 3 8 8 4 5 8 8 8 8 6 4 7 6 8 6 8 8 7 8 8
+ [800] 7 6 8 8 6 8 7 6 5 5 8 6 6 5 7 8 6 7 8 6 8 8 7 7 5 5 8 7 7 6 8 8 7 3 6 8 7 6 8 5 7 7 8 8 8 8 8
+ [847] 7 8 8 4 7 7 8 7 8 7 7 6 3 8 8 8 8 8 5 8 5 6 6 8 7 8 8 8 5 8 8 8 5 7 3 8 8 6 4 6 8 4 8 8 3 8 8
+ [894] 7 8 4 8 7 7 8 8 7 8 6 6 5 7 7 8 6 7 8 5 7 8 6 8 8 8 8 4 3 8 8 6 6 7 8 5 7 6 7 7 5 7 6 7 5 5 6
+ [941] 7 5 8 6 8 7 5 3 7 3 6 7 7 7 7 8 8 7 7 7 8 6 6 8 3 6 5 5 8 6 5 4 8 4 7 8 8 6 8 7 7 8 8 5 7 5 6
+ [988] 8 5 8 8 8 8 5 8 6 7 7 7 8
+```
+
+---
+
+* Applying a function row-wise
+
+
+```r
+wmax <- apply(m1, 1, function(x) which.max(abs(x)))
+table(wmax)
+```
+
+```
+wmax
+  2   3   4   5   6   7   8 
+  3  27  60 135 176 250 349 
+```
+
+```r
+barplot(table(wmax))
+```
+
+![plot of chunk unnamed-chunk-13](figures/rapply-3-unnamed-chunk-13-1.png)
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+
+```r
+Titanic[,,2,]
+```
+
+```
+, , Survived = No
+
+      Sex
+Class  Male Female
+  1st   118      4
+  2nd   154     13
+  3rd   387     89
+  Crew  670      3
+
+, , Survived = Yes
+
+      Sex
+Class  Male Female
+  1st    57    140
+  2nd    14     80
+  3rd    75     76
+  Crew  192     20
+```
+
+
+---
+
+* `apply()` can also summarize over margins of higher-dimensional arrays
+
+
+```r
+apply(Titanic[,,2,], MARGIN = 3, sum)
+```
+
+```
+  No  Yes 
+1438  654 
+```
+
+* More interestingly, the summary can happen over multiple dimensions
+
+
+```r
+apply(Titanic[,,2,], MARGIN = c(2, 3), sum)
+```
+
+```
+        Survived
+Sex        No Yes
+  Male   1329 338
+  Female  109 316
+```
+
+---
+
+layout: true
+
+# `tapply()` : Apply function over "ragged" array
+
+---
+
+* Similar in spirit to `apply()`, but meant for groups of unequal size
+
+* General form: `tapply(X, INDEX, FUN, ..., simplify = TRUE)`
+
+	* `X` is split according to grouping variable(s) `INDEX`
+	
+	* `FUN` applied to each subset
+
+---
+
+* A simple example we have seen before
+
+
+```r
+with(mtcars, tapply(mpg, am, FUN = mean))
+```
+
+```
+       0        1 
+17.14737 24.39231 
+```
+
+---
+
+* `FUN` can be more complicated
+
+
+```r
+with(mtcars, tapply(mpg, am, FUN = summary))
+```
+
+```
+$`0`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  10.40   14.95   17.30   17.15   19.20   24.40 
+
+$`1`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.00   21.00   22.80   24.39   30.40   33.90 
+```
+
+---
+
+* Output of different size leads to list output (controlled by `simplify` as usual)
+
+
+```r
+with(mtcars, tapply(mpg, am, FUN = unique))
+```
+
+```
+$`0`
+ [1] 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 15.2 10.4 14.7 21.5 15.5 13.3
+
+$`1`
+ [1] 21.0 22.8 32.4 30.4 33.9 27.3 26.0 15.8 19.7 15.0 21.4
+```
+
+---
+
+* Grouping by multiple variables is possible
+
+* The default result is an array with groups as margins
+
+
+```r
+with(mtcars, tapply(mpg, list(am, gear), FUN = mean))
+```
+
+```
+         3      4     5
+0 16.10667 21.050    NA
+1       NA 26.275 21.38
+```
+
+* Some combinations are empty in this case
+
+
+```r
+with(mtcars, tapply(mpg, list(am, gear), FUN = length))
+```
+
+```
+   3 4  5
+0 15 4 NA
+1 NA 8  5
+```
+
+---
+
+* `tapply()` essentially calls `split()` followed by `lapply()`
+
+* `split()` is often very useful to divide data into subsets for further manipulation
+
+.scrollable400[
+
+
+```r
+str(split(mtcars, mtcars$am))
+```
+
+```
+List of 2
+ $ 0:'data.frame':	19 obs. of  11 variables:
+  ..$ mpg : num [1:19] 21.4 18.7 18.1 14.3 24.4 22.8 19.2 17.8 16.4 17.3 ...
+  ..$ cyl : num [1:19] 6 8 6 8 4 4 6 6 8 8 ...
+  ..$ disp: num [1:19] 258 360 225 360 147 ...
+  ..$ hp  : num [1:19] 110 175 105 245 62 95 123 123 180 180 ...
+  ..$ drat: num [1:19] 3.08 3.15 2.76 3.21 3.69 3.92 3.92 3.92 3.07 3.07 ...
+  ..$ wt  : num [1:19] 3.21 3.44 3.46 3.57 3.19 ...
+  ..$ qsec: num [1:19] 19.4 17 20.2 15.8 20 ...
+  ..$ vs  : num [1:19] 1 0 1 0 1 1 1 1 0 0 ...
+  ..$ am  : num [1:19] 0 0 0 0 0 0 0 0 0 0 ...
+  ..$ gear: num [1:19] 3 3 3 3 4 4 4 4 3 3 ...
+  ..$ carb: num [1:19] 1 2 1 4 2 2 4 4 3 3 ...
+ $ 1:'data.frame':	13 obs. of  11 variables:
+  ..$ mpg : num [1:13] 21 21 22.8 32.4 30.4 33.9 27.3 26 30.4 15.8 ...
+  ..$ cyl : num [1:13] 6 6 4 4 4 4 4 4 4 8 ...
+  ..$ disp: num [1:13] 160 160 108 78.7 75.7 ...
+  ..$ hp  : num [1:13] 110 110 93 66 52 65 66 91 113 264 ...
+  ..$ drat: num [1:13] 3.9 3.9 3.85 4.08 4.93 4.22 4.08 4.43 3.77 4.22 ...
+  ..$ wt  : num [1:13] 2.62 2.88 2.32 2.2 1.61 ...
+  ..$ qsec: num [1:13] 16.5 17 18.6 19.5 18.5 ...
+  ..$ vs  : num [1:13] 0 0 1 1 1 1 1 0 1 0 ...
+  ..$ am  : num [1:13] 1 1 1 1 1 1 1 1 1 1 ...
+  ..$ gear: num [1:13] 4 4 4 4 4 4 4 5 5 5 ...
+  ..$ carb: num [1:13] 4 4 1 1 2 1 1 2 2 4 ...
+```
+
+]
+
+
+---
+
+layout: false
+
+# What else?
+
+
+```r
+apropos("apply") # objects with 'apply' in their names
+```
+
+```
+ [1] "apply"      "dendrapply" "eapply"     "kernapply"  "lapply"     "mapply"     "rapply"    
+ [8] "sapply"     "tapply"     "vapply"    
+```
+
+* `vapply()`: Safer version of `sapply()` with pre-specified return type
+
+* `mapply()`: Vectorized apply, where multiple arguments can be varied
+
+* `eapply()`: Apply over elements in an environment, which we can ignore for now
+
+* `rapply()`: Recursive apply (over complex lists), which we can also ignore for now
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
