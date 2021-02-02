@@ -178,10 +178,17 @@ barplot(table(wmax))
 
 ---
 
+layout: true
+
+# `apply()` function to margins of an array
+
+---
+
 * `apply()` can also summarize over margins of higher-dimensional arrays
 
 ```{r}
-Titanic[,,2,]
+Titanic.adult <- Titanic[, , "Adult", ]
+Titanic.adult
 ```
 
 
@@ -190,14 +197,77 @@ Titanic[,,2,]
 * `apply()` can also summarize over margins of higher-dimensional arrays
 
 ```{r}
-apply(Titanic[,,2,], MARGIN = 3, sum)
+apply(Titanic.adult, MARGIN = 3, sum)
 ```
 
 * More interestingly, the summary can happen over multiple dimensions
 
 ```{r}
-apply(Titanic[,,2,], MARGIN = c(2, 3), sum)
+apply(Titanic.adult, MARGIN = c(2, 3), sum)
 ```
+
+---
+
+* Another example: UC Berkeley admissions data
+
+.scrollable400[
+
+```{r}
+UCBAdmissions
+```
+
+]
+
+---
+
+* Sum over third dimension (department) to get total admissions by gender
+
+```{r}
+apply(UCBAdmissions, c(1, 2), sum)
+prop.table(apply(UCBAdmissions, c(1, 2), sum), margin = 2)
+```
+
+* The `prop.table()` function converts counts into prortions (in this case, by column)
+
+---
+
+* We can write a small function to extract percent admitted 
+
+```{r}
+admittedPercent <- function(x) round(100 * prop.table(x, margin = 2)[1, ])
+admittedPercent(apply(UCBAdmissions, c(1, 2), sum))
+```
+
+* This suggests that female candidates are rejected at a considerably higher rate
+
+--
+
+* We can apply this to any specific department as well
+
+```{r}
+admittedPercent(UCBAdmissions[,, 1])
+```
+
+* For the first department, the admission rates seem to be reversed
+
+---
+
+* It is easier to use `apply()` again to do this for all departments
+
+```{r}
+apply(UCBAdmissions, 3, admittedPercent)
+```
+
+* Contrary to aggregated results, this suggests that most departments have comparable rejection rates
+
+* Why this apparent contradiction?
+--
+
+```{r}
+apply(UCBAdmissions, c(2, 3), sum) # total candidates by department
+```
+
+
 
 ---
 
@@ -225,15 +295,21 @@ with(mtcars, tapply(mpg, am, FUN = mean))
 
 ---
 
-* `FUN` can be more complicated
+* `FUN` can be have more complicated output
 
 ```{r}
 with(mtcars, tapply(mpg, am, FUN = summary))
 ```
 
+* The `simplify` argument controls form of return value
+
+* `simplify = FALSE` produces list output as usual
+
+* But `simplify = TRUE` (default) simplifies _only_ if `FUN` returns scalar values
+
 ---
 
-* Output of different size leads to list output (controlled by `simplify` as usual)
+* Output of different size leads to list output as usual
 
 ```{r}
 with(mtcars, tapply(mpg, am, FUN = unique))
@@ -243,7 +319,7 @@ with(mtcars, tapply(mpg, am, FUN = unique))
 
 * Grouping by multiple variables is possible
 
-* The default result is an array with groups as margins
+* With scalar-valued `FUN`, the default result is an array with groups as margins
 
 ```{r}
 with(mtcars, tapply(mpg, list(am, gear), FUN = mean))
