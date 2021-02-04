@@ -16,8 +16,6 @@ mathjax: true
 
 * Functions can be arguments of other functions
 
-* `do.call()`
-
 -->
 
 # The `*apply()` family of functions

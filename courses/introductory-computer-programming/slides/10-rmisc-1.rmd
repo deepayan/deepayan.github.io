@@ -1,0 +1,261 @@
+---
+layout: remark
+title: Some Miscellaneous Topics
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+# Some miscellaneous topics
+
+* Matrices and arrays: construction and operations
+
+* Replacement functions
+
+* `do.call()`
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-misc-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/misc-1-')
+library(lattice)
+lattice.options(default.args = list(as.table = TRUE), 
+                default.theme = list(grid.pars = list(cex = 1.5)))
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+---
+
+layout: true
+
+# Matrix construction
+
+---
+
+* `matrix(data, nrow, ncol)` : data + dimension
+
+```{r}
+matrix(month.abb, 3, 4)
+matrix(month.abb, 3, 4, byrow = TRUE)
+```
+
+* `array(data, dim)` similarly allows construction of general arrays
+
+---
+
+* `rbind(...)` : construct matrix by combining rows
+
+* `cbind(...)` : construct matrix by combining columns
+
+.scrollable400[
+
+```{r}
+X <- with(mtcars, cbind(Int = 1, am = am, wt = wt)) # design matrix
+X
+```
+
+]
+
+---
+
+layout: true
+
+# Matrix operations
+
+---
+
+* `t(x)` : transpose of matrix
+
+* `aperm(x, perm)` : general array permutation
+
+* `a * b` : element-wise multiplication
+
+* `a %*% b` : matrix multiplication
+
+* `crossprod(x)` : More efficient version of `t(x) %*% x`
+
+* `crossprod(x, y)` : More efficient version of `t(x) %*% y`
+
+* `tcrossprod(x, y)`: Similar version of `x %*% t(y)`
+
+---
+
+```{r}
+t(X) %*% X
+crossprod(X)
+```
+
+---
+
+* `solve(A, b)` : solve system of linear equations $Ax = b$
+
+```{r}
+y <- mtcars$mpg
+solve(crossprod(X), crossprod(X, y))
+```
+
+* Compare with
+
+```{r}
+coef(lm(mpg ~ 1 + am + wt, data = mtcars))
+```
+
+---
+
+* `lm()` is actually more numerically efficient (it does not actually compute `crossprod(X)`)
+
+* It also handles factor (categorical) variables through its formula interface
+
+* The `model.matrix()` function computes just the design matrix without fitting the model
+
+---
+
+layout: true
+
+# Replacement functions
+
+---
+
+* We have seen several examples of the form:
+
+```r
+x[i] <- value
+attr(x, "name") <- value
+colnames(x) <- value
+```
+
+* All these calls have a "complex" expression on the LHS of the assignment
+
+* These are known as _replacement functions_
+--
+
+* These are very natural once you get used to them
+
+* However, they are somewhat unusual, and we should be aware of why they are needed
+
+* The main reason is that R functions are now allowed to _modify_ their arguments
+
+---
+
+* Example: setting names
+
+```{r}
+d <- data.frame(1, mtcars$wt, mtcars$am)
+names(d)
+```
+
+* Suppose we want to change the names to `"Int", "wt", "am"`
+
+* In other languages, we would have something like
+
+```r
+setNames(d, c("Int", "wt", "am"))
+```
+
+---
+
+* Unfortunately, such a function _cannot_ modify `d`
+
+* The best it can do is to return a modified version of `d`:
+
+```r
+d <- setNames(d, c("Int", "wt", "am"))
+```
+
+* This is similar to how `transform()`, `dplyr::mutate()`, etc., work
+
+---
+
+* Replacement functions are the exception to this rule
+
+```{r}
+str(d)
+names(d) <- c("Int", "wt", "am")
+str(d)
+```
+
+* It is easy to write your own replacement functions
+
+* For now, those details are not important
+
+
+---
+
+layout: true
+
+# The `do.call()` function to call a function
+
+---
+
+* It is easy to manipulate the language itself in R (e.g., `quote()`)
+
+* Such manipulation is usually only needed for advanced programming, not routine use
+
+* But one particular tool is very useful in practice: `do.call()`
+
+
+---
+
+* Example
+
+```{r}
+am.summary <- with(mtcars, tapply(mpg, am, FUN = summary))
+am.summary
+```
+
+* Suppose we want to combine these into a matrix:
+
+```{r}
+cbind(am.summary[[1]], am.summary[[2]])
+```
+
+---
+
+```{r}
+gear.summary <- with(mtcars, tapply(mpg, gear, FUN = summary)) # different variable
+gear.summary
+cbind(gear.summary[[1]], gear.summary[[2]], gear.summary[[3]]) # three arguments instead of two 
+```
+
+---
+
+* Alternative: `do.call(what, args)`
+
+	- `what` is a function
+	
+	- `args` is a _list_ of arguments
+	
+	- Calls the function `what` with arguments given in `args`
+
+* The following are equivalent:
+
+```r
+FUN(val1, val2, arg3 = val3)
+```
+
+* and
+
+```r
+do.call(FUN, args = list(val1, val2, arg3 = val3))
+```
+
+---
+
+* So we can rewrite the previous `cbind()` calls as
+
+```{r}
+do.call(cbind, am.summary)
+do.call(cbind, gear.summary)
+```
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+

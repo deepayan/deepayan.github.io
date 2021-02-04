@@ -16,8 +16,6 @@ mathjax: true
 
 * Functions can be arguments of other functions
 
-* `do.call()`
-
 -->
 
 
@@ -227,7 +225,7 @@ apply(UCBAdmissions, c(1, 2), sum)
 prop.table(apply(UCBAdmissions, c(1, 2), sum), margin = 2)
 ```
 
-* The `prop.table()` function converts counts into prortions (in this case, by column)
+* The `prop.table()` function converts counts into proportions (in this case, by column)
 
 ---
 

@@ -1,0 +1,436 @@
+---
+layout: remark
+title: Some Miscellaneous Topics
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+# Some miscellaneous topics
+
+* Matrices and arrays: construction and operations
+
+* Replacement functions
+
+* `do.call()`
+
+
+
+
+---
+
+layout: true
+
+# Matrix construction
+
+---
+
+* `matrix(data, nrow, ncol)` : data + dimension
+
+
+```r
+matrix(month.abb, 3, 4)
+```
+
+```
+     [,1]  [,2]  [,3]  [,4] 
+[1,] "Jan" "Apr" "Jul" "Oct"
+[2,] "Feb" "May" "Aug" "Nov"
+[3,] "Mar" "Jun" "Sep" "Dec"
+```
+
+```r
+matrix(month.abb, 3, 4, byrow = TRUE)
+```
+
+```
+     [,1]  [,2]  [,3]  [,4] 
+[1,] "Jan" "Feb" "Mar" "Apr"
+[2,] "May" "Jun" "Jul" "Aug"
+[3,] "Sep" "Oct" "Nov" "Dec"
+```
+
+* `array(data, dim)` similarly allows construction of general arrays
+
+---
+
+* `rbind(...)` : construct matrix by combining rows
+
+* `cbind(...)` : construct matrix by combining columns
+
+.scrollable400[
+
+
+```r
+X <- with(mtcars, cbind(Int = 1, am = am, wt = wt)) # design matrix
+X
+```
+
+```
+      Int am    wt
+ [1,]   1  1 2.620
+ [2,]   1  1 2.875
+ [3,]   1  1 2.320
+ [4,]   1  0 3.215
+ [5,]   1  0 3.440
+ [6,]   1  0 3.460
+ [7,]   1  0 3.570
+ [8,]   1  0 3.190
+ [9,]   1  0 3.150
+[10,]   1  0 3.440
+[11,]   1  0 3.440
+[12,]   1  0 4.070
+[13,]   1  0 3.730
+[14,]   1  0 3.780
+[15,]   1  0 5.250
+[16,]   1  0 5.424
+[17,]   1  0 5.345
+[18,]   1  1 2.200
+[19,]   1  1 1.615
+[20,]   1  1 1.835
+[21,]   1  0 2.465
+[22,]   1  0 3.520
+[23,]   1  0 3.435
+[24,]   1  0 3.840
+[25,]   1  0 3.845
+[26,]   1  1 1.935
+[27,]   1  1 2.140
+[28,]   1  1 1.513
+[29,]   1  1 3.170
+[30,]   1  1 2.770
+[31,]   1  1 3.570
+[32,]   1  1 2.780
+```
+
+]
+
+---
+
+layout: true
+
+# Matrix operations
+
+---
+
+* `t(x)` : transpose of matrix
+
+* `aperm(x, perm)` : general array permutation
+
+* `a * b` : element-wise multiplication
+
+* `a %*% b` : matrix multiplication
+
+* `crossprod(x)` : More efficient version of `t(x) %*% x`
+
+* `crossprod(x, y)` : More efficient version of `t(x) %*% y`
+
+* `tcrossprod(x, y)`: Similar version of `x %*% t(y)`
+
+---
+
+
+```r
+t(X) %*% X
+```
+
+```
+        Int     am       wt
+Int  32.000 13.000 102.9520
+am   13.000 13.000  31.3430
+wt  102.952 31.343 360.9011
+```
+
+```r
+crossprod(X)
+```
+
+```
+        Int     am       wt
+Int  32.000 13.000 102.9520
+am   13.000 13.000  31.3430
+wt  102.952 31.343 360.9011
+```
+
+---
+
+* `solve(A, b)` : solve system of linear equations $Ax = b$
+
+
+```r
+y <- mtcars$mpg
+solve(crossprod(X), crossprod(X, y))
+```
+
+```
+           [,1]
+Int 37.32155131
+am  -0.02361522
+wt  -5.35281145
+```
+
+* Compare with
+
+
+```r
+coef(lm(mpg ~ 1 + am + wt, data = mtcars))
+```
+
+```
+(Intercept)          am          wt 
+37.32155131 -0.02361522 -5.35281145 
+```
+
+---
+
+* `lm()` is actually more numerically efficient (it does not actually compute `crossprod(X)`)
+
+* It also handles factor (categorical) variables through its formula interface
+
+* The `model.matrix()` function computes just the design matrix without fitting the model
+
+---
+
+layout: true
+
+# Replacement functions
+
+---
+
+* We have seen several examples of the form:
+
+```r
+x[i] <- value
+attr(x, "name") <- value
+colnames(x) <- value
+```
+
+* All these calls have a "complex" expression on the LHS of the assignment
+
+* These are known as _replacement functions_
+--
+
+* These are very natural once you get used to them
+
+* However, they are somewhat unusual, and we should be aware of why they are needed
+
+* The main reason is that R functions are now allowed to _modify_ their arguments
+
+---
+
+* Example: setting names
+
+
+```r
+d <- data.frame(1, mtcars$wt, mtcars$am)
+names(d)
+```
+
+```
+[1] "X1"        "mtcars.wt" "mtcars.am"
+```
+
+* Suppose we want to change the names to `"Int", "wt", "am"`
+
+* In other languages, we would have something like
+
+```r
+setNames(d, c("Int", "wt", "am"))
+```
+
+---
+
+* Unfortunately, such a function _cannot_ modify `d`
+
+* The best it can do is to return a modified version of `d`:
+
+```r
+d <- setNames(d, c("Int", "wt", "am"))
+```
+
+* This is similar to how `transform()`, `dplyr::mutate()`, etc., work
+
+---
+
+* Replacement functions are the exception to this rule
+
+
+```r
+str(d)
+```
+
+```
+'data.frame':	32 obs. of  3 variables:
+ $ X1       : num  1 1 1 1 1 1 1 1 1 1 ...
+ $ mtcars.wt: num  2.62 2.88 2.32 3.21 3.44 ...
+ $ mtcars.am: num  1 1 1 0 0 0 0 0 0 0 ...
+```
+
+```r
+names(d) <- c("Int", "wt", "am")
+str(d)
+```
+
+```
+'data.frame':	32 obs. of  3 variables:
+ $ Int: num  1 1 1 1 1 1 1 1 1 1 ...
+ $ wt : num  2.62 2.88 2.32 3.21 3.44 ...
+ $ am : num  1 1 1 0 0 0 0 0 0 0 ...
+```
+
+* It is easy to write your own replacement functions
+
+* For now, those details are not important
+
+
+---
+
+layout: true
+
+# The `do.call()` function to call a function
+
+---
+
+* It is easy to manipulate the language itself in R (e.g., `quote()`)
+
+* Such manipulation is usually only needed for advanced programming, not routine use
+
+* But one particular tool is very useful in practice: `do.call()`
+
+
+---
+
+* Example
+
+
+```r
+am.summary <- with(mtcars, tapply(mpg, am, FUN = summary))
+am.summary
+```
+
+```
+$`0`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  10.40   14.95   17.30   17.15   19.20   24.40 
+
+$`1`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.00   21.00   22.80   24.39   30.40   33.90 
+```
+
+* Suppose we want to combine these into a matrix:
+
+
+```r
+cbind(am.summary[[1]], am.summary[[2]])
+```
+
+```
+            [,1]     [,2]
+Min.    10.40000 15.00000
+1st Qu. 14.95000 21.00000
+Median  17.30000 22.80000
+Mean    17.14737 24.39231
+3rd Qu. 19.20000 30.40000
+Max.    24.40000 33.90000
+```
+
+---
+
+
+```r
+gear.summary <- with(mtcars, tapply(mpg, gear, FUN = summary)) # different variable
+gear.summary
+```
+
+```
+$`3`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  10.40   14.50   15.50   16.11   18.40   21.50 
+
+$`4`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  17.80   21.00   22.80   24.53   28.07   33.90 
+
+$`5`
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  15.00   15.80   19.70   21.38   26.00   30.40 
+```
+
+```r
+cbind(gear.summary[[1]], gear.summary[[2]], gear.summary[[3]]) # three arguments instead of two 
+```
+
+```
+            [,1]     [,2]  [,3]
+Min.    10.40000 17.80000 15.00
+1st Qu. 14.50000 21.00000 15.80
+Median  15.50000 22.80000 19.70
+Mean    16.10667 24.53333 21.38
+3rd Qu. 18.40000 28.07500 26.00
+Max.    21.50000 33.90000 30.40
+```
+
+---
+
+* Alternative: `do.call(what, args)`
+
+	- `what` is a function
+	
+	- `args` is a _list_ of arguments
+	
+	- Calls the function `what` with arguments given in `args`
+
+* The following are equivalent:
+
+```r
+FUN(val1, val2, arg3 = val3)
+```
+
+* and
+
+```r
+do.call(FUN, args = list(val1, val2, arg3 = val3))
+```
+
+---
+
+* So we can rewrite the previous `cbind()` calls as
+
+
+```r
+do.call(cbind, am.summary)
+```
+
+```
+               0        1
+Min.    10.40000 15.00000
+1st Qu. 14.95000 21.00000
+Median  17.30000 22.80000
+Mean    17.14737 24.39231
+3rd Qu. 19.20000 30.40000
+Max.    24.40000 33.90000
+```
+
+```r
+do.call(cbind, gear.summary)
+```
+
+```
+               3        4     5
+Min.    10.40000 17.80000 15.00
+1st Qu. 14.50000 21.00000 15.80
+Median  15.50000 22.80000 19.70
+Mean    16.10667 24.53333 21.38
+3rd Qu. 18.40000 28.07500 26.00
+Max.    21.50000 33.90000 30.40
+```
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
