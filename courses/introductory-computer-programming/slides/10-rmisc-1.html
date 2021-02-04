@@ -183,7 +183,7 @@ coef(lm(mpg ~ 1 + am + wt, data = mtcars))
 
 ---
 
-* `lm()` is actually more numerically efficient (it does not actually compute `crossprod(X)`)
+* `lm()` is more numerically efficient (it does not actually compute `crossprod(X)`)
 
 * It also handles factor (categorical) variables through its formula interface
 
@@ -214,7 +214,7 @@ colnames(x) <- value
 
 * However, they are somewhat unusual, and we should be aware of why they are needed
 
-* The main reason is that R functions are now allowed to _modify_ their arguments
+* The main reason is that R functions are not allowed to _modify_ their arguments
 
 ---
 
@@ -252,7 +252,7 @@ d <- setNames(d, c("Int", "wt", "am"))
 
 ---
 
-* Replacement functions are the exception to this rule
+* Replacement functions provide a more "natural" alternative
 
 
 ```r
