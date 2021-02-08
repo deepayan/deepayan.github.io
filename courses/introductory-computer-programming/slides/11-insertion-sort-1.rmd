@@ -1,0 +1,940 @@
+---
+layout: remark
+title: 'Algorithms: Insertion Sort - 1'
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+# Algorithms
+
+* Procedure to perform a task or solve a problem
+
+* We have seen some examples
+
+* Important theoretical questions:
+
+	* Is an algorithm correct? (Does it _always_ work?)
+
+	* How much resource does the algorithm need?
+
+* These questions are particularly interesting when multiple algorithms are available
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-algo-insertion-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/algo-insertion-1-')
+library(lattice)
+default.theme <- standard.theme("pdf")
+default.theme$strip.background$col <- "#F2F2F2"
+default.theme$grid.pars <- list(cex = 1.5)
+lattice.options(default.args = list(as.table = TRUE), 
+                default.theme = default.theme)
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+---
+
+# Correctness
+
+* When is an algorithm correct?
+
+* The answer may depend on the input
+
+* An algorithm may be correct for some inputs, not for others
+
+* A specific input for a general problem is often called an _instance_ of the problem
+--
+
+* To be correct, an algorithm must
+
+	* Stop (after a finite number of steps), and
+
+	* produce the _correct output_
+
+* This must happen for _all possible inputs_, i.e.,  all _instances_ of the problem
+
+---
+
+# An incorrect algorithm
+
+.algorithm[
+.name[`is\_prime(n)`]
+__if__ $i \in \lbrace 2, 3, 5, 7, 11, 13, 17, 19 \rbrace$
+    __return__ TRUE
+__else__ 
+    __return__ FALSE
+]
+
+* Correct for "most" input (for "random" input)
+
+* But not correct (because incorrect for at least one input)
+
+
+---
+
+# Efficiency
+
+* _How efficient is an algorithm?_
+
+* That is, how much of resources does the algorithm need?
+
+* We are usually interested in efficiency in terms of
+
+	* Time needed for the algorithm to execute
+
+	* Amount of memory / storage needed while the algorithm runs
+
+* The answer may again depend on the specific instance of the problem
+
+
+---
+
+# Sorting
+
+* We will study these questions mainly in the context of one specific
+  problem, namely _sorting_
+
+* The basic problem:
+
+	* Input: A sequence of numbers <span>$(a_1, a_2, ..., a_n)$</span>
+
+	* Desired output: A permutation of the input, <span>$(b_1, b_2, ..., b_n)$</span>
+      such that <span>$b_1 \leq b_2 \leq ... \leq b_n$</span>
+
+* Sometimes we are interested in the _permutation_ rather than the _permuted output_
+
+* The $a_i$-s are known as <em>keys</em>
+
+
+---
+
+# Arrays
+
+* The analysis of algorithms is both a practical and a theoretical exercise
+
+* For a theoretical analysis of algorithms, we need
+
+	* Abstract data structures to represent the input and output (and
+	  possibly intermediate objects)
+
+	* Some rules or conventions regarding how these structures behave
+
+* These structures and rules should reflect actual practical implementations
+--
+
+* For sorting, we usually need a simple data structure known as an
+_array_:
+
+	* An array $A[1,...,n]$ of length $n$ is a sequence of length $n$
+
+	* The $i$-th element of an array $A$ is denoted by $A[i]$
+
+	* Each $A[i]$ acts as a _variable_, that is, we can assign values
+      to it, and query its current value
+
+	* The sub-array with indices $i$ to $j$ (inclusive) is often
+      indicated by $A[i, ..., j]$
+
+
+---
+
+# Insertion sort
+
+* _Insertion sort_ is a simple and intuitive sorting algorithm
+
+* Basic idea:
+
+	* Think of sorting a hand of cards
+
+	* Start with an empty left hand and the cards face down on the table
+
+	* Remove one card at a time from the table and insert it into the
+      correct position in the left hand
+
+	* To find its correct position, compare it with each of the cards
+      already in the hand, from right to left
+
+* Insertion sort is a good algorithm for sorting a small number of
+  elements
+
+
+
+---
+
+name: insertion-sort
+
+# Insertion sort
+
+* The following pseudo-code represents the insertion sort algorithm
+
+* Here the input is an already-constructed array `A`
+
+* The length of the array is given by the attribute `A.length`
+
+.algorithm[
+.name[`insertion-sort(A)`]
+__for__ (j = 2 to A.length) {
+    key = A[j] // Value to insert into the sorted sequence A[1,...,j-1]
+    i = j - 1
+    __while__ (i > 0 and A[i] > key) {
+        A[i+1] = A[i]
+        i = i - 1
+    }
+    A[i+1] = key
+}
+]
+
+
+---
+
+# Exercise
+
+* Is it obvious that this algorithm works?
+
+* Can you think of any other sorting algorithm?
+
+* Is your algorithm more efficient than insertion sort?
+
+
+
+---
+
+# Insertion sort in R
+
+```{r}
+insertion.sort <- function(A, verbose = FALSE)
+{
+    if (length(A) < 2) return(A)
+    for (j in 2:length(A)) {
+        key <- A[j]
+        i <- j - 1
+        while (i > 0 && A[i] > key) {
+            A[i+1] <- A[i]
+            i <- i - 1
+        }
+        A[i+1] <- key
+        if (verbose) cat("j =", j, ", i =", i,
+		                 ", A = (", paste(format(A), collapse = ", "), ")\n")
+    }
+    return (A)
+}
+```
+
+* More or less same as the algorithm pseudo-code
+
+* Additional `verbose` argument to print intermediate steps
+
+* Due to R semantics, the result must be _returned_ (not modified _in place_)
+
+* This last behaviour has important practical implications (to be discussed later)
+
+
+
+---
+
+# Insertion sort in R
+
+```{r}
+(A <- sample(10))
+insertion.sort(A)
+(A <- round(runif(10), 2))
+insertion.sort(A)
+```
+
+---
+
+# Insertion sort in R
+
+```{r}
+A
+insertion.sort(A, verbose = TRUE)
+```
+
+---
+
+# Correctness
+
+* Examples suggest that this algorithm works
+
+* How can we formally prove correctness for all possible input (all instances)?
+--
+
+* Note that the algorithm works by running a loop
+
+* The key observation is the following:
+
+	>  At the beginning of each loop (for any particular value of
+    >  $j$), The first $j-1$ elements in $A[1,...,j-1]$ are the same
+    >  as the first $j-1$ elements originally in the array, but they
+    >  are now sorted.
+
+
+---
+
+# Loop invariant
+
+* This kind of statement is known as a _loop invariant_
+
+* Such loop invariants can be used to prove correctness if we can show three things:
+
+	- Initialization: It is true prior to the first iteration of the loop
+
+	- Maintenance: If it is true before an iteration of the loop, it
+	  remains true before the next iteration
+
+	- Termination: Upon termination, the invariant leads to a useful conclusion
+
+* The first two properties are similar to induction
+
+* The third is important in the sense that a loop invariant is useless
+  unless the third property holds
+
+
+
+---
+
+# Loop invariant for insertion sort
+
+### Statement
+
+>  At the beginning of each loop (for any particular value of $j$),
+>  The first $j-1$ elements in $A[1,...,j-1]$ are the same as the
+>  first $j-1$ elements originally in the array, but they are now
+>  sorted.
+
+
+### Initialization
+
+* Before starting the for loop for $j = 2$, $A[1,...,j-1]$ is
+  basically just $A[1]$, which is
+
+	* trivially sorted, and
+
+	* the same as the original $A[1]$
+
+
+---
+
+# Loop invariant for insertion sort
+
+
+### Maintenance
+
+* At the beginning of the for loop with some value of $j$, $A[1,..., j-1]$ is sorted
+
+* Informally, the while loop within each iteration [works by](#insertion-sort)
+
+	* comparing $key = A[j]$ with $A[j-1], A[j-2], ..., A[1]$ (in that order)
+
+	* moving them one position to the right, until the correct position of $key$ is found
+
+* Clearly, this while loop must terminate within at most $j$ steps
+
+* After the while loop ends, $key = A[j]$ is inserted in the correct position
+
+* At the end, $A[1,...,j]$ is a sorted version of the original $A[1,...,j]$.
+
+* Thus, the loop invariant is now true for index $j+1$
+--
+
+* To be more formal, we could prove a loop invariant for the while loop also
+
+* Will not go into that much detail
+
+
+---
+
+# Loop invariant for insertion sort
+
+### Termination
+
+* The for loop essentially increments $j$ by 1 every time it runs
+
+* The loop terminates when $j > n = A.length$
+
+* As each loop iteration increases $j$ by 1, we must have $j = n + 1$ at that time
+
+* Substituting $n + 1$ for $j$ in the loop invariant, we have
+
+	* $A[1,...,n]$ has the same elements as it originally had, and is now sorted.
+
+* Hence, the algorithm is correct.
+
+
+
+---
+
+# Run time analysis
+
+* It is natural to be interested in studying the efficiency of an algorithm
+
+* Usually, we are interested in running time and memory usage
+
+* Both these may depend on the size of the input, and often on the
+  specific input
+--
+
+* If we have a practical implementation, we can simply run the
+  algorithm to study running time
+
+* Let's try this with the R implementation
+
+
+
+---
+
+# Run time of R implementation
+
+* We expect running time to depend on size of input
+
+* To average out effect of individual inputs, we can consider multiple random inputs, e.g.,
+
+```{r}
+x <- replicate(20, runif(100), simplify = FALSE) # list of 20 vectors
+system.time(lapply(x, insertion.sort))
+x <- replicate(20, runif(1000), simplify = FALSE)
+system.time(lapply(x, insertion.sort))
+```
+
+
+---
+
+# Run time of R implementation
+
+* Do this systematically for various input sizes
+
+```{r}
+timeSort <- function(size, nrep = 20, sort.fun = insertion.sort)
+{
+    x <- replicate(nrep, runif(size), simplify = FALSE)
+    system.time(lapply(x, sort.fun))["elapsed"] / nrep
+}
+n <- seq(100, 3000, by = 100)
+tinsertion <- sapply(n, timeSort, nrep = 5, sort.fun = insertion.sort)
+```
+
+
+---
+
+# Run time of R implementation
+
+```{r}
+xyplot(tinsertion ~ n, grid = TRUE, aspect = "xy")
+```
+\
+
+
+---
+
+# Run time of R implementation
+
+```{r}
+tsort <- sapply(n, timeSort, nrep = 5, sort.fun = sort) # built-in sort() function
+xyplot(tinsertion + tsort ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
+```
+\
+
+
+---
+
+# Insertion sort in Python
+
+* We can also implement the algorithm in Python
+
+* Arrays are not copied when given as arguments, so changes modify original
+
+* Python array index starts from 0, so need to suitably modify
+
+
+```{python}
+def insertion_sort_py(A):
+    for j in range(1, len(A)):
+        key = A[j]
+        i = j - 1
+        while i > -1 and A[i] > key :
+            A[i+1] = A[i]
+            i = i - 1
+        A[i+1] = key
+```
+
+
+---
+
+# Insertion sort in Python
+
+
+```{python}
+import numpy as np
+import time
+x = np.random.uniform(0, 1, 10).round(2)
+x
+t0 = time.time()
+insertion_sort_py(x)
+t1 = time.time()
+x
+t1 - t0 # elapsed time in seconds
+```
+
+
+---
+
+# Run time of Python implementation
+
+
+```{python}
+def time_sort(size, nrep, sortfun):
+	total_time = 0.0
+	for i in range(nrep):
+		x = np.random.uniform(0, 1, size)
+		t0 = time.time()
+		sortfun(x)
+		t1 = time.time()
+		total_time += (t1 - t0)
+	return total_time / nrep
+
+nvals = range(100, 3001, 100)
+tvals = [time_sort(i, 5, insertion_sort_py) for i in nvals]
+print(tvals)
+```
+
+---
+
+# Run time comparison
+
+```{r}
+library(reticulate) # to communicate between R and Python (ignore for now)
+tpython <- py$tvals
+xyplot(tinsertion + tpython ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
+```
+\
+
+
+
+
+---
+
+# Insertion sort in C++
+
+* Yet another possibility is to implement the algorithm in C / C++
+
+* We will use `Rcpp` so that we can easily call the function from R
+
+* Array indexing starts from 0 (like Python), so similar modifications needed
+
+
+```{Rcpp, cache=TRUE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericVector insertion_sort_rcpp_bad(NumericVector A)
+{
+	int i, j, n = A.size();
+	double key;
+    for (int j = 1; j < n; j++) {
+        key = A[j];
+        i = j - 1;
+        while (i > -1 && A[i] > key) {
+            A[i+1] = A[i];
+            i = i - 1;
+		}
+        A[i+1] = key;
+	}
+	return A;
+}
+```
+
+
+---
+
+# Insertion sort in C++
+
+```{r}
+(A <- round(runif(10), 2))
+insertion_sort_rcpp_bad(A)
+A # changed!
+```
+
+
+---
+
+# Insertion sort in C++
+
+* C++ also does not copy arrays when given as arguments, so changes modify original
+
+* This violates implicit contract of R functions, so we need to explicitly copy
+
+
+```{Rcpp, cache=TRUE}
+#include <Rcpp.h>
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+NumericVector insertion_sort_rcpp(NumericVector x)
+{
+	int i, j, n = x.size();
+	double key;
+	NumericVector A = clone(x);
+    for (int j = 1; j < n; j++) {
+        key = A[j];
+        i = j - 1;
+        while (i > -1 && A[i] > key) {
+            A[i+1] = A[i];
+            i = i - 1;
+		}
+        A[i+1] = key;
+	}
+	return A;
+}
+```
+
+
+---
+
+# Insertion sort in C++
+
+```{r}
+(A <- round(runif(10), 2))
+insertion_sort_rcpp(A)
+A # unchanged
+```
+
+
+---
+
+# Run time comparison
+
+```{r}
+trcpp <- sapply(n, timeSort, nrep = 5, sort.fun = insertion_sort_rcpp)
+xyplot(tinsertion + tpython + trcpp ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
+```
+\
+
+
+---
+
+# Run time comparison
+
+```{r}
+xyplot(tinsertion + tpython + trcpp ~ n, grid = TRUE, outer = TRUE,
+       scales = list(y = "free"), ylab = "time (seconds)")
+```
+\
+
+
+---
+
+# Run time comparison (for larger inputs)
+
+```{r}
+trcpp10 <- sapply(10 * n, timeSort, nrep = 5, sort.fun = insertion_sort_rcpp)
+tsort <- sapply(10 * n, timeSort, nrep = 5, sort.fun = sort)
+xyplot(trcpp10 + tsort ~ (10 * n), grid = TRUE, outer = TRUE, ylab = "time (seconds)", aspect = 1)
+```
+\
+
+
+
+---
+
+# Run time comparison (for larger inputs)
+
+```{r}
+tsort <- sapply(100 * n, timeSort, nrep = 5, sort.fun = sort)
+xyplot(tsort ~ (100 * n), grid = TRUE, outer = TRUE, ylab = "time (seconds)", aspect = 1)
+```
+\
+
+
+
+---
+
+# Run time comparison: summary
+
+* Run time may vary substantially depending on implementation
+
+* Even a C++ implementation of insertion sort is mich slower than built in `sort()` in R
+
+* As a crude approximation, run time of insertion sort seems to be roughly quadratic in input size
+
+* Can we validate this observation theoretically?
+
+
+
+---
+
+# Theoretical analysis of algorithms
+
+* Analysis of an algorithm means predicting the resources requires by it, e.g.,
+
+	* amount of memory
+
+	* amount of input-output
+
+	* (most commonly) amount of computational time
+
+* This helps identify efficient algorithms when multiple candidates available
+
+* Such analysis may indicate multiple viable candidates, but helps to discard inferior ones
+
+
+---
+
+# Theoretical model
+
+* Analysis of an algorithm requires a _model_ of the implementation technology
+
+* Specifically, we need model for the resources and their associated costs
+--
+
+* We will assume a _single-processor random access machine (RAM)_ model
+
+* This has a precise technical meaning, but for our purposes, it means that
+
+	* Instructions are executed one after another, with no concurrent
+	  operations
+
+	* Accessing any location in memory has the same cost, regardless
+      of the location
+
+
+---
+
+# Theoretical model
+
+* In particular, accessing variable values (memory look-up) requires constant time
+
+* Arrays are assumed to occupy contiguous locations in memory
+
+* In other words, location of $A[i]$ = location of $A[1]$ + constant * $(i-1)$
+
+* So accessing any $A[i]$ has same cost
+
+* Drawback: arrays cannot be resized without incurring significant cost (by copying)
+
+
+---
+
+# Theoretical model
+
+* We can be more precise, by
+
+	* listing the set of basic instructions the machine can perform
+
+	* E.g., add, multiply, data copy, move, branching, etc.
+
+	* Model the cost of each such operation
+
+* We will not try to be that precise
+
+* With reasonable assumptions, we will still be able to do reasonable analysis
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* Intuitively clear that time taken by insertion sort depends on several factors:
+
+	- Size of the input (longer arrays will need more time)
+
+	- Whether the array is already (almost) sorted
+	
+	- In that case the position of the key is found quickly in every step
+
+* We need to formalize both these dependencies
+--
+
+* Notion of _input size_ depends on the context
+
+	* For sorting problem, length of the input array is the natural notion
+
+	* For multiplying two numbers, a reasonable notion may be their magnitudes
+--
+
+* To take the nature of input into account, we usually consider
+
+	* worst case
+
+    * best case
+
+	* average case
+
+
+---
+
+# How should we define "running time"?
+
+* Ideally, sum of the times taken (or _cost_) for each basic
+instruction in the machine.
+
+* We take a slightly different approach
+
+* Instead of assigning a cost to each basic instruction, we assign a
+  cost to each _step_ in our algorithm
+
+* Then, count the number of times each step is executed
+
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* Try this for insertion sort
+
+* Assume a cost for each line of the algorithm
+
+.algorithm[
+.name[`insertion-sort(A)`]                      <span class="fright">cost</span>
+__for__ (j = 2 to A.length) {                   <span class="fright">$c\_1$</span>
+    key = A[j]                                  <span class="fright">$c\_2$</span>
+    i = j - 1                                   <span class="fright">$c\_3$</span>
+    __while__ (i > 0 and A[i] > key) {          <span class="fright">$c\_4$</span>
+        A[i+1] = A[i]                           <span class="fright">$c\_5$</span>
+        i = i - 1                               <span class="fright">$c\_6$</span>
+    }
+    A[i+1] = key                                <span class="fright">$c\_7$</span>
+}
+]
+
+* We need to count the number of times each step is executed
+
+* This depends on the number of times the while loop runs, which depends on the input
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* Let $t_j$ denote the number of times the while condition is tested for index $j$
+
+* The test will be false for the last iteration (and the loop will not run)
+
+.algorithm[
+.name[`insertion-sort(A)`]              <span class="fright">cost * times</span>
+__for__ (j = 2 to A.length) {           <span class="fright">$c\_1 \times n$</span>
+    key = A[j]                          <span class="fright">$c\_2 \times n-1$</span>
+    i = j - 1                           <span class="fright">$c\_3 \times n-1$</span>
+    __while__ (i > 0 and A[i] > key) {  <span class="fright">$c\_4 \times \sum\_{j=2}^n t\_j$</span>
+        A[i+1] = A[i]                   <span class="fright">$c\_5 \times \sum\_{j=2}^n (t\_j-1)$</span>
+        i = i - 1                       <span class="fright">$c\_6 \times \sum\_{j=2}^n (t\_j-1)$</span>
+    }
+    A[i+1] = key                        <span class="fright">$c\_7 \times n-1$</span>
+}
+]
+
+
+
+
+`insertion-sort(A)` \	\	\	\	\	\	\	\	\	\	\	\	\	\	\	\	\	cost\	\	times
+
+| <span class="lc"/>__for__ (j = 2 to A.length) { \	\	\	\	\	\	\	$c_1$\	\	$n$
+|     <span class="lc"/>key = A[j] \	\	\	\	\	\	\	\	\	\	\	\	$c_2$\	\	$n-1$
+|     <span class="lc"/>i = j - 1 \	\	\	\	\	\	\	\	\	\	\	\	\	$c_3$\	\	$n-1$
+|     <span class="lc"/>__while__ (i > 0 and A[i] > key) { \	\	$c_4$\	\	$\sum_{j=2}^n t_j$
+|         <span class="lc"/>A[i+1] = A[i] \	\	\	\	\	\	\	\	\	$c_5$\	\	$\sum_{j=2}^n (t_j-1)$
+|         <span class="lc"/>i = i - 1 \	\	\	\	\	\	\	\	\	\	\	$c_6$\	\	$\sum_{j=2}^n (t_j-1)$
+|       } \	\	\	\	\	\	\	\	\	\	\
+|     <span class="lc"/>A[i+1] = key \	\	\	\	\	\	\	\	\	\	\	$c_7$\	\	$n-1$
+|   }
+\
+
+
+* The total running time (cost) is
+
+$$
+T(n) = c_1 n + (c_2+c_3+c_7) (n-1) + c_4 \left( \sum t_j \right) +
+       (c_5+c_6) \left( \sum t_j - 1 \right)
+$$
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* Runtime of insertion sort
+
+$$
+T(n) = c_1 n + (c_2+c_3+c_7) (n-1) + c_4 \left( \sum t_j \right) +
+       (c_5+c_6) \left( \sum t_j - 1 \right)
+$$
+
+* Depends on the values of $t_j$
+
+* If input is already sorted, then $t_j=1$ for all $j$, and hence
+
+$$
+T(n) = c_1 n + (c_2+c_3+c_7+c_4) (n-1) = an + b,
+$$
+
+* In other words, $T(n)$ is linear in $n$, with coefficients $a$ and $b$ that depend on the costs $c_i$
+
+* This is the _best case_ scenario
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* Runtime of insertion sort
+
+$$
+T(n) = c_1 n + (c_2+c_3+c_7) (n-1) + c_4 \left( \sum t_j \right) +
+       (c_5+c_6) \left( \sum t_j - 1 \right)
+$$
+
+* The _worst case_ scenario is when the array is reverse sorted
+
+* In that case, $t_j = j$ for all $j$
+
+* Noting that $\sum\limits_2^n j = \frac{n(n+1)}{2} - 1$ and $\sum\limits_2^n (j-1) = \frac{n(n-1)}{2}$, we have
+
+$$
+T(n) = an^2 + bn + c
+$$
+
+* In other words, $T(n)$ is quadratic, with coefficients $a, b, c$ that depend on the costs $c_i$
+
+
+
+---
+
+# Runtime analysis of insertion sort
+
+* The best case scenario is usually not of interest
+
+* An algorithm is typically evaluated based on its worst case running time
+
+* Another reasonable definition is the _average case_ running time
+
+* For the sorting problem, this is defined as the
+
+	* Expected running time if the input is randomly ordered
+
+	* More precisely, "randomly ordered" means all permutations are equally likely
+
+
+---
+
+# Exercises
+
+* Derive the average case running time of insertion sort
+
+* Modify the insertion sort algorithm to return a _permutation_ that will sort the input
+
+* Specifically, `p <- insertion_order(A)` should give an index vector `p` such that `A[p]` is sorted
+
+* Implement this modified algorithm using both R and Rcpp
+
+* To use Rcpp, you must first install a compiler and other tools [from here](https://cran.rstudio.com/bin/windows/Rtools/)
+
+* See also the [RStudio page for Rcpp](https://support.rstudio.com/hc/en-us/articles/200486088-Using-Rcpp-with-RStudio) for other resources
+
+
+
