@@ -658,7 +658,7 @@ xyplot(tsort ~ (100 * n), grid = TRUE, outer = TRUE, ylab = "time (seconds)", as
 
 * Run time may vary substantially depending on implementation
 
-* Even a C++ implementation of insertion sort is mich slower than built in `sort()` in R
+* Even a C++ implementation of insertion sort is much slower than built in `sort()` in R
 
 * As a crude approximation, run time of insertion sort seems to be roughly quadratic in input size
 
@@ -784,22 +784,26 @@ instruction in the machine.
 
 ---
 
+layout: true
+
 # Runtime analysis of insertion sort
+
+---
 
 * Try this for insertion sort
 
 * Assume a cost for each line of the algorithm
 
 .algorithm[
-.name[`insertion-sort(A)`]                      <span class="fright">cost</span>
-__for__ (j = 2 to A.length) {                   <span class="fright">$c\_1$</span>
-    key = A[j]                                  <span class="fright">$c\_2$</span>
-    i = j - 1                                   <span class="fright">$c\_3$</span>
-    __while__ (i > 0 and A[i] > key) {          <span class="fright">$c\_4$</span>
-        A[i+1] = A[i]                           <span class="fright">$c\_5$</span>
-        i = i - 1                               <span class="fright">$c\_6$</span>
+.name[`insertion-sort(A)`]                                                cost
+for (j = 2 to A.length) {                       $c_1$
+    key = A[j]                                  $c_2$
+    i = j - 1                                   $c_3$
+    while (i > 0 and A[i] > key) {              $c_4$
+        A[i+1] = A[i]                           $c_5$
+        i = i - 1                               $c_6$
     }
-    A[i+1] = key                                <span class="fright">$c\_7$</span>
+    A[i+1] = key                                $c_7$
 }
 ]
 
@@ -807,44 +811,24 @@ __for__ (j = 2 to A.length) {                   <span class="fright">$c\_1$</spa
 
 * This depends on the number of times the while loop runs, which depends on the input
 
-
 ---
-
-# Runtime analysis of insertion sort
 
 * Let $t_j$ denote the number of times the while condition is tested for index $j$
 
 * The test will be false for the last iteration (and the loop will not run)
 
 .algorithm[
-.name[`insertion-sort(A)`]              <span class="fright">cost * times</span>
-__for__ (j = 2 to A.length) {           <span class="fright">$c\_1 \times n$</span>
-    key = A[j]                          <span class="fright">$c\_2 \times n-1$</span>
-    i = j - 1                           <span class="fright">$c\_3 \times n-1$</span>
-    __while__ (i > 0 and A[i] > key) {  <span class="fright">$c\_4 \times \sum\_{j=2}^n t\_j$</span>
-        A[i+1] = A[i]                   <span class="fright">$c\_5 \times \sum\_{j=2}^n (t\_j-1)$</span>
-        i = i - 1                       <span class="fright">$c\_6 \times \sum\_{j=2}^n (t\_j-1)$</span>
+.name[`insertion-sort(A)`]                                              cost * times
+for (j = 2 to A.length) {                       $c\_1 \times n$
+    key = A[j]                                  $c\_2 \times (n-1)$
+    i = j - 1                                   $c\_3 \times (n-1)$
+    while (i > 0 and A[i] > key) {              $c\_4 \times \sum\_{j=2}^n t\_j$
+        A[i+1] = A[i]                           $c\_5 \times \sum\_{j=2}^n (t\_j-1)$
+        i = i - 1                               $c\_6 \times \sum\_{j=2}^n (t\_j-1)$
     }
-    A[i+1] = key                        <span class="fright">$c\_7 \times n-1$</span>
+    A[i+1] = key                                $c\_7 \times n-1$
 }
 ]
-
-
-
-
-`insertion-sort(A)` \	\	\	\	\	\	\	\	\	\	\	\	\	\	\	\	\	cost\	\	times
-
-| <span class="lc"/>__for__ (j = 2 to A.length) { \	\	\	\	\	\	\	$c_1$\	\	$n$
-|     <span class="lc"/>key = A[j] \	\	\	\	\	\	\	\	\	\	\	\	$c_2$\	\	$n-1$
-|     <span class="lc"/>i = j - 1 \	\	\	\	\	\	\	\	\	\	\	\	\	$c_3$\	\	$n-1$
-|     <span class="lc"/>__while__ (i > 0 and A[i] > key) { \	\	$c_4$\	\	$\sum_{j=2}^n t_j$
-|         <span class="lc"/>A[i+1] = A[i] \	\	\	\	\	\	\	\	\	$c_5$\	\	$\sum_{j=2}^n (t_j-1)$
-|         <span class="lc"/>i = i - 1 \	\	\	\	\	\	\	\	\	\	\	$c_6$\	\	$\sum_{j=2}^n (t_j-1)$
-|       } \	\	\	\	\	\	\	\	\	\	\
-|     <span class="lc"/>A[i+1] = key \	\	\	\	\	\	\	\	\	\	\	$c_7$\	\	$n-1$
-|   }
-\
-
 
 * The total running time (cost) is
 
@@ -855,8 +839,6 @@ $$
 
 
 ---
-
-# Runtime analysis of insertion sort
 
 * Runtime of insertion sort
 
@@ -877,10 +859,7 @@ $$
 
 * This is the _best case_ scenario
 
-
 ---
-
-# Runtime analysis of insertion sort
 
 * Runtime of insertion sort
 
@@ -901,11 +880,7 @@ $$
 
 * In other words, $T(n)$ is quadratic, with coefficients $a, b, c$ that depend on the costs $c_i$
 
-
-
 ---
-
-# Runtime analysis of insertion sort
 
 * The best case scenario is usually not of interest
 
@@ -919,8 +894,9 @@ $$
 
 	* More precisely, "randomly ordered" means all permutations are equally likely
 
-
 ---
+
+layout: false
 
 # Exercises
 
