@@ -64,7 +64,7 @@ options(warnPartialMatchDollar = FALSE, width = 100)
 
 .algorithm[
 .name[`is\_prime(n)`]
-__if__ $i \in \lbrace 2, 3, 5, 7, 11, 13, 17, 19 \rbrace$
+__if__ $n \in \lbrace 2, 3, 5, 7, 11, 13, 17, 19 \rbrace$
     __return__ TRUE
 __else__ 
     __return__ FALSE
@@ -426,7 +426,6 @@ tinsertion <- sapply(n, timeSort, nrep = 5, sort.fun = insertion.sort)
 ```{r}
 xyplot(tinsertion ~ n, grid = TRUE, aspect = "xy")
 ```
-\
 
 
 ---
@@ -437,7 +436,6 @@ xyplot(tinsertion ~ n, grid = TRUE, aspect = "xy")
 tsort <- sapply(n, timeSort, nrep = 5, sort.fun = sort) # built-in sort() function
 xyplot(tinsertion + tsort ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
 ```
-\
 
 
 ---
@@ -502,6 +500,7 @@ tvals = [time_sort(i, 5, insertion_sort_py) for i in nvals]
 print(tvals)
 ```
 
+
 ---
 
 # Run time comparison
@@ -511,9 +510,6 @@ library(reticulate) # to communicate between R and Python (ignore for now)
 tpython <- py$tvals
 xyplot(tinsertion + tpython ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
 ```
-\
-
-
 
 
 ---
@@ -613,7 +609,6 @@ A # unchanged
 trcpp <- sapply(n, timeSort, nrep = 5, sort.fun = insertion_sort_rcpp)
 xyplot(tinsertion + tpython + trcpp ~ n, grid = TRUE, outer = TRUE, ylab = "time (seconds)")
 ```
-\
 
 
 ---
@@ -624,7 +619,6 @@ xyplot(tinsertion + tpython + trcpp ~ n, grid = TRUE, outer = TRUE, ylab = "time
 xyplot(tinsertion + tpython + trcpp ~ n, grid = TRUE, outer = TRUE,
        scales = list(y = "free"), ylab = "time (seconds)")
 ```
-\
 
 
 ---
@@ -636,7 +630,6 @@ trcpp10 <- sapply(10 * n, timeSort, nrep = 5, sort.fun = insertion_sort_rcpp)
 tsort <- sapply(10 * n, timeSort, nrep = 5, sort.fun = sort)
 xyplot(trcpp10 + tsort ~ (10 * n), grid = TRUE, outer = TRUE, ylab = "time (seconds)", aspect = 1)
 ```
-\
 
 
 
@@ -648,7 +641,6 @@ xyplot(trcpp10 + tsort ~ (10 * n), grid = TRUE, outer = TRUE, ylab = "time (seco
 tsort <- sapply(100 * n, timeSort, nrep = 5, sort.fun = sort)
 xyplot(tsort ~ (100 * n), grid = TRUE, outer = TRUE, ylab = "time (seconds)", aspect = 1)
 ```
-\
 
 
 
