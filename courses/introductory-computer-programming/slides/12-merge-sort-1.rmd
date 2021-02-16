@@ -1,0 +1,863 @@
+---
+layout: remark
+title: 'Algorithms: Merge Sort'
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+# Recap: Running time of insertion sort
+
+* Worst case runtime for input array of length $n$ is
+
+$$
+T(n) = an^2 + bn + c
+$$
+
+* $a, b, c$ depend on costs of each step, $c_1, c_2, \dotsc, c_6$
+
+* $a, b, c$ do not depend on the input or $n$
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(cache = TRUE, cache.path='~/knitr-cache/icp-algo-merge-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/algo-merge-1-')
+library(lattice)
+default.theme <- standard.theme("pdf")
+default.theme$strip.background$col <- "#F2F2F2"
+default.theme$grid.pars <- list(cex = 1.5)
+lattice.options(default.args = list(as.table = TRUE), 
+                default.theme = default.theme)
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+
+---
+
+# Order of growth
+
+* We will usually ignore the exact costs $c_i$ for each step once $T(n)$ has been calculated
+
+* As $n$ grows larger, $T(n) = an^2 + bn + c$ is dominated by the $n^2$ term
+
+* Lower order terms (linear and constant) are asymptotically insignificant compared to $n^2$
+
+* More precisely, as long as $a > 0$,
+
+$$
+\lim_{n \to \infty} \frac{bn + c}{T(n)} = 0
+$$
+--
+
+* For this reason, we usually simplify further and say that the _order
+  of growth_ of $T(n)$ is like $n^2$
+
+* This is indicated using the notation
+
+$$
+T(n) = \Theta(n^2)
+$$
+
+---
+
+# Comparing algorithms
+
+* One algorithm is considered better than another if it has lower order of growth
+
+* This is true even if the second one is faster for small input (as it will be slower for large enough input)
+
+* If two algorithms have same order of growth, the coefficients may be important in practice
+
+* However, theoretical analysis will usually consider them to be equivalent
+--
+
+* Question: Can we find a sorting algorithm that is __better__ than insertion sort?
+
+---
+
+# Divide and Conquer
+
+* Insertion sort is an _incremental algorithm_: modifies the input one step at a time
+
+* Another common approach is known as "divide-and-conquer"
+
+* Depends on a technique called _recursion_ (an algorithm calling itself)
+
+* The basic idea is:
+
+	- **Divide** the problem into a number of subproblems that are smaller instances of the same problem
+
+	- **Conquer** the subproblems by solving them recursively
+
+	- **Combine** the solutions to the subproblems into the solution for the original problem
+
+
+---
+
+# Merge sort
+
+* The first example of this idea that we will study is called _merge sort_
+
+* Loosely, it operates as follows
+
+	- Divide: Divide the $n$-element sequence to be sorted into two
+      subsequences of $n/2$ elements each
+
+	- Conquer: Sort the two subsequences
+
+	    * If a subsequences is of length 1, it is already sorted, and there is nothing more to do
+
+	    * Otherwise, sort it recursively using merge sort
+
+	- Combine: Merge the two sorted subsequences to produce the sorted answer
+
+
+---
+
+# Merge sort as an algorithm
+
+.algorithm[
+.name[`merge-sort(A, p, r)`]
+if (p < r) {
+    q = floor( (p+r)/2 )
+    merge-sort(A, p, q)
+    merge-sort(A, q+1, r)
+    merge(A, p, q, r)
+}
+]
+
+* The first two steps (divide and conquer) are conceptually trivial
+
+* The `p` and `r` arguments define the sub-array to be sorted
+--
+
+* Key operation: merge (combine) the two sorted sub-arrays $A[p, ..., q]$ and $A[q+1, ..., r]$
+
+* Calling $\text{MERGE}(A, p, q, r)$ must result in sorted array $A[p, ..., r]$
+
+---
+
+layout: true
+
+# The merge step
+
+---
+
+* We want an auxiliary procedure $\text{MERGE}(A, p, q, r)$, where
+
+	* $A$ is an array
+
+	* $p$, $q$, and $r$ are indices into the array such that $p \leq q < r$
+
+	* Assumes that subarrays $A[p,...,q]$ and $A[q+1,...,r]$ are in sorted order
+
+	* Goal is to merge them to into single sorted subarray that replaces the current subarray $A[p,...,r]$
+
+---
+
+* The essential idea of $\text{MERGE}$ is the following:
+
+	* Suppose we have two sorted piles on the table, with the smallest cards on top
+
+	* Start with a new empty pile
+
+	* Look at the top two cards, pick the smaller one, and add to new pile
+
+	* Repeat (if one pile empty, choose always from the other)
+
+
+---
+
+.algorithm[
+.name[`merge(A, p, q, r)`]
+n$\_1$ = q - p + 1
+n$\_2$ = r - q
+Create new arrays L[1, ... , n$\_1$+1] and R[1, ..., n$\_2$+1]
+__for__ (i = 1, ..., n$\_1$) { L[i] = A[ p+i-1] }
+__for__ (j = 1, ..., n$\_2$) { R[j] = A[ q+j] }
+L[ n$\_1$+1 ] = $\infty$ 		                 // sentinel values
+R[ n$\_2$+1 ] = $\infty$ 		                 // ensures that L and R never become empty
+i = 1
+j = 1
+__for__ (k = p, ..., r) {
+    __if__ (L[i] $\leq$ R[j]) {
+        A[k] = L[i]
+        i = i + 1
+    }
+    __else__ {
+        A[k] = R[j]
+        j = j + 1
+    }
+}
+]
+
+---
+
+* It is easy to see that the runtime of $\text{merge}$ is linear in $n=r-p+1$
+
+* One comparison needed to fill every position
+
+* To prove correctness, consider the loop invariant
+
+	> At the start of each iteration of the main for loop, the
+	> subarray $A[p,...,k-1]$ contains the $k-p$ smallest elements of
+	> $L[1,...,n_1+1]$ and $R[1,...,n_2+1]$ in sorted order. Also, of
+	> the remaining elements, $L[i]$ and $R[j]$ are the smallest
+	> elements in their respective arrays.
+
+
+---
+
+layout: true
+
+# Correctness of `merge`
+
+---
+
+### Initialization
+
+* Prior to the first iteration, we have $k = p$, so that the subarray
+  $A[p,...,k-1]$ is empty
+
+* This empty subarray contains the $k - p = 0$ smallest elements of
+  $L$ and $R$
+
+* As $i = j = 1$, $L[i]$ and $R[j]$ are the respective smallest
+  elements not copied back into $A$
+
+
+---
+
+### Maintenance
+
+* Suppose that $L[i] \leq R[j]$
+
+* Then $L[i]$ is the smallest element not yet copied back into $A$
+
+* $A[p,...,k-1]$ already contains the $k-p$ smallest elements of $L$ and $R$
+
+* So, after $L[i]$ is copied into $A[k]$, $A[p,...,k]$ will contain the $k - p + 1$ smallest elements
+
+* Incrementing $k$ (in for loop) and $i$ reestablishes the loop invariant for the next iteration
+
+* If instead $L[i] > R[j]$, then the other branch maintains the loop invariant
+
+
+---
+
+### Termination
+
+* At termination, $k = r + 1$
+
+* By the loop invariant,
+
+	> the subarray $A[p,...,k-1] \equiv A[p,...,r]$, contains the $k -
+	> p = r - p + 1$ smallest elements of $L[1,...,n_1]$ and
+	> $R[1,...,n_2]$, in sorted order
+
+* The arrays $L$ and $R$ together contain $n_1 + n_2 + 2 = r - p + 3$ elements
+
+* All but the two largest have been copied back into A, and these two largest elements are the sentinels
+
+
+---
+
+layout: false
+
+# Merge sort
+
+* Our $\text{MERGE-SORT}$ algorithm is now complete
+
+.algorithm[
+.name[`merge-sort(A, p, r)`]
+if (p < r) {
+    q = floor( (p+r)/2 )
+    merge-sort(A, p, q)
+    merge-sort(A, q+1, r)
+    merge(A, p, q, r)
+}
+]
+
+
+* In general, this sorts the subarray $A[p,...,r]$
+
+* It is initially called as $\text{merge}(A, 1, n)$ for an $n$-element input array
+
+
+---
+
+# Analysis of divide and conquer algorithms
+
+* The runtime of merge sort can be expressed as a recurrence
+
+<div>
+$$
+T(n) = \begin{cases}
+            c & n \leq 1 \\
+            2 T(\lceil n/2 \rceil) + an + b & \text{otherwise}
+       \end{cases}
+$$
+</div>
+--
+
+
+* This can also be written in terms of order-of-growth notation
+
+<div>
+$$
+T(n) = \begin{cases}
+            \Theta(1) & n \leq 1 \\
+            2 T(\lceil n/2 \rceil) + \Theta(n) & \text{otherwise}
+       \end{cases}
+$$
+</div>
+
+* $\Theta(1)$ represents a constant cost of sorting a 0 or 1-element array
+
+* The $\Theta(n)$ term is the cost of merging, including the
+  (constant) cost of computing the split
+--
+
+* We will later see a general result that helps to solve recurrences of this form
+
+* For now, we will derive the solution for merge sort based on heuristic arguments
+
+
+
+---
+
+# Analysis of merge sort
+
+* We do this by constructing a so-called _recursion tree_
+
+* For convenience, we assume that the input size $n$ is an exact power of $2$
+
+* This means that each split is of exactly half the size
+
+* This lets us rewrite the recurrence in a simpler form:
+
+<div>
+$$
+T(n) =
+\begin{cases}
+  c & n = 1 \\
+  cn + 2 T(n/2) & n > 1
+\end{cases}
+$$
+</div>
+
+
+```{r, echo=FALSE}
+bin_tree <- function(size, values = NULL)
+{
+        ## need to calculate x and y coordinates of each node
+        h <- floor(log2(size))
+        ## stopifnot(size > 1, h > 0)
+        xpos <- function(level = 1)
+                ## x-position of nodes at this level
+        {
+                ## level counted from bottom (lowest layer is level=1)
+                ## rule: gap between nodes at level l is l
+                ##       2^(h - l + 1) nodes in total, average position is 0
+                x <- seq(1, by = level, length.out = 2^(h-level+1))
+                data.frame(x = x - mean(x), y = level)
+        }
+        d <- do.call(rbind, lapply((h+1):1, xpos))[1:size, ]
+        if (!is.null(values)) d <- cbind(d, values = values[1:size])
+		class(d) <- c("bin_tree", class(d))
+        d
+}
+plot.bin_tree <- function(d, pch = 16, ..., gp.text = list(), xlim, ylim, newpage = TRUE, yoffset = max(d$y))
+{
+        require(grid, quietly = TRUE)
+        if (newpage) grid.newpage()
+		d$y <- d$y + yoffset - max(d$y)
+		if (missing(xlim)) xlim <- extendrange(d$x, f = 0.1)
+		if (diff(xlim) == 0) xlim <- c(-1, 1)
+		if (missing(ylim)) ylim <- extendrange(d$y, f = 0.1)
+        pushViewport(viewport(xscale = xlim,
+                              yscale = ylim))
+        ## add lines joining child to parent
+		if (nrow(d) > 1)
+		{
+			i <- seq_len(nrow(d))[-1]
+			parent <- floor(i/2)
+			with(d, grid.segments(x[i], y[i], x[parent], y[parent], 
+                 gp = gpar(...), default.units = "native"))
+	    }
+        ## add the points (note: must fill to hide lines)
+		with(d, grid.points(x, y, pch = pch, gp = gpar(...)))
+        ## add text if any
+        if (!is.null(d$values)) 
+            with(d, grid.text(values, x, y, gp = do.call(gpar, gp.text), default.units = "native"))
+        popViewport()
+}
+```
+
+
+---
+
+layout: true
+
+# Recursion tree for merge sort
+
+---
+
+<!-- 
+
+<div style="float: right; width: 50%">
+
+<img src="rec_tree.png"/> 
+
+
+</div>
+
+-->
+
+
+```{r, echo=FALSE, fig.height=8}
+b <- bin_tree(31, values = c("T(n)", rep("", 30)))
+plot(head(b, 1), fill = "white", pch = 21, cex = 6,
+     xlim = c(-10, 10), ylim = c(0, 5.5), yoffset = 5)
+```
+
+---
+
+```{r, echo=FALSE, fig.height=8}
+b <- bin_tree(31, values = c("c n", rep("T(n/2)", 2), rep("", 28)))
+plot(head(b, 3), fill = "white", pch = 21, cex = 6,
+     xlim = c(-10, 10), ylim = c(0, 5.5), yoffset = 5)
+```
+
+---
+
+```{r, echo=FALSE, fig.height=8}
+b <- bin_tree(31, values = c("c n", rep("cn/2", 2), 
+                            rep("T(n/4)", 4), rep("", 24)))
+plot(head(b, 7), fill = "white", pch = 21, cex = 6,
+     xlim = c(-10, 10), ylim = c(0, 5.5), yoffset = 5)
+```
+
+---
+
+
+```{r, echo=FALSE, fig.height=8}
+b <- bin_tree(31, values = c("c n", rep("cn/2", 2), 
+                            rep("cn/4", 4), 
+                            rep("...", 8), 
+                            rep("c", 16)))
+plot(b, fill = "white", pch = 21, cex = 6,
+     xlim = c(-10, 10), ylim = c(0, 5.5), yoffset = 5)
+```
+
+---
+
+* Main observations:
+
+	* Each level of the tree requires $cn$ time
+
+	* There are $1 + \log_2 n$ levels in total
+
+* This gives a total runtime of 
+
+$$
+T(n) = cn (1 + \log_2 n) = \Theta( n \log n )
+$$
+
+---
+
+layout: false
+
+
+# Growth of functions
+
+* Before moving on, we will briefly discuss asymptotic growth notation 
+
+* Formally, we are interested in the behaviour of a function $f(n)$ as $n \to \infty$
+
+* All functions we consider are from $\mathbb{N} \to \mathbb{R}$
+
+* Sometimes we may abuse notation and consider functions with domain $\mathbb{R}$
+
+
+---
+
+# $\Theta$-notation
+
+* Given a function $g: \mathbb{N} \to \mathbb{R}$, we define the _set_
+
+<div>
+\begin{eqnarray*}
+\Theta(g(n)) = \lbrace f(n)~ &\mid& ~\exists~ c_1, c_2 > 0 \text{ and } N \in \mathbb{N} 
+                               \text{ such that } \\
+						&&	   n \geq N \implies 0 
+							   \leq c_1 g(n) \leq f(n) \leq c_2 g(n) 
+  \rbrace
+\end{eqnarray*}
+</div>
+
+--
+
+* That is, $f(n) \in \Theta(g(n))$ if $f(n)$ can be asymptotically bounded
+on both sides by multiples of $g(n)$
+--
+
+
+* We will usually write $f(n) = \Theta(g(n))$ to mean the same thing.
+--
+
+
+* Note that this definition implicitly requires $f(n)$ to be asymptotically non-negative
+
+* We will assume this here as well as for other asymptotic notations used in
+this course.
+
+* The $\Theta$ notation is used to indicate *exact* order of growth 
+
+* The next two notations indicate upper and lower bounds
+
+
+---
+
+# $O$-notation
+
+
+* The $O$-notation (usually pronounced "big-oh") indicates an asymptotic upper bound
+
+$$
+O(g(n)) = \left\lbrace f(n) ~\mid ~\exists~ c > 0 \text{ and }
+  N \in \mathbb{N} \text{ such that } n \geq N \implies 
+  0 \leq  f(n) \leq c g(n) \right\rbrace
+$$
+--
+
+* As before, we usually write $f(n) = \Theta(g(n))$ to mean $f(n) \in \Theta(g(n))$
+
+* Note that $f(n) = \Theta(g(n)) \implies f(n) = O(g(n))$, that is,
+  $\Theta(g(n)) \subseteq O(g(n))$
+--
+
+* The $O$-notation is important because upper bounds are often easier
+  to prove (than lower bounds)
+
+* That is often a sufficiently useful characterization of an algorithm
+
+---
+
+# $\Omega$-notation
+
+* The $\Omega$-notation (pronounced "big-omega") similarly indicates
+  an asymptotic lower bound
+
+$$
+\Omega(g(n)) = \left\lbrace f(n)~ \mid ~\exists~ c > 0 \text{ and }
+  N \in \mathbb{N} \text{ such that } n \geq N \implies 
+  0 \leq c g(n) \leq  f(n) \right\rbrace
+$$
+--
+
+* The proof of the following theorem is an exercise:
+
+$$f(n) = \Theta(g(n)) \iff f(n) = \Omega(g(n)) \text{ and } f(n) = O(g(n))$$
+
+* So, for example, if $T(n)$ is the running time of insertion sort, then we can say that 
+
+$$T(n) = \Omega(n) \text{ and } T(n) = O(n^2)$$ 
+
+* But *not* that 
+
+$$T(n) = \Theta(n) \text{ or } T(n) = \Theta(n^2)$$ 
+
+* However, if $T(n)$ denotes the worst-case running time of insertion sort, then
+
+$$
+T(n) = \Theta(n^2)
+$$
+
+
+---
+
+# Arithmetic with asymptotic notation
+
+* We will often do casual arithmetic with asymptotic notation
+
+* Most of the time this is OK, but we should be careful about potential ambiguity
+
+* Example: Consider the statement 
+
+$$a n^2 + bn + c = an^2 + \Theta(n)$$ 
+
+* Here we use $\Theta(n)$ to actually mean a *function* $f(n) \in
+  \Theta(n)$ (in this case, $f(n) = bn + c$)
+
+* Similarly, we could write
+
+$$2n^2 + \Theta(n) = \Theta(n^2)$$
+
+* This means that whatever the choice of $f(n) \in \Theta(n)$ in the LHS, $2n^2 + f(n) = \Theta(n^2)$
+
+
+---
+
+# Arithmetic with asymptotic notation
+
+* This kind of abuse of notation can sometimes lead to amiguity
+
+* For example, if $f(n) = \Theta(n)$, then
+
+$$
+\sum_{i=1}^n f(i) = \Theta(n(n+1)/2) = \Theta(n^2)
+$$ 
+
+* We may write the following to mean the same thing: 
+
+$$\sum_{i=1}^n \Theta(i)$$ 
+
+* But not $\Theta(1) + \Theta(2) + \cdots + \Theta(n)$ (which does not even make sense)
+
+
+---
+
+# $o$- and $\omega$-notation
+
+* The $O$- and $\Omega$-notations indicate bounds that may or may not
+  be asymptotically "tight"
+
+* The "little-oh" and "little-omega" notations indicate strictly *non-tight* bounds
+
+$$
+o(g(n)) = \left\lbrace f(n) \colon ~\text{for all}~ c > 0, ~\exists~ N \in \mathbb{N}
+                       \text{ such that } n \geq N \implies 
+				       0 \leq  f(n) \leq c g(n) \right\rbrace
+$$
+
+* and
+
+$$
+\omega(g(n)) = \left\lbrace f(n) \colon ~\text{for all}~ c > 0, ~\exists~ N \in \mathbb{N}
+                \text{ such that } n \geq N \implies 
+				0 \leq c g(n) \leq  f(n) \right\rbrace
+$$
+
+
+---
+
+# $o$- and $\omega$-notation
+
+* Essentially, as $f(n)$ and $g(n)$ are asymptotically non-negative,
+
+$$f(n) = o(g(n)) \implies \limsup \frac{f(n)}{g(n)} = 0 \implies \lim \frac{f(n)}{g(n)} = 0$$
+
+
+* Similarly, $f(n) = \omega(g(n)) \implies \lim \frac{f(n)}{g(n)} = \infty$
+
+* Refer to _Introduction to Algorithms_ (Cormen et al) for further properties of asymptotic notation
+
+* We will use these properties as and when necessary
+
+
+
+---
+
+# Analyzing Divide and Conquer algorithms
+
+* The runtime analysis of a divide-and-conquer algorithm usually involves solving a recurrence
+
+* Let $T(n)$ be the running time on a problem of size n
+
+* We can write
+
+<div>
+$$
+T(n) =
+\begin{cases}
+  \Theta(1) & \text{if}~ n \leq c \\
+  a T(n/b) + D(n) + C(n) & \text{otherwise}
+\end{cases}
+$$ 
+</div>
+
+* where $T(n)$ is constant if the problem is small enough (say $n \leq c$ for some constant $c$), and otherwise
+
+	- the division step produces $a$ subproblems, each of size $n/b$
+
+	- $D(n)$ is the time taken to divide the problem into subproblems,
+
+	- $C(n)$ is the time taken to combine the sub-solutions.
+
+---
+
+# Analyzing Divide and Conquer algorithms
+
+* There are three common methods to solve recurrences.
+
+	- The _substitution method_: guess a bound and then use mathematical
+      induction to prove it correct
+
+	- The _recursion-tree method_: convert the recurrence into a tree,
+	  and use techniques for bounding summations to solve the
+      recurrence
+
+	- The _master method_ provides bounds for recurrences of the form
+      $T(n) = aT(n/b) + f(n)$ for certain functions $f(n)$ that cover
+      most common cases
+
+---
+
+# The substitution method
+
+* The substitution method is basically to
+
+	1. Guess the form of the solution, and 
+
+	2. Use mathematical induction to verify it
+
+
+<!-- 
+
+* Example (similar to merge sort): Find an upper bound for the recurrence 
+
+$$T(n) = 2 T(n/2) + n$$
+
+* Suppose we guess that the solution is $T(n) = O(n \log_2 n)$
+
+* We need to prove that $T(n) \leq c n \log_2 n$ for some constant $c > 0$
+
+* Assume this holds for all positive $m < n$, in particular,
+
+$$
+T( n/2 ) \leq \frac{cn}{2}  \log_2  \frac{n}{2}
+$$ 
+  
+
+* Substituting, we have (provided $c \geq 1$)
+
+<div>
+$$
+\begin{aligned}
+    T(n) & = &  2 T( n/2 ) + n\\
+    & \leq & 2 \frac12 c  n  \log_2  (n/2)  + n \\
+    & = &  c n \log_2 n - c n \log_2 2  + n \\
+    & = &  c n \log_2 n - c n  + n \\
+    & \leq &  c n \log_2 n  \\
+\end{aligned}
+$$
+</div>
+
+
+* Technically, we still need to prove the guess for a boundary condition.
+
+* Let's try for $n=1$: 
+
+	- Require $T(1) \leq c~1 \log_2 1 = 0$ 
+
+	- Not possible for any realistic value of $T(1)$
+
+	- So the solution is not true for $n=1$
+
+* However, for $n=2$: 
+
+	- Require $T(2) \leq c~2 \log_2 2 = 2c$ 
+
+	- Can be made to hold for some choice of $c>1$, whatever the value of $T(2) = 2 T(1) + 2$
+
+* Similarly for $T(3)$
+
+* Note that for $n > 3$, the induction step never makes use of $T(1)$ directly
+
+
+* Remark: be careful not to use asymptotic notation in the induction step
+
+* Consider this proof to show $T(n) = O(n)$, assuming $T(m) \leq cm$ for $m<n$
+
+<div>
+$$
+\begin{aligned}
+  T(n) & = & 2 T(n / 2) + n \\
+       & \leq & 2 c  n/2  + n \\
+       & \leq & cn + n \\
+       & =    & O(n)
+\end{aligned}
+$$
+</div>
+	   
+
+* The last step is invalid
+
+* Unfortunately, making a good guess is not always easy, limiting the
+usefulness of this method
+
+
+-->
+
+
+
+---
+
+# The recursion tree method
+
+* This is the method we used to calculate the merge sort run time
+
+* Usually this is helpful to derive a guess that we can then formally
+prove using recursion
+
+
+---
+
+# The master method
+
+* __The Master theorem__: Let $a \geq 1$ and $b > 1$ be constants, let
+  $f(n)$ be a function, and
+
+$$T(n) = a T(n/b) + f(n)$$ 
+
+* Here $n/b$ could also be floor or ceiling of $n/b$ 
+--
+
+* Then $T(n)$ has the following asymptotic bounds:
+
+	1. If $f(n) = O(n^{\log_b a - \varepsilon})$ for some constant
+       $\varepsilon > 0$, then $T(n) = \Theta(n^{\log_b a})$
+
+	2. If $f(n) = \Theta(n^{\log_b a})$, then $T(n) = \Theta(n^{\log_b
+	   a} \log_2 n) = \Theta(f(n) \log_2 n)$
+
+	3. If $f(n) = \Omega(n^{\log_b a + \varepsilon})$ for some
+       constant $\varepsilon > 0$, and if $a f(n/b) \leq c f(n)$ for
+       some constant $c < 1$ and all sufficiently large $n$, then
+       $T(n) = \Theta(f(n))$
+
+
+
+---
+
+# The master method
+
+* We will not prove the master theorem
+
+* Note that we are essentially comparing $f(n)$ with $n^{\log_b a}$
+
+* whichever is bigger (by a polynomial factor) determines the solution
+
+* If they are the same size, we get an additional $\log n$ factor
+
+* Additionally, the third case needs a regularity condition on $f(n)$
+
+* Exercise: Use the master theorem to obtain the asymptotic order for
+
+$$
+T(n) = T(n/2) + cn
+$$
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
