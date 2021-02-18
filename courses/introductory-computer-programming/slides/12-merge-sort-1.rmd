@@ -847,11 +847,11 @@ $$T(n) = a T(n/b) + f(n)$$
 
 * Additionally, the third case needs a regularity condition on $f(n)$
 
-* Exercise: Use the master theorem to obtain the asymptotic order for
+* Exercises: 
 
-$$
-T(n) = T(n/2) + cn
-$$
+	- Use the master theorem to obtain the asymptotic order for $$T(n) = T(n/2) + cn$$
+
+	- Prove the bound using the substitution (induction) method
 
 
 ---
