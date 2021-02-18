@@ -849,10 +849,9 @@ $$T(n) = a T(n/b) + f(n)$$
 
 * Exercises: 
 
-	- Use the master theorem to obtain the asymptotic order for $$T(n) = T(n/2) + cn$$
+	- Use the master theorem to obtain the asymptotic order for the recurrence $$T(n) = 2 T(n/2) + n$$
 
 	- Prove the bound using the substitution (induction) method
-
 
 ---
 
