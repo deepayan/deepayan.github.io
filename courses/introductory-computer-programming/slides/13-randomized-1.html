@@ -27,7 +27,7 @@ mathjax: true
 <div>
 $$
 \newcommand{\sub}[2]{ {#1}_{#2} }
-\newcommand{\sumlimits}[2]{ \sum\limits_{#2}^{#3} }
+\newcommand{\sumlimits}[2]{ \sum\limits_{#1}^{#2} }
 $$
 </div>
 
@@ -572,7 +572,7 @@ layout: true
 * So, we can write
 
 $$
-X = \sub{\sum}{i=1}^{n-1} \sub{\sum}{j=i+1}^n \sub{X}{ij}
+X = \sumlimits{i=1}{n-1} \sumlimits{j=i+1}{n} \sub{X}{ij}
 $$ 
 
 * Therefore
