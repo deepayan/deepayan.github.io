@@ -122,14 +122,17 @@ X   & = & \sub{\sum}{i} \sub{X}{i}
 
 * Then $E(\sub{X}{i}) = 1/i \implies E(X) = \sub{\sum}{i=1}^n 1/i \approx \log n$
 
-* Exercise: Can we write $E(X) = \Theta(\log n)$?
+* Exercises: 
 
-* Exercise: Determine $Var(X)$.
+	- Can we write $E(X) = \Theta(\log n)$?
+
+    - Exercise: Determine $Var(X)$
 --
 
 * This is similar to average case runtime analysis of insertion sort
 
-* However, in this case average case is different from the worst case (and the best case)
+* However, for this problem the average case is different from the
+  worst case (and the best case)
 --
 
 * The final sorting algorithm we discuss also has this feature
@@ -140,7 +143,7 @@ X   & = & \sub{\sum}{i} \sub{X}{i}
 
 * The final general sorting algorithm we study is called quicksort
 
-* It is among the fastest sorting algorithms in practice
+* Also $\Theta(n \log n)$, but among the fastest sorting algorithms in practice
 
 * Estimating the runtime theoretically is somewhat tricky
 
@@ -312,7 +315,7 @@ __if__ (p < r) {
 * As the procedure runs, it partitions the array into four (possibly
   empty) regions.
 
-* At the start of each iteration of the for loop in lines 3--7, the
+* At the start of each iteration of the for loop, the
   regions satisfy certain properties.
 
 * We state these properties as a loop invariant:
@@ -489,6 +492,7 @@ __if__ (p < r) {
 	
 * The expected runtime in that case is clearly equivalent to the
   average case of `QUICKSORT`
+--
 
 * Instead, we only choose the pivot randomly (in each partition step)
 	
@@ -523,6 +527,7 @@ layout: true
 	
 * Let $X$ be the number of such comparisons in `PARTITION` over the
   *entire* execution of `QUICKSORT`
+--
 
 * Then the running time of `QUICKSORT` is $O(n + X)$
 
@@ -572,8 +577,9 @@ $$
 * Therefore
 
 $$
-E(X) = \sub{\sum}{i=1}^{n-1} \sub{\sum}{j=i+1}^n E(\sub{X}{ij}) = \sub{\sum}{i=1}^{n-1}
-\sub{\sum}{j=i+1}^n P(\sub{z}{i} \textsf{ is compared with } \sub{z}{j})
+E(X) = \sum\sub{\limits}{i=1}^{n-1} \sum\sub{\limits}{j=i+1}^n E(\sub{X}{ij})
+     = \sum\sub{\limits}{i=1}^{n-1}
+\sum\sub{\limits}{j=i+1}^n P(\sub{z}{i} \textsf{ is compared with } \sub{z}{j})
 $$ 
 
 * The trick to evaluating this probability is to notice that it only
