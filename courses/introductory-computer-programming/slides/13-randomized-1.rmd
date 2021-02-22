@@ -17,28 +17,33 @@ mathjax: true
 * Typical approach: look at each one by one, keeping track of the best
 
 * Not much we can do to improve on this
----
+--
 
 * A variant of this problem: there is a substantial cost to updating the current 'best' value
 
 * We can phrase this as a simplified **hiring problem**
 
+
+<div>
+\newcommand{\sub}[2]{#1_#2}
+</div>
+
+
 ---
 
 # The hiring problem
 
-* Suppose that your current office assistant is horribly bad, and you need
-to hire a new office assistant
+* Suppose you want to hire a new assistant
 
 * An employment agency sends you one candidate every day
 
 * You interview a candidate and decide either to hire or not
 
-* But if you don't hire the candidate immediately, you cannot hire him / her later
+* But if you don't hire the candidate immediately, you _cannot_ hire him / her later
 
 * You pay the employment agency a small fee to interview an applicant
 
-* Hiring an applicant is more costly: must compensate the current
+* Hiring an applicant is more costly: you must compensate the current
   current assistant being replaced
 
 ---
@@ -92,7 +97,7 @@ __for__ (i = 1, ..., n) {
 * Best case: $m=1$
 
 * What is the average case?
----
+--
 
 * We need to assume a probability distribution on the input order
 
@@ -106,25 +111,24 @@ __for__ (i = 1, ..., n) {
 
 * Define
 
+<div>
 \begin{eqnarray*}
-X_i & = & \boldsymbol{1}\left\lbrace\text{Candidate } i \text{ is hired}\right\rbrace \\
-X   & = & \sum_i X_i
+\sub{X}{i} & = & \boldsymbol{1}\left\lbrace\text{Candidate } i \text{ is hired}\right\rbrace \\
+X   & = & \sub{\sum}{i} \sub{X}{i}
 \end{eqnarray*}
+</div>
 
-* Then $E(X_i) = 1/i \implies E(X) = \sum_{i=1}^n 1/i \approx \log n$
+* Then $E(\sub{X}{i}) = 1/i \implies E(X) = \sub{\sum}{i=1}^n 1/i \approx \log n$
 
 * Exercise: Can we write $E(X) = \Theta(\log n)$?
 
 * Exercise: Determine $Var(X)$.
-
----
-
-# Probabilistic analysis 
+--
 
 * This is similar to average case runtime analysis of insertion sort
 
 * However, in this case average case is different from the worst case (and the best case)
----
+--
 
 * The final sorting algorithm we discuss also has this feature
 
@@ -208,8 +212,7 @@ __while__ (TRUE) {
     __else__ {
         __return__ j
     }
-}
-]
+}]
 
 
 ---
@@ -315,11 +318,11 @@ __if__ (p < r) {
 	> At the beginning of each iteration of the loop, for any array
 	> index $k$,
 	> 
-	> #. If $p \leq k \leq i$, then $A[k] \leq x$
+	> 1. If $p \leq k \leq i$, then $A[k] \leq x$
 	> 
-	> #. If $i+1 \leq k \leq j-1$, then $A[k] > x$
+	> 2. If $i+1 \leq k \leq j-1$, then $A[k] > x$
 	> 
-	> #. If $k = r$, then $A[k] = x$
+	> 3. If $k = r$, then $A[k] = x$
 	>
 	> (The values of $A[k]$ can be anything for $j \leq k < r$)
 
@@ -402,14 +405,14 @@ layout: false
 	- Input data already sorted
 	
 	- All input values constant 
----
+--
 
 * Exercise: 
 
 	- Are these worst cases for the original (Hoare) partition algorithm as well?
 
-	- Suggest simple modifications which can "fix" these worst cases
-      (without increasing order of runtime of `PARTITION`)
+	- Suggest simple modifications to "fix" these worst cases (without
+      increasing order of runtime)
 	
 ---
 
@@ -419,7 +422,7 @@ layout: false
 
 * This is the expected runtime when the input order is random
   (uniformly over all permutations)
----
+--
 
 * A related concept: Randomized Algorithms
 
@@ -477,8 +480,7 @@ __if__ (p < r) {
 # Randomized quicksort and average case
 
 * Claim: If all input elements are distinct, these two are essentially equivalent
-
-. . .
+--
 
 * An alternative randomized version of quicksort is to randomly
   permute the input initially
@@ -562,14 +564,14 @@ layout: true
 * So, we can write
 
 $$
-X = \sum_{i=1}^{n-1} \sum_{j=i+1}^n X_{ij}
+X = \sub{\sum}{i=1}^{n-1} \sub{\sum}{j=i+1}^n \sub{X}{ij}
 $$ 
 
 * Therefore
 
 $$
-E(X) = \sum_{i=1}^{n-1} \sum_{j=i+1}^n E(X_{ij}) = \sum_{i=1}^{n-1}
-\sum_{j=i+1}^n P(z_i \textsf{ is compared with } z_j)
+E(X) = \sub{\sum}{i=1}^{n-1} \sub{\sum}{j=i+1}^n E(\sub{X}{ij}) = \sub{\sum}{i=1}^{n-1}
+\sub{\sum}{j=i+1}^n P(\sub{z}{i} \textsf{ is compared with } \sub{z}{j})
 $$ 
 
 * The trick to evaluating this probability is to notice that it only
@@ -594,10 +596,10 @@ $$P(z_i \textsf{ is compared with } z_j)$$
 
 * This is easy once we realize that 
 
-	> until the first time something in $Z_{ij}$ is chosen as a pivot,
-	> all elements in $Z_{ij}$ remain in the *same partition* in any
-	> previous call to PARTITION (they are either all less than or
-	> greater than any previous pivot)
+	> until the first time something in $\sub{Z}{ij}$ is chosen as a
+	> pivot, all elements in $\sub{Z}{ij}$ remain in the *same
+	> partition* in any previous call to PARTITION (they are either
+	> all less than or greater than any previous pivot)
 
 * Recall that pivots are chosen uniformly randomly (in `RANDOMIZED-PARTITION`)
 
@@ -605,12 +607,14 @@ $$P(z_i \textsf{ is compared with } z_j)$$
 
 * Thus the required probability is $2/|Z_{ij}| = 2/(j-i+1)$, and so
 
+<div>
 $$
 EX = \sum_{i=1}^{n-1} \sum_{j=i+1}^n \frac{2}{j-i+1} =
      \sum_{i=1}^{n-1} \sum_{k=1}^{n-i} \frac{2}{k+1} < \sum_{i=1}^{n-1}
      \sum_{k=1}^{n} \frac{2}{k} 
    = \sum_{i=1}^{n-1} O(\log_2 n) = O(n \log_2 n)
 $$
+</div>
 
 ---
 
