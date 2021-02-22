@@ -1,0 +1,621 @@
+---
+layout: remark
+title: 'Probabilistic and Randomized Algorthms'
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+# Probabilistic Analysis
+
+* A common problem: finding the maximum
+
+	* given a list of things 
+
+	* want to find the "best" among them 
+
+* Typical approach: look at each one by one, keeping track of the best
+
+* Not much we can do to improve on this
+---
+
+* A variant of this problem: there is a substantial cost to updating the current 'best' value
+
+* We can phrase this as a simplified **hiring problem**
+
+---
+
+# The hiring problem
+
+* Suppose that your current office assistant is horribly bad, and you need
+to hire a new office assistant
+
+* An employment agency sends you one candidate every day
+
+* You interview a candidate and decide either to hire or not
+
+* But if you don't hire the candidate immediately, you cannot hire him / her later
+
+* You pay the employment agency a small fee to interview an applicant
+
+* Hiring an applicant is more costly: must compensate the current
+  current assistant being replaced
+
+---
+
+# Hiring strategy: always hire the best
+
+* You want to have the best possible person for the job at all times
+
+* If applicant being interviewed better than the current office assistant:
+
+	- Fire the current assistant 
+	
+	- Hire the new applicant
+
+* What is the cost of this strategy?
+
+---
+
+# Hiring strategy: always hire the best
+
+.algorithm[
+.name[`hire-assistant(n)`]
+best = 0 // least-qualified dummy candidate
+__for__ (i = 1, ..., n) {
+    interview candidate i
+    __if__ (i is better than best) {
+        best = i
+        hire candidate i
+    }
+}
+]
+
+* Let $c_i$ be interview cost, and $c_h$ be hiring cost
+
+* Total cost is $nc_i + mc_h$, where $m$ is the number of times we hired someone new
+
+* The first part is fixed, so we concentrate on $m c_h$
+
+---
+
+# Probabilistic analysis 
+
+* Worst case: 
+
+	* we get applicants in increasing order (worst to best)
+
+	* we hire everyone we interview
+	
+	* So $m = n$
+	
+* Best case: $m=1$
+
+* What is the average case?
+---
+
+* We need to assume a probability distribution on the input order
+
+* Simplest model: candidates come in random order
+
+* More precisely, their order is a _uniformly random permutation_ of $1, 2, ..., n$
+
+---
+
+# Probabilistic analysis 
+
+* Define
+
+\begin{eqnarray*}
+X_i & = & \boldsymbol{1}\left\lbrace\text{Candidate } i \text{ is hired}\right\rbrace \\
+X   & = & \sum_i X_i
+\end{eqnarray*}
+
+* Then $E(X_i) = 1/i \implies E(X) = \sum_{i=1}^n 1/i \approx \log n$
+
+* Exercise: Can we write $E(X) = \Theta(\log n)$?
+
+* Exercise: Determine $Var(X)$.
+
+---
+
+# Probabilistic analysis 
+
+* This is similar to average case runtime analysis of insertion sort
+
+* However, in this case average case is different from the worst case (and the best case)
+---
+
+* The final sorting algorithm we discuss also has this feature
+
+---
+
+# Quicksort
+
+* The final general sorting algorithm we study is called quicksort
+
+* It is among the fastest sorting algorithms in practice
+
+* Estimating the runtime theoretically is somewhat tricky
+
+---
+
+# Quicksort
+
+* Quicksort is a divide-and-conquer algorithm (like merge-sort)
+
+* The steps to sort an array $A[p,...,r]$ are:
+
+	- Choose an element in $A$ as the pivot element $x$
+
+	- __Divide__: Partition (rearrange) the array $A[p,...,r]$ and compute index $p \leq q \leq r$ such that
+	
+		- Each element of $A[p,...,q] \leq x$
+		
+		- Each element of $A[q+1,...,r] \geq x$
+
+		- Computing the index $q$ is part of the partitioning procedure
+
+	- __Conquer__: Sort the two subarrays $A[p,...,q]$ and $A[q+1,...,r]$ by
+      recursive calls to quicksort
+
+	- __Combine__: No further work needed, because the whole array is now sorted
+
+---
+
+# Quicksort
+
+* The procedure can thus be written as
+
+.algorithm[
+.name[`QUICKSORT(A, p, r)`]
+__if__ (p < r) {
+    q = PARTITION(A, p, r)
+    QUICKSORT(A, p, q)
+    QUICKSORT(A, q+1, r)
+}
+]
+
+* The full array A of length n can be sorted with `QUICKSORT(A, 1, n)`
+
+* Of course, the important ingredient is `PARTITION()`
+
+
+---
+
+# Partitioning in quicksort: original version
+
+* Quicksort was originally invented by
+  [C. A. R. Hoare](https://en.wikipedia.org/wiki/Tony_Hoare) in 1959
+
+* He proposed the following `PARTITION()` algorithm
+
+.algorithm[
+.name[`PARTITION(A, p, r)`]
+x = A[p] // choose first element as pivot
+i = p - 1
+j = r + 1
+__while__ (TRUE) {
+    __repeat__
+        j = j - 1
+    __until__ (A[j] $\leq$ x)
+    __repeat__
+        i = i + 1
+    __until__ (A[i] $\geq$ x)
+    __if__ (i < j) {
+        swap A[i] and A[j]
+    }
+    __else__ {
+        __return__ j
+    }
+}
+]
+
+
+---
+
+# Correctness
+
+* Exercise: Assuming $p < r$, show that in the algorithm above,
+
+	* Elements outside the subarray $A[p, ..., r]$ are never accessed
+	  
+	* The algorithm terminates after a finite number of steps
+	
+	* On termination, the return value $j$ satisfies $p \leq j < r$
+
+	* Every element of $A[p, ..., j]$ is less than or equal to every element of $A[j+1, ..., r]$
+
+---
+
+# Performance of quicksort (informally)
+
+* Runtime of `PARTITION` is clearly $\Theta(n)$ (linear)
+
+* Worst-case: partitioning produces one subproblem with $n-1$ elements
+  and one with 1 element
+
+$$
+T(n) = T(n-1) + T(1) + \Theta(n) = T(n-1) + \Theta(n)
+$$
+
+* Solved by $T(n) = \Theta(n^2)$
+
+* Best case: always balanced split 
+
+$$
+T(n) = 2 T(n/2) + \Theta(n)
+$$ 
+
+* By master theorem gives $T(n) = O(n \log_2 n)$
+
+* This happens if we can somehow ensure that the pivot is always the median
+
+* That is of course impossible to ensure
+
+* Average case: This turns out to be also $O(n \log_2 n)$, but the
+  proof of this is more involved
+
+---
+
+# Lomuto partitioning scheme
+
+* We will study a slightly different version of quicksort (due to Lomuto)
+
+* Formal runtime analysis of this version is easier 
+
+.algorithm[
+.name[`PARTITION(A, p, r)`]
+<span class="lc"/>x = A[r]  // choose last element as pivot
+<span class="lc"/>i = p - 1
+<span class="lc"/>__for__ (j = p, ..., r-1)
+    <span class="lc"/>__if__ (A[j] <= x) {
+        <span class="lc"/>i = i + 1
+        <span class="lc"/>swap(A[i], A[j])
+    <span class="lc"/>}
+<span class="lc"/>swap(A[i+1], A[r])
+<span class="lc"/>__return__ i + 1
+]
+
+---
+
+# Lomuto partitioning scheme
+
+* This rearranges $A[p,...,r]$ and computes index $p \leq q \leq r$ such that
+
+	- $A[q] = x$
+	
+	- Each element of $A[p,...,q-1] \leq x$
+		
+	- Each element of $A[q+1,...,r] \geq x$
+
+* The quicksort algorithm is modified as
+
+.algorithm[
+.name[`QUICKSORT(A, p, r)`]
+__if__ (p < r) {
+    q = PARTITION(A, p, r)
+    QUICKSORT(A, p, q-1)
+    QUICKSORT(A, q+1, r)
+}
+]
+
+---
+
+# Correctness of Lomuto partitioning scheme 
+
+* As the procedure runs, it partitions the array into four (possibly
+  empty) regions.
+
+* At the start of each iteration of the for loop in lines 3--7, the
+  regions satisfy certain properties.
+
+* We state these properties as a loop invariant:
+
+	> At the beginning of each iteration of the loop, for any array
+	> index $k$,
+	> 
+	> #. If $p \leq k \leq i$, then $A[k] \leq x$
+	> 
+	> #. If $i+1 \leq k \leq j-1$, then $A[k] > x$
+	> 
+	> #. If $k = r$, then $A[k] = x$
+	>
+	> (The values of $A[k]$ can be anything for $j \leq k < r$)
+
+---
+
+layout: true
+
+# Proof of loop invariant
+
+---
+
+### Initialization: 
+
+* Prior to the first iteration of the loop, $i = p-1$ and $j = p$
+
+* No values lie between $p$ and $i$ and no values lie between $i + 1$ and $j - 1$
+
+* So, the first two conditions of the loop invariant are trivially satisfied
+
+* The assignment $x = A[r]$ in line 1 satisfies the third condition
+
+---
+
+### Maintenance: 
+
+* We have two cases, depending on the outcome of the test in line 4
+
+* When $A[j] > x$, the only action is to increment $j$, after which
+
+	- condition 2 holds for $A[j-1]$ 
+	
+	- all other entries remain unchanged
+
+* When $A[j] \leq x$, the loop increments $i$, swaps $A[i]$ and
+  $A[j]$, and then increments $j$
+
+* Because of the swap, we now have that $A[i] \leq x$, and condition 1
+  is satisfied
+
+* Similarly, $A[j-1] > x$, as the value swapped into $A[j-1]$ is, by
+  the loop invariant, greater than $x$
+
+---
+
+### Termination: 
+
+* At termination, $j = r$
+
+* Every entry in the array is in one of the three sets described by the invariant
+
+* We have partitioned the values in the array into three sets: 
+
+	- those less than or equal to $x$
+	
+	- those greater than $x$
+	
+	- a singleton set containing $x$
+
+* The second-last line of `PARTITION` swaps the pivot element with the
+  leftmost element greater than $x$
+
+* This moved the pivot into its correct place in the partitioned array
+
+* The last line returns the pivot's new index
+
+---
+
+layout: false
+
+# Performance of quicksort
+
+* Again, it is easy to see that the running time of `PARTITION` is $\Theta(n)$
+
+* Worst case: $T(n) = \Theta(n^2)$ as before
+
+* Best case: $T(n) = O(n \log_2 n)$ as before
+
+* Examples of worst case:
+
+	- Input data already sorted
+	
+	- All input values constant 
+---
+
+* Exercise: 
+
+	- Are these worst cases for the original (Hoare) partition algorithm as well?
+
+	- Suggest simple modifications which can "fix" these worst cases
+      (without increasing order of runtime of `PARTITION`)
+	
+---
+
+# Performance of quicksort
+
+* Average case: What is the runtime of quicksort in the "average case"
+
+* This is the expected runtime when the input order is random
+  (uniformly over all permutations)
+---
+
+* A related concept: Randomized Algorithms
+
+* An algorithm is _randomized_ if it makes use of (pseudo)-random numbers
+
+* We will analyze a randomized version of quicksort 
+
+	* This requires a "random number generator" algorithm `RANDOM(i, j)` 
+
+	* `RANDOM(i, j)` should return a random integer between $i$ and
+      $j$ (inclusive) with uniform probability
+
+---
+
+# Randomized quicksort
+
+* Randomized quicksort chooses a random element as pivot (instead of
+  the last) when partitioning
+
+.algorithm[
+.name[`RANDOMIZED-PARTITION(A, p, r)`]
+i = RANDOM(p,r)
+swap(A[r], A[i])
+return PARTITION(A, p, r)
+]
+
+* The new quicksort calls `RANDOMIZED-PARTITION` in place of `PARTITION`
+
+.algorithm[
+.name[`RANDOMIZED-QUICKSORT(A, p, r)`]
+__if__ (p < r) {
+     q = RANDOMIZED-PARTITION(A, p, r)
+     RANDOMIZED-QUICKSORT(A, p, q-1)
+     RANDOMIZED-QUICKSORT(A, q+1, r)
+}
+]
+
+---
+
+# Randomized quicksort and average case
+
+* A randomized algorithm can proceed differently on different runs
+  with the same input
+  
+* In other words, the runtime for a given input is a random variable 
+
+* This leads to two distinct concepts:
+
+	* Expected runtime of `RANDOMIZED-QUICKSORT` (on a given input)
+	
+	* Average case runtime of `QUICKSORT` (averaged over random input order)
+
+---
+
+# Randomized quicksort and average case
+
+* Claim: If all input elements are distinct, these two are essentially equivalent
+
+. . .
+
+* An alternative randomized version of quicksort is to randomly
+  permute the input initially
+	
+* The expected runtime in that case is clearly equivalent to the
+  average case of `QUICKSORT`
+
+* Instead, we only choose the pivot randomly (in each partition step)
+	
+* However, this does not change the resulting partitions (as sets)
+
+* A little thought shows that the number of comparisons is also the same
+  
+* The number of swaps may differ, but are less than the number of comparisons
+
+
+<!-- 
+Finding the average case runtime of quicksort is the same as finding
+expected runtime of RANDOMIZED-QUICKSORT.
+
+To ensure "average case" behavior (which assumes input randomly
+ordered), we can modify QUICKSORT to make it randomized as follows (by
+choosing the pivot randomly).
+-->
+
+---
+
+layout: true
+
+# Average-case analysis
+
+---
+
+* Assume that all elements of the input $n$-element array $A[1, ..., n]$  are distinct
+
+* Each call to `PARTITION` has a for loop where each iteration makes
+  one comparison ($A[j] \leq x$) 
+	
+* Let $X$ be the number of such comparisons in `PARTITION` over the
+  *entire* execution of `QUICKSORT`
+
+* Then the running time of `QUICKSORT` is $O(n + X)$
+
+* This is easy to see, because 
+
+	* `PARTITION` is called at most $n$ times (actually less)
+	
+	* In each such call, each iteration of the for loop makes one
+      comparison contributing to $X$
+	
+	* The remaining operations of `PARTITION` only contribute a constant term
+
+* To analyze runtime of quicksort, we will try to find $E(X)$
+
+* In other words, we will not analyze contribution of each `PARTITION` call separately
+
+
+
+---
+
+* Let
+
+	- $z_1 < z_2 < \dotsm < z_n$ be the elements of $A$ in increasing
+      order
+
+	- $Z_{ij} = \lbrace z_i, ..., z_j \rbrace$ be the set of elements
+      between $z_i$ and $z_j$, inclusive.
+
+	- $X_{ij} = { \boldsymbol{1} \left\lbrace z_i \textsf{ is compared with }
+      z_j\right\rbrace}$ sometime during the execution of `QUICKSORT`
+--
+
+* First, note that two elements may be compared at most once
+
+	* One of the elements being compared is always the pivot
+	
+	* The pivot is never involved in subsequent recursive calls to `QUICKSORT`
+
+---
+
+* So, we can write
+
+$$
+X = \sum_{i=1}^{n-1} \sum_{j=i+1}^n X_{ij}
+$$ 
+
+* Therefore
+
+$$
+E(X) = \sum_{i=1}^{n-1} \sum_{j=i+1}^n E(X_{ij}) = \sum_{i=1}^{n-1}
+\sum_{j=i+1}^n P(z_i \textsf{ is compared with } z_j)
+$$ 
+
+* The trick to evaluating this probability is to notice that it only
+depends on $Z_{ij}$
+
+---
+
+* We want to compute
+
+$$P(z_i \textsf{ is compared with } z_j)$$
+
+* Consider the first element $x$ in $Z_{ij} = \lbrace z_i, ..., z_j
+\rbrace$ that is chosen as a pivot (at some point)
+
+* If $z_i < x < z_j$, then $z_i$ and $z_j$ will never be compared
+
+* However, if $x$ is either $z_i$ or $z_j$, then they will be compared
+
+* So, we want the probability that $x$ is either $z_i$ or $z_j$
+
+---
+
+* This is easy once we realize that 
+
+	> until the first time something in $Z_{ij}$ is chosen as a pivot,
+	> all elements in $Z_{ij}$ remain in the *same partition* in any
+	> previous call to PARTITION (they are either all less than or
+	> greater than any previous pivot)
+
+* Recall that pivots are chosen uniformly randomly (in `RANDOMIZED-PARTITION`)
+
+* So any element of $Z_{ij}$ is equally likely to be the one chosen first
+
+* Thus the required probability is $2/|Z_{ij}| = 2/(j-i+1)$, and so
+
+$$
+EX = \sum_{i=1}^{n-1} \sum_{j=i+1}^n \frac{2}{j-i+1} =
+     \sum_{i=1}^{n-1} \sum_{k=1}^{n-i} \frac{2}{k+1} < \sum_{i=1}^{n-1}
+     \sum_{k=1}^{n} \frac{2}{k} 
+   = \sum_{i=1}^{n-1} O(\log_2 n) = O(n \log_2 n)
+$$
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
