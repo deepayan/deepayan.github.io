@@ -25,7 +25,9 @@ mathjax: true
 
 
 <div>
-\newcommand{\sub}[2]{#1_#2}
+$$
+\newcommand{\sub}[2]{{#1}_{#2}}
+$$
 </div>
 
 
