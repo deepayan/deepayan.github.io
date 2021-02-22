@@ -27,6 +27,7 @@ mathjax: true
 <div>
 $$
 \newcommand{\sub}[2]{ {#1}_{#2} }
+\newcommand{\sumlimits}[2]{ \sum\limits_{#2}^{#3} }
 $$
 </div>
 
@@ -577,9 +578,8 @@ $$
 * Therefore
 
 $$
-E(X) = \sum\sub{\limits}{i=1}^{n-1} \sum\sub{\limits}{j=i+1}^n E(\sub{X}{ij})
-     = \sum\sub{\limits}{i=1}^{n-1}
-\sum\sub{\limits}{j=i+1}^n P(\sub{z}{i} \textsf{ is compared with } \sub{z}{j})
+E(X) = \sumlimits{i=1}{n-1} \sumlimits{j=i+1}{n} E(\sub{X}{ij})
+     = \sumlimits{i=1}{n-1} \sumlimits{j=i+1}{n} P(\sub{z}{i} \textsf{ is compared with } \sub{z}{j})
 $$ 
 
 * The trick to evaluating this probability is to notice that it only
