@@ -125,9 +125,9 @@ X   & = & \sub{\sum}{i} \sub{X}{i}
 
 * Exercises: 
 
-	- Can we write $E(X) = \Theta(\log n)$?
+    - Can we write $E(X) = \Theta(\log n)$?
 
-    - Exercise: Determine $Var(X)$
+    - Determine $Var(X)$
 --
 
 * This is similar to average case runtime analysis of insertion sort
@@ -256,7 +256,7 @@ $$
 T(n) = 2 T(n/2) + \Theta(n)
 $$ 
 
-* By master theorem gives $T(n) = O(n \log_2 n)$
+* Master theorem gives $T(n) = O(n \log_2 n)$
 
 * This happens if we can somehow ensure that the pivot is always the median
 
