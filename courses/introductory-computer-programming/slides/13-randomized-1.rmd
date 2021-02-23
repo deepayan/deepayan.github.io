@@ -1,6 +1,6 @@
 ---
 layout: remark
-title: 'Probabilistic and Randomized Algorthms'
+title: 'Probabilistic and Randomized Algorithms'
 subtitle: Introductory Computer Programming
 author: Deepayan Sarkar
 mathjax: true
