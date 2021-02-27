@@ -1,0 +1,267 @@
+---
+layout: remark
+title: 'Algorithms: Miscellanous Topics'
+subtitle: Introductory Computer Programming
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+
+# General lower bound for comparison-based sort
+
+<div>
+$$
+\newcommand{\sub}[2]{ {#1}_{#2} }
+\newcommand{\sumlimits}[2]{ \sum\limits_{#1}^{#2} }
+$$
+</div>
+
+* For example, this is what happens when we do insertion sort on three
+  elements $\sub{a}{1}, \sub{a}{2}, \sub{a}{3}$
+
+* Here, $i \leq j$ denotes the act of comparing $\sub{a}{i}$ and $\sub{a}{j}$
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+opts_chunk$set(## cache = TRUE, cache.path='~/knitr-cache/icp-algo-misc-1/', autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE,
+               knitr.table.format = "html",
+               fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/algo-misc-1-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+```
+
+
+```{r, echo=FALSE,fig.width=19,fig.height=7}
+heap_graph <- function(size, values = NULL)
+{
+	## need to calculate x and y coordinates of each node
+	h <- floor(log2(size))
+	stopifnot(size > 1, h > 0)
+	xpos <- function(level = 1)
+		## x-position of nodes at this level
+	{
+		## level counted from bottom (lowest layer is level=1)
+		## rule: gap between nodes at level l is l
+		##       2^(h - l + 1) nodes in total, average position is 0
+		x <- seq(1, by = level, length.out = 2^(h-level+1))
+		data.frame(x = x - mean(x), y = level)
+	}
+	d <- do.call(rbind, lapply((h+1):1, xpos))[1:size, ]
+	if (!is.null(values)) d <- cbind(d, values = values[1:size])
+    class(d) <- c("heap_graph", class(d))
+	d
+}
+plotBinaryTree <- function(d, pch = 16, ..., gp.text = list(cex = 2), newpage = TRUE)
+{
+	require(grid, quietly = TRUE)
+	if (newpage) grid.newpage()
+	pushViewport(viewport(xscale = extendrange(d$x, f = 0.15),
+	                      yscale = extendrange(d$y, f = 0.15)))
+	keep <- !is.na(d$values)
+	## add lines joining child to parent
+	i <- seq_len(nrow(d))[keep]
+	i <- i[-1] # exclude root
+	parent <- floor(i/2)
+	with(d, grid.segments(x[i], y[i], x[parent], y[parent], 
+	                      default.units = "native"))
+	with(d, grid.text(rep(c("TRUE", "FALSE"), 5),
+                      0.5 * (x[i] + x[parent]), 0.5 * (y[i] + y[parent]), 
+	                  default.units = "native", hjust = c(1.1, -0.1), vjust = -0.1))
+	## add the points (note: must fill to hide lines)
+    with(d, grid.points(x[keep], y[keep], pch = pch, gp = gpar(...)))
+	## add text if any
+	if (!is.null(d$values)) 
+	    with(d, grid.text(values[keep], x[keep], y[keep], 
+		                  gp = do.call(gpar, gp.text), default.units = "native"))
+	popViewport()
+}
+## fake binary tree by putting NA values for missing nodes in a heap
+h <- heap_graph(15, values = c("1 ≤ 2", 
+                               "2 ≤ 3", "1 ≤ 3",
+							   "( 1, 2, 3 )", "1 ≤ 3", "( 2, 1, 3 )", "2 ≤ 3", 
+							   NA, NA, "( 1, 3, 2 )", "( 3, 1 ,2 )", NA, NA, "( 2, 3, 1)", "( 3, 2, 1 )"))
+cols <- rep("black", 11)
+cols[c(4, 6, 8:11)] <- "transparent"
+textCols <- ifelse(cols == "black", "black", "royalblue")
+plotBinaryTree(h, cex = 10, pch = 21, fill = "white", col = cols, 
+               gp.text = gpar(col = textCols, cex = 2.2))
+```
+
+
+
+---
+
+# General lower bound for comparison-based sort
+
+* Generally, this decision tree must be a _binary_ tree (two outcomes
+  of each comparison)
+
+* It must have at least $n!$ leaf nodes (one or more for each possible permutation)
+
+* Comparisons needed to reach a particular leaf: length of the path
+  from the root node
+
+. . .
+
+* The worst case number of comparisons is the height of the binary
+  tree (longest path)
+
+* A binary tree of height $h$ can have at most $2^h$ leaf nodes
+
+* A binary tree with at least $n!$ leaf nodes must have height $h \geq \log_2 n!$
+
+* Using [Stirling's
+  approximation](https://en.wikipedia.org/wiki/Stirling%27s_approximation)
+  $\log n! = n \log n - n + O(\log n)$,
+
+$$
+h \geq \log_2(n!) / \log_2(2) = \Theta(n \log n)
+$$ 
+
+
+---
+
+# Linear time sorting
+
+* Sorting can be done in linear time in some special cases
+
+* As shown above, they cannot be comparison-based algorithms
+
+* Usually, these algorithms put restrictions on possible values 
+
+* Examples:
+
+	* Counting sort
+	
+	* Radix sort
+
+. . .
+
+
+* Details left for a second semester project
+
+
+---
+
+# Randomly permuting arrays
+
+* A common requirement in randomized algorithms is to find a random
+  permutation of an input array
+
+* One option: assign random key values to each element, then sort the
+  elements according to these keys
+  
+.algorithm[
+.name[`PERMUTE-BY-SORTING(A)`]
+n = length(A)
+let $P$[1,,,,n] be a new array
+__for__ (i = 1, ..., n) {
+    P[i] = RANDOM(1, M)
+}
+sort A, using P as sort keys
+]
+
+
+* Here $M$ should large enough that the possibility of keys being
+  duplicated is small
+
+* Exercise: Show that `PERMUTE-BY-SORTING` produces a uniform random
+  permutation of the input, assuming that all key values are distinct
+
+
+---
+
+# Randomly permuting arrays
+
+* The runtime for `PERMUTE-BY-SORTING` will be $\Omega(n \log_2 n)$ if we
+  use a comparison sort
+
+* A better method for generating a random permutation is to permute the
+  given array in place
+  
+* The procedure `RANDOMIZE-IN-PLACE` does so in $\Theta(n)$ time
+
+.algorithm[
+.name[`RANDOMIZE-IN-PLACE(A)`]
+n = length(A)
+__for__ (i = 1, ..., n) {
+    swap(A[i], A[ RANDOM(i, n) ])
+}
+]
+
+* In the $i$th iteration, $A[i]$ is chosen randomly from among $A[i],
+  A[i+1], ..., A[n]$
+
+* Subsequent to the ith iteration, $A[i]$ is never altered.
+
+---
+
+# Randomly permuting arrays
+
+* Procedure `RANDOMIZE-IN-PLACE` computes a uniform random permutation
+
+* We prove this using the following loop invariant
+
+	> Just prior to the $i$th iteration of the for loop, for each
+	> possible $(i-1)$-permutation of the $n$ elements, the subarray
+	> $A[1,...,i-1]$ contains this $(i-1)$-permutation with
+	> probability $(n-i+1)!/n!$.\
+
+### Initialization
+
+* Holds trivially ($i-1=0$)
+
+* If this is not convincing, take (just before) $i=2$ to be the
+  initial step
+
+
+---
+
+# Randomly permuting arrays
+
+### Maintenance 
+
+* Assume true upto $i=1,...,k$
+
+* Consider what happens just before $i=(k+1)$th iteration (i.e., just after $k$th iteration)
+
+* Let $(\sub{X}1, \sub{X}2, ..., \sub{X}k)$ be the random variable denoting the observed
+permutation
+
+*  For any specific $k$-permutation $(\sub{x}1, \sub{x}2, ..., \sub{x}k)$,
+
+<div>
+\begin{eqnarray*}
+  P(\sub{X}1 = \sub{x}1, \sub{X}2 = \sub{x}2, ..., \sub{X}k = \sub{x}k) 
+  &=& P(\sub{X}k = \sub{x}k | \sub{X}1 = \sub{x}1, \sub{X}2 = \sub{x}2, ..., \sub{X}{k-1} = \sub{x}{k-1}) \\
+  & & \times  P(\sub{X}1 = \sub{x}1, \sub{X}2 = \sub{x}2, ..., \sub{X}{k-1} = \sub{x}{k-1}) \\
+  &=& \frac{1}{n-k+1} \times \frac{(n-k+1)!}{n!} = \frac{(n-k)!}{n!}
+\end{eqnarray*}
+</div>
+
+
+### Termination
+
+* $i=n+1$, so each $n$-permutation is observed with probability $1/n!$
+
+
+---
+
+# Further topics
+
+* We will not discuss analysis of algorithms further
+
+* If you are interested, an excellent book on this topic is\
+  <a
+  href="https://www.amazon.in/Introduction-Algorithms-Eastern-Economy-Thomas/dp/8120340078/"
+  >Introduction to Algorithms</a> by Cormen, Leiserson, Rivest and Stein
+
+
+
+---
+
+layout: false
+class: middle, center
+
+# Questions?
+
