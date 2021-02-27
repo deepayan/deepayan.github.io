@@ -110,6 +110,7 @@ plotBinaryTree(h, cex = 10, pch = 21, fill = "white", col = cols,
   tree (longest path)
 
 * A binary tree of height $h$ can have at most $2^h$ leaf nodes
+--
 
 * A binary tree with at least $n!$ leaf nodes must have height $h \geq \log_2 n!$
 
@@ -130,9 +131,12 @@ $$
 
 * As shown above, they cannot be comparison-based algorithms
 
-* Usually, these algorithms put restrictions on possible values 
+* Usually, these algorithms put restrictions on possible values in the input array
+---
 
-* Examples:
+* Example: Input consists of letters (lexical / dictionary sorting)
+
+* Common methods:
 
 	* Counting sort
 	
@@ -144,7 +148,11 @@ $$
 
 ---
 
+layout: true
+
 # Randomly permuting arrays
+
+---
 
 * A common requirement in randomized algorithms is to find a random
   permutation of an input array
@@ -155,32 +163,33 @@ $$
 .algorithm[
 .name[`PERMUTE-BY-SORTING(A)`]
 n = length(A)
-let $P$[1,,,,n] be a new array
+let P[1, ..., n] be a new array
 __for__ (i = 1, ..., n) {
     P[i] = RANDOM(1, M)
 }
 sort A, using P as sort keys
 ]
 
-
 * Here $M$ should large enough that the possibility of keys being
   duplicated is small
+--
 
-* Exercise: Show that `PERMUTE-BY-SORTING` produces a uniform random
-  permutation of the input, assuming that all key values are distinct
+* Exercise: 
+
+	- Assume that all key values are distinct 
+	- Show that `PERMUTE-BY-SORTING` produces a uniform random permutation of the input
 
 
 ---
-
-# Randomly permuting arrays
 
 * The runtime for `PERMUTE-BY-SORTING` will be $\Omega(n \log_2 n)$ if we
   use a comparison sort
 
 * A better method for generating a random permutation is to permute the
   given array in place
+--
   
-* The procedure `RANDOMIZE-IN-PLACE` does so in $\Theta(n)$ time
+* The following algorithm does so in $\Theta(n)$ time
 
 .algorithm[
 .name[`RANDOMIZE-IN-PLACE(A)`]
@@ -197,8 +206,6 @@ __for__ (i = 1, ..., n) {
 
 ---
 
-# Randomly permuting arrays
-
 * Procedure `RANDOMIZE-IN-PLACE` computes a uniform random permutation
 
 * We prove this using the following loop invariant
@@ -207,6 +214,7 @@ __for__ (i = 1, ..., n) {
 	> possible $(i-1)$-permutation of the $n$ elements, the subarray
 	> $A[1,...,i-1]$ contains this $(i-1)$-permutation with
 	> probability $(n-i+1)!/n!$.\
+--	
 
 ### Initialization
 
@@ -217,8 +225,6 @@ __for__ (i = 1, ..., n) {
 
 
 ---
-
-# Randomly permuting arrays
 
 ### Maintenance 
 
@@ -239,7 +245,7 @@ permutation
   &=& \frac{1}{n-k+1} \times \frac{(n-k+1)!}{n!} = \frac{(n-k)!}{n!}
 \end{eqnarray*}
 </div>
-
+--
 
 ### Termination
 
@@ -247,6 +253,8 @@ permutation
 
 
 ---
+
+layout: false
 
 # Further topics
 
