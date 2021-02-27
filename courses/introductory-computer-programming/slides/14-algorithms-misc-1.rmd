@@ -71,15 +71,19 @@ plotBinaryTree <- function(d, pch = 16, ..., gp.text = list(cex = 2), newpage = 
     with(d, grid.points(x[keep], y[keep], pch = pch, gp = gpar(...)))
 	## add text if any
 	if (!is.null(d$values)) 
-	    with(d, grid.text(values[keep], x[keep], y[keep], 
+	    with(d, grid.text(parse(text = values[keep]), x[keep], y[keep], 
 		                  gp = do.call(gpar, gp.text), default.units = "native"))
 	popViewport()
 }
 ## fake binary tree by putting NA values for missing nodes in a heap
-h <- heap_graph(15, values = c("1 ≤ 2", 
-                               "2 ≤ 3", "1 ≤ 3",
-							   "( 1, 2, 3 )", "1 ≤ 3", "( 2, 1, 3 )", "2 ≤ 3", 
-							   NA, NA, "( 1, 3, 2 )", "( 3, 1 ,2 )", NA, NA, "( 2, 3, 1)", "( 3, 2, 1 )"))
+#h <- heap_graph(15, values = c("1 ≤ 2", 
+#                               "2 ≤ 3", "1 ≤ 3",
+#							   "( 1, 2, 3 )", "1 ≤ 3", "( 2, 1, 3 )", "2 ≤ 3", 
+#							   NA, NA, "( 1, 3, 2 )", "( 3, 1 ,2 )", NA, NA, "( 2, 3, 1)", "( 3, 2, 1 )"))
+h <- heap_graph(15, values = c("1 <= 2", 
+                               "2 <= 3", "1 <= 3",
+							   "'( 1, 2, 3 )'", "1 <= 3", "'( 2, 1, 3 )'", "2 <= 3", 
+							   NA, NA, "'( 1, 3, 2 )'", "'( 3, 1 ,2 )'", NA, NA, "'( 2, 3, 1)'", "'( 3, 2, 1 )'"))
 cols <- rep("black", 11)
 cols[c(4, 6, 8:11)] <- "transparent"
 textCols <- ifelse(cols == "black", "black", "royalblue")
@@ -100,8 +104,7 @@ plotBinaryTree(h, cex = 10, pch = 21, fill = "white", col = cols,
 
 * Comparisons needed to reach a particular leaf: length of the path
   from the root node
-
-. . .
+--
 
 * The worst case number of comparisons is the height of the binary
   tree (longest path)
@@ -134,9 +137,7 @@ $$
 	* Counting sort
 	
 	* Radix sort
-
-. . .
-
+--
 
 * Details left for a second semester project
 
