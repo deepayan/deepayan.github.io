@@ -1,20 +1,86 @@
 
+// Include something like the following in your HTML
+
+// <canvas height=400 width=400 id="scribbler"
+//     style="position: fixed; background: transparent; z-index: -1;">
+// </canvas>
+
+// - Customize z-index value below if needed: the canvas needs be on top when active
+//
+// - This code only handles drag events. 
+//
+// - The safest way to do this is to add event listeners to the window
+// - element. But this effectively disables other handlers (like text
+// - selection). use [de]activateScribbler() to choose
+
+
 // global variables
 
 var gcontext; // graphics context
 
-var gdrag = { // draw on mouse movement when gdrag.on is true
-    on: false, 
-    startx: undefined,
-    starty: undefined,
+var gdrag = {
+    // settings
+    cid: "scribbler",   // id - must match canvas id in HTML
+    method: "scribble", // "none" / "highlight"
+    zindex: "3",        // "3" works with remark.js
+    active: false,      // whether active; needed to toggle
+    // state variables
+    on: false,          // drag in progress
+    startx: undefined,  // start event position (x)
+    starty: undefined,  // start event position (y)
 };
+
+
+// FIXME: Need UI to control
 
 var gpar = {
     stroke: "blue",
     lwd: 2
 };
 
-// Only scribbling currently supported.
+function handleKeyDown(e) {
+    if (e.code == "Escape") // toggle scribbler
+    {
+	if (gdrag.active) 
+	    deactivateScribbler();
+	else
+	    activateScribbler();
+    }
+}
+
+function activateScribbler() // add event handlers
+{
+    var ltarget = window; // or something else ?
+    // ltarget.addEventListener("mousewheel", on_wheel, false);
+    ltarget.addEventListener("mousedown", on_mousedown, false);
+    ltarget.addEventListener("mouseup", on_mouseup, false);
+    ltarget.addEventListener("mousemove", on_mousemove, false);
+    // ltarget.addEventListener("click", on_click, false);
+    // touch events for tablets/mobile
+    ltarget.addEventListener("touchstart", handleTouch, true);
+    ltarget.addEventListener("touchmove", handleTouch, true);
+    ltarget.addEventListener("touchend", handleTouch, true);
+    document.getElementById(gdrag.cid).style.zIndex = gdrag.zindex;
+    gdrag.active = true;
+    console.log("scribbler activated"); // FIXME: use visual indicator
+}
+
+function deactivateScribbler() // add event handlers
+{
+    var ltarget = window;
+    ltarget.removeEventListener("mousedown", on_mousedown, false);
+    ltarget.removeEventListener("mouseup", on_mouseup, false);
+    ltarget.removeEventListener("mousemove", on_mousemove, false);
+    ltarget.removeEventListener("touchstart", handleTouch, true);
+    ltarget.removeEventListener("touchmove", handleTouch, true);
+    ltarget.removeEventListener("touchend", handleTouch, true);
+    document.getElementById(gdrag.cid).style.zIndex = "-1";
+    gdrag.active = false;
+    console.log("scribbler deactivated"); // FIXME: use visual indicator
+}
+
+// Only scribbling currently supported. Easy to add: highlight by
+// semi-transparent rectangle.
 
 // Strategy: just draw segments whenever mouse drags (i.e., moves
 // while mouse is down). A more sophisticated version could try to
@@ -36,20 +102,15 @@ function drawSegment(x0, y0, x1, y1)
 function setup() // add event handlers
 {
     // var cookie_id = getKeyValue("gid="); // cookie or url
-    var mycanvas = document.getElementById('mycanvas');
-    // this part should run when window is resized
+    var mycanvas = document.getElementById(gdrag.cid);
+    // this part should run again when window is resized
     mycanvas.width = window.innerWidth;
     mycanvas.height = window.innerHeight;
     gcontext = mycanvas.getContext('2d'); // global
-    // mycanvas.addEventListener("mousewheel", on_wheel, false);
-    mycanvas.addEventListener("mousedown", on_mousedown, false);
-    mycanvas.addEventListener("mouseup", on_mouseup, false);
-    mycanvas.addEventListener("mousemove", on_mousemove, false);
-    // mycanvas.addEventListener("click", on_click, false);
-    // touch events for tablets/mobile
-    mycanvas.addEventListener("touchstart", handleTouch, true);
-    mycanvas.addEventListener("touchmove", handleTouch, true);
-    mycanvas.addEventListener("touchend", handleTouch, true);
+    // set event handlers
+    // activateScribbler();
+    // deactivateScribbler();
+    document.addEventListener('keydown', handleKeyDown);
 }
 
 // Maybe do this only if nothing has been drawn. We can always reload
@@ -57,8 +118,8 @@ function setup() // add event handlers
 
 function reset() // desructively resize canvas (called when window is resized)
 {
-    log("reset");
-    var mycanvas = document.getElementById('mycanvas');
+    // log("reset");
+    var mycanvas = document.getElementById(gdrag.cid);
     // this part should run when window is resized
     mycanvas.width = window.innerWidth;
     mycanvas.height = window.innerHeight;
