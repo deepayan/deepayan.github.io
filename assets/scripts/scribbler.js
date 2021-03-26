@@ -24,6 +24,8 @@ var gdrag = {
     method: "scribble", // "none" / "highlight"
     zindex: "3",        // "3" works with remark.js
     active: false,      // whether active; needed to toggle
+    toggleCode: "Escape",
+    clearCode: "KeyQ",
     // state variables
     on: false,          // drag in progress
     startx: undefined,  // start event position (x)
@@ -39,13 +41,19 @@ var gpar = {
 };
 
 function handleKeyDown(e) {
-    if (e.code == "Escape") // toggle scribbler
+    if (e.code == gdrag.toggleCode) // toggle scribbler
     {
 	if (gdrag.active) 
 	    deactivateScribbler();
 	else
 	    activateScribbler();
     }
+    else if (e.code == gdrag.clearCode) // clear scribbler
+    {
+	clearScribbler();
+    }
+    // else console.log(e.code);
+    return;
 }
 
 function activateScribbler() // add event handlers
@@ -65,7 +73,10 @@ function activateScribbler() // add event handlers
     console.log("scribbler activated"); // FIXME: use visual indicator
 }
 
-function deactivateScribbler() // add event handlers
+// remove handlers (o.w. keeps drawing) and also change change z-index
+// (o.w. loses default selection behaviour)
+
+function deactivateScribbler()
 {
     var ltarget = window;
     ltarget.removeEventListener("mousedown", on_mousedown, false);
@@ -78,6 +89,12 @@ function deactivateScribbler() // add event handlers
     gdrag.active = false;
     console.log("scribbler deactivated"); // FIXME: use visual indicator
 }
+
+function clearScribbler()
+{
+    gcontext.clearRect(0, 0, gcontext.canvas.width, gcontext.canvas.height);
+}
+
 
 // Only scribbling currently supported. Easy to add: highlight by
 // semi-transparent rectangle.
