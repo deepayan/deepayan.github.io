@@ -4,7 +4,9 @@ author: Deepayan Sarkar
 ---
 
 
-Some (fairly outdated) analysis of the ongoing COVID-19 pandemic:
+Some analysis of the ongoing COVID-19 pandemic. Most are now outdated.
+
+- [Growth of COVID-19 Infections in India](covid-19/increment-ratio.html)
 
 - [How the doubling times of cases (and deaths) have changed over time](covid-19/doubling.html)
 
