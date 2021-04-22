@@ -5,6 +5,24 @@ author: Deepayan Sarkar
 mathjax: true
 ---
 
+# Background
+
+* Trying to measure growth rate rather than absolute number of cases
+
+* The usual motivations:
+
+	- Want something that can be compared across time and location
+	
+	- Something that should not depend on degree of systematic under-reporting
+
+	- Something that should not be overly affected by daily fluctuations and patterns
+
+
+* Measure used: number of new cases in _last seven days_ divided by number in _previous seven days_ 
+
+* Anything higher than 1 is bad on a sustained basis, but more than 2 is _really_ bad
+
+
 
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
 library(knitr)
@@ -24,24 +42,7 @@ ct$axis.line$col <- "grey50"
 lattice.options(default.theme = ct, default.args = list(as.table = TRUE))
 ```
 
----
 
-# Background
-
-* Trying to measure growth rate rather than absolute number of cases
-
-* The usual motivations:
-
-	- Want something that can be compared across time and location
-	
-	- Something that should not depend on degree of systematic under-reporting
-
-	- Something that should not be overly affected by daily fluctuations and patterns
-
-
-* Measure used: number of new cases in _last seven days_ divided by number in _previous seven days_ 
-
-* Anything higher than 1 is bad on a sustained basis, but more than 2 is _really_ bad
 
 
 ```{r}
