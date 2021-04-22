@@ -47,7 +47,8 @@ cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
     tail(increments, -lag) / head(increments, -lag)
 }
 
-## plot for subsets:
+
+## India-specific functions: assumes data in format provided by covid19india.org
 
 getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FALSE)
 {
@@ -72,6 +73,51 @@ getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FAL
 
 prepanelq <- function(x, y, ...) list(ylim = quantile(y, c(0, 0.99), na.rm = TRUE))
 
+
+## divide cases (only) into urban / rural based on top districts as on March 1
+
+getRatioUR <- function(data, state = "West Bengal",
+                       districts = "",
+                       cutoff.date = "2021-03-01",
+                       cutoff.pc = 50,
+                       cutoff.count,
+                       lag = 7, smooth = FALSE)
+{
+    dsub <- subset(data, State == state)
+    dcutoff <- subset(dsub, Date == cutoff.date)
+    if (any(duplicated(dcutoff$District)))
+        stop("duplicate districts, check code")
+    if (missing(districts))
+    {
+        ## identify 'urban' districts that have highest
+        conf <- dcutoff$Confirmed
+        o <- order(conf, decreasing = TRUE)
+        if (missing(cutoff.count))
+        {
+            ## choose top districts that cumulatively exceed 'cutoff.pc' percent of cases
+            cpc <- 100 * cumsum(conf[o]) / sum(conf)
+            cutoff.count <- which(cpc > cutoff.pc)[1]
+        }
+        districts <- head(dcutoff$District[o], cutoff.count)
+        message(paste(districts, collapse = " / "))
+    }
+
+    ## aggregate over state / district. TODO: Similar function where
+    ## state total is broken up into those from specified districts,
+    ## and the rest
+    durban <- subset(dsub, District %in% districts)
+    drural <- subset(dsub, !(District %in% districts))
+    where <- state
+    ## Now get one number per date: use dplyr?
+    curban <- with(durban, tapply(Confirmed, Date, sum))
+    crural <- with(drural, tapply(Confirmed, Date, sum))
+    data.frame(where = where,
+               rurban = cum2ratio(curban, lag = lag, smooth = smooth),
+               rrural = cum2ratio(crural, lag = lag, smooth = smooth),
+               turban = tail(curban, 1),
+               trural = tail(crural, 1),
+               date = tail(sort(unique(dsub$Date)), -lag))
+}
 
 
 

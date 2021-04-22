@@ -27,15 +27,15 @@ mathjax: true
 ```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
 library(knitr)
 opts_chunk$set(cache = FALSE, autodep = TRUE,
-               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               comment = "", warning = TRUE, message = FALSE, prompt = FALSE,
                dev.args = list(pointsize = 16), echo = FALSE,
                fig.width = 15, fig.height = 8, dpi = 96, fig.path='figures/incratio-')
 options(warnPartialMatchDollar = FALSE, width = 100)
 library(lattice)
 library(RColorBrewer)
 library(latticeExtra)
-bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
-ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+bdark <- RColorBrewer::brewer.pal(n = 8, name = "Dark2")
+ct <- custom.theme(symbol = bdark, fill = adjustcolor(bdark, alpha.f = 0.5))
 ct$strip.background$col <- "grey90"
 ct$strip.border$col <- "grey50"
 ct$axis.line$col <- "grey50"
@@ -46,7 +46,7 @@ lattice.options(default.theme = ct, default.args = list(as.table = TRUE))
 
 
 ```{r}
-source("tregularize.R")
+## source("tregularize.R")
 source("covid-utils.R")
 TARGET <- "districts.csv"
 ## To download the latest version, delete the file and run again
@@ -176,5 +176,173 @@ if (N > 12) {
 if (N > 18) {
     p[19:N]
 }
+```
+
+---
+
+layout: false
+
+# All election states have seen a surge
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+rbind(getRatio(dall, "Assam", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "Kerala", lag = LAG, smooth = LAMBDA),
+      ## getRatio(dall, "Puducherry", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
+         xyplot(x = rcases ~ date | where, 
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ylim = extendrange(c(0, 3)),
+                prepanel = prepanelq,
+                layout = c(NA, 2),
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
+---
+
+# Urban vs Rural
+
+- In many states, COVID numbers were dominated by urban areas
+
+- Has the pattern of growth been similar in urban vs rural?
+
+- Has the pattern changed, especially due to the elections in March and April?
+
+- In the following plots, "urban" districts are those within a state
+  that cumulatively accounted for more than 50% of cases till March 1
+
+---
+
+# West Bengal
+
+- Urban = Kolkata / North 24 Parganas / South 24 Parganas
+
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+getRatioUR(dall, "West Bengal", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
+    xyplot(x = rurban + rrural ~ date, # main = "West Bengal",
+           auto.key = list(lines = TRUE, points = FALSE, columns = 2,
+                           text = c("Urban", "Rural")),
+           ylab = "Ratio of last two 1-week increments in confirmed cases",
+           ylim = extendrange(c(0, 3)),
+           prepanel = prepanelq,
+           panel = function(...) {
+               panel.abline(v = as.Date(c("2020-08-01", "2021-03-01")), 
+                            col = "grey50", lwd = 3)
+               panel.xyplot(...)
+               panel.text(x = as.Date(c("2020-08-01", "2021-03-01")) + 2,
+                          y = 2,
+                          labels = c("Unlock 3.0",
+                                     "Election dates announced"),
+                          col = "grey50", lwd = 3, srt = 90, pos = 1)
+           },
+           abline = list(h = 1, lwd = 2, col = "grey"),
+           type = "o", pch = ".", cex = 2, grid = TRUE)
+```
+
+---
+
+# Tamil Nadu 
+
+- Urban = Chennai / Coimbatore / Chengalpattu / Thiruvallur / Salem / Kancheepuram
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+getRatioUR(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
+    xyplot(x = rurban + rrural ~ date, # main = "Tamil Nadu",
+           auto.key = list(lines = TRUE, points = FALSE, columns = 2,
+                           text = c("Urban", "Rural")),
+           ylab = "Ratio of last two 1-week increments in confirmed cases",
+           ylim = extendrange(c(0, 3)),
+           prepanel = prepanelq,
+           panel = function(...) {
+               panel.abline(v = as.Date(c("2020-08-01", "2021-03-01")), 
+                            col = "grey50", lwd = 3)
+               panel.xyplot(...)
+               panel.text(x = as.Date(c("2020-08-01", "2021-03-01")) + 2,
+                          y = 2,
+                          labels = c("Unlock 3.0",
+                                     "Election dates announced"),
+                          col = "grey50", lwd = 3, srt = 90, pos = 1)
+           },
+           abline = list(h = 1, lwd = 2, col = "grey"),
+           type = "o", pch = ".", cex = 2, grid = TRUE)
+```
+
+
+---
+
+# Kerala
+
+Urban = Ernakulam / Kozhikode / Malappuram / Thiruvananthapuram / Thrissur
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+getRatioUR(dall, "Kerala", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
+    xyplot(x = rurban + rrural ~ date, # main = "Kerala",
+           auto.key = list(lines = TRUE, points = FALSE, columns = 2,
+                           text = c("Urban", "Rural")),
+           ylab = "Ratio of last two 1-week increments in confirmed cases",
+           ylim = extendrange(c(0, 3)),
+           prepanel = prepanelq,
+           panel = function(...) {
+               panel.abline(v = as.Date(c("2020-08-01", "2021-03-01")), 
+                            col = "grey50", lwd = 3)
+               panel.xyplot(...)
+               panel.text(x = as.Date(c("2020-08-01", "2021-03-01")) + 2,
+                          y = 2,
+                          labels = c("Unlock 3.0",
+                                     "Election dates announced"),
+                          col = "grey50", lwd = 3, srt = 90, pos = 1)
+           },
+           abline = list(h = 1, lwd = 2, col = "grey"),
+           type = "o", pch = ".", cex = 2, grid = TRUE)
+```
+
+---
+
+# Maharashtra
+
+Urban = Pune / Mumbai / Thane / Nagpur
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+getRatioUR(dall, "Maharashtra", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
+    xyplot(x = rurban + rrural ~ date, # main = "Maharashtra",
+           auto.key = list(lines = TRUE, points = FALSE, columns = 2,
+                           text = c("Urban", "Rural")),
+           ylab = "Ratio of last two 1-week increments in confirmed cases",
+           ylim = extendrange(c(0, 3)),
+           prepanel = prepanelq,
+           abline = list(h = 1, lwd = 2, col = "grey"),
+           type = "o", pch = ".", cex = 2, grid = TRUE)
+```
+
+---
+
+# Karnataka
+
+Urban = Bengaluru Urban / Mysuru / Ballari
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+getRatioUR(dall, "Karnataka", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
+    xyplot(x = rurban + rrural ~ date, # main = "Karnataka",
+           auto.key = list(lines = TRUE, points = FALSE, columns = 2,
+                           text = c("Urban", "Rural")),
+           ylab = "Ratio of last two 1-week increments in confirmed cases",
+           ylim = extendrange(c(0, 3)),
+           prepanel = prepanelq,
+           abline = list(h = 1, lwd = 2, col = "grey"),
+           type = "o", pch = ".", cex = 2, grid = TRUE)
 ```
 
