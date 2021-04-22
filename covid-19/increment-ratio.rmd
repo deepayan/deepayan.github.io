@@ -59,7 +59,6 @@ dall <-
     {
         Date  <- as.Date(Date)
     })
-
 ```
 
 ---
@@ -97,6 +96,7 @@ rbind(getRatio(dall, "Delhi", lag = LAG, smooth = LAMBDA),
                 ylab = "Ratio of last two 1-week increments in confirmed cases",
                 ## ylim = extendrange(c(0, 3)),
                 prepanel = prepanelq,
+                layout = c(NA, 2),
                 abline = list(h = 1, lwd = 2, col = "grey"),
                 type = "l", pch = 16, grid = TRUE)
 ```
@@ -119,14 +119,14 @@ latestRatio <- function(s, min.cases = 100)
 states <- unique(dall$State)
 rstates <- as.data.frame(t(sapply(states, latestRatio)))
 names(rstates) <- c("Current", "One week ago")
-kable(rstates[ order(rstates$current, decreasing = TRUE), ])
+kable(rstates[ order(rstates$Current, decreasing = TRUE), ])
 ```
 
 ]
 
 
 ```{r}
-states <- rownames(rstates)[is.finite(rstates$current)]
+states <- rownames(rstates)[is.finite(rstates$Current)]
 states <- setdiff(states, c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))
 LAMBDA <- FALSE
 LAG <- 7
