@@ -63,7 +63,7 @@ dall <-
 
 ---
 
-# Delhi, Mumbai, Kolkata, Bengaluru
+# Cities: Bengaluru, Chennai, Delhi, Kolkata, Mumbai
 
 
 ```{r}
@@ -83,7 +83,7 @@ rbind(getRatio(dall, district = "Delhi", lag = LAG),
 
 ---
 
-# Delhi, Maharashtra, Karnataka, West Bengal
+# States: Delhi, Karnataka, Maharashtra, West Bengal
 
 ```{r}
 LAMBDA <- FALSE
@@ -216,14 +216,13 @@ rbind(getRatio(dall, "Assam", lag = LAG, smooth = LAMBDA),
 
 # West Bengal
 
-- Urban = Kolkata / North 24 Parganas / South 24 Parganas
-
 
 ```{r}
 LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "West Bengal", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "West Bengal",
+           main = "Urban = Kolkata / North 24 Parganas / South 24 Parganas",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
            ylab = "Ratio of last two 1-week increments in confirmed cases",
@@ -247,13 +246,14 @@ getRatioUR(dall, "West Bengal", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
 
 # Tamil Nadu 
 
-- Urban = Chennai / Coimbatore / Chengalpattu / Thiruvallur / Salem / Kancheepuram
+
 
 ```{r}
 LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Tamil Nadu",
+           main = "Urban = Chennai / Coimbatore / Chengalpattu / Thiruvallur / Salem / Kancheepuram",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
            ylab = "Ratio of last two 1-week increments in confirmed cases",
@@ -278,13 +278,14 @@ getRatioUR(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
 
 # Kerala
 
-Urban = Ernakulam / Kozhikode / Malappuram / Thiruvananthapuram / Thrissur
+
 
 ```{r}
 LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Kerala", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Kerala",
+           main = "Urban = Ernakulam / Kozhikode / Malappuram / Thiruvananthapuram / Thrissur",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
            ylab = "Ratio of last two 1-week increments in confirmed cases",
@@ -308,13 +309,14 @@ getRatioUR(dall, "Kerala", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
 
 # Maharashtra
 
-Urban = Pune / Mumbai / Thane / Nagpur
+
 
 ```{r}
 LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Maharashtra", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Maharashtra",
+           main = "Urban = Pune / Mumbai / Thane / Nagpur",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
            ylab = "Ratio of last two 1-week increments in confirmed cases",
@@ -328,13 +330,14 @@ getRatioUR(dall, "Maharashtra", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
 
 # Karnataka
 
-Urban = Bengaluru Urban / Mysuru / Ballari
+
 
 ```{r}
 LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Karnataka", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Karnataka",
+           main = "Urban = Bengaluru Urban / Mysuru / Ballari",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
            ylab = "Ratio of last two 1-week increments in confirmed cases",
