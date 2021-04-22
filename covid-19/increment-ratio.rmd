@@ -1,0 +1,181 @@
+---
+layout: remark
+title: Measuring How Fast COVID Infections are Spreading in India
+author: Deepayan Sarkar
+mathjax: true
+---
+
+class: center middle
+
+# Measuring How Fast COVID Infections are Spreading in India
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+library(knitr)
+opts_chunk$set(cache = FALSE, autodep = TRUE,
+               comment = "", warning = TRUE, message = TRUE, prompt = FALSE,
+               dev.args = list(pointsize = 16), echo = FALSE,
+               fig.width = 15, fig.height = 9, dpi = 96, fig.path='figures/incratio-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+library(lattice)
+library(RColorBrewer)
+library(latticeExtra)
+bpaired <- RColorBrewer::brewer.pal(n = 12, name = "Paired")
+ct <- custom.theme(symbol = bpaired[c(FALSE, TRUE)], fill = bpaired[c(TRUE, FALSE)])
+ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
+lattice.options(default.theme = ct, default.args = list(as.table = TRUE))
+```
+
+---
+
+# Background
+
+* Trying to measure growth rate rather than absolute number of cases
+
+* The usual motivations:
+
+	- Want something that can be compared across time and location
+	
+	- Something that should not depend on degree of systematic under-reporting
+
+	- Somthing that should not be affected by daily fluctuations and patterns
+
+
+* Measure used: number of new cases in _last seven days_ divided by number in _previous seven days_ 
+
+
+```{r}
+source("tregularize.R")
+source("covid-utils.R")
+TARGET <- "districts.csv"
+## To download the latest version, delete the file and run again
+if (!file.exists(TARGET))
+    download.file("https://api.covid19india.org/csv/latest/districts.csv",
+                  destfile = TARGET)
+dall <- read.csv(TARGET)
+dall <-
+    within(dall,
+    {
+        Date  <- as.Date(Date)
+    })
+
+```
+
+---
+
+# Delhi, Mumbai, Kolkata, Bengaluru
+
+
+```{r}
+LAMBDA <- 0
+LAG <- 7
+rbind(getRatio(dall, district = "Delhi", lag = LAG),
+      getRatio(dall, district = "Mumbai", lag = LAG),
+      getRatio(dall, district = "Chennai", lag = LAG),
+      getRatio(dall, district = "Bengaluru Urban", lag = LAG),
+      getRatio(dall, district = "Kolkata", lag = LAG)) |>
+         xyplot(x = rcases ~ date | where, 
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ylim = extendrange(c(0, 3)), ## prepanel = prepanelq,
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
+---
+
+## Delhi, Maharashtra, Karnataka, West Bengal
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+rbind(getRatio(dall, "Delhi", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "Maharashtra", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "Karnataka", lag = LAG, smooth = LAMBDA),
+      getRatio(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
+         xyplot(x = rcases ~ date | where, 
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ## ylim = extendrange(c(0, 3)),
+                prepanel = prepanelq,
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
+
+---
+
+# Current growth rates by state
+
+.scrollable500[
+
+```{r}
+LAMBDA <- FALSE
+LAG <- 7
+latestRatio <- function(s, min.cases = 100)
+{
+    r <- getRatio(dall, state = s, lag = LAG, smooth = LAMBDA)
+    round(rev(r$rcases)[c(1, 8)], 2)
+}
+states <- unique(dall$State)
+rstates <- as.data.frame(t(sapply(states, latestRatio)))
+names(rstates) <- c("current", "last_week")
+kable(rstates[ order(rstates$current, decreasing = TRUE), ])
+```
+
+]
+
+
+```{r}
+states <- rownames(rstates)[is.finite(rstates$current)]
+states <- setdiff(states, c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))
+LAMBDA <- FALSE
+LAG <- 7
+slist <- lapply(sort(states),
+                function(s) getRatio(dall, s, lag = LAG, smooth = LAMBDA))
+sdf <- do.call(rbind, slist)
+p <- xyplot(x = rcases ~ date | where, data = sdf, subset = total >= 1e5,
+            ylab = "Ratio of last two 1-week increments in confirmed cases",
+            ylim = extendrange(c(0, 3)),
+            prepanel = prepanelq,
+            abline = list(h = 1, lwd = 2, col = "grey"),
+            type = "l", pch = 16, grid = TRUE)
+N <- dim(p)
+```
+
+---
+
+layout: true
+
+# All other states with at least 100000 confirmed cases
+
+---
+
+```{r}
+if (N > 6) p[1:6] else p
+```
+
+---
+
+```{r}
+if (N > 6) {
+    if (N > 12) p[7:12] else p[7:N]
+}
+```
+
+---
+
+```{r}
+if (N > 12) {
+    if (N > 18) p[13:18] else p[13:N]
+}
+```
+
+---
+
+```{r}
+if (N > 18) {
+    p[19:N]
+}
+```
+

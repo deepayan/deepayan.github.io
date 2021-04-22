@@ -37,3 +37,43 @@ doubling.ts <- function(region, d, min = 50, start = as.Date("2020-01-22"))
 }
 
 
+cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
+{
+    if (smooth)
+    {
+        x <- exp(tsmoothTS(log(x), lambda = smooth))
+    }
+    increments <- c(rep(NA, lag), diff(x, lag = lag))
+    tail(increments, -lag) / head(increments, -lag)
+}
+
+## plot for subsets:
+
+getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FALSE)
+{
+    ## aggregate over state / district. TODO: Similar function where
+    ## state total is broken up into those from specified districts,
+    ## and the rest
+    dsub <- if (missing(district)) subset(data, State == state)
+            else if (missing(state)) subset(data, District == district)
+            else subset(data, State == state & District == district)
+    where <- if (missing(district)) state
+             else if (missing(state)) district
+             else paste(state, district, sep = " / ")
+    ## Now get one number per date: use dplyr?
+    confirmed <- with(dsub, tapply(Confirmed, Date, sum))
+    deaths <- with(dsub, tapply(Deceased, Date, sum))
+    data.frame(where = where,
+               rcases = cum2ratio(confirmed, lag = lag, smooth = smooth),
+               rdeaths = cum2ratio(deaths, lag = lag, smooth = smooth),
+               total = tail(confirmed, 1),
+               date = tail(sort(unique(dsub$Date)), -lag))
+}
+
+prepanelq <- function(x, y, ...) list(ylim = quantile(y, c(0, 0.99), na.rm = TRUE))
+
+
+
+
+
+
