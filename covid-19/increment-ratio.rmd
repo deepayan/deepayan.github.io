@@ -134,13 +134,13 @@ kable(rstates[ order(rstates[[3]], decreasing = TRUE), ])
 
 ```{r}
 states <- rownames(rstates)[is.finite(rstates[[1]])]
-states <- setdiff(states, c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))
 LAMBDA <- FALSE
 LAG <- 7
 slist <- lapply(sort(states),
-                function(s) getRatio(dall, s, lag = LAG, smooth = LAMBDA))
+                function(s) getRatio(dall, s, lag = LAG, smooth = LAMBDA, death.lag = 7))
 sdf <- do.call(rbind, slist)
-p <- xyplot(x = rcases ~ date | where, data = sdf, subset = total >= 1e5,
+p <- xyplot(x = rcases ~ date | where, data = sdf,
+            subset = total >= 1e5 & !(where %in% c("Delhi", "Maharashtra", "Karnataka", "West Bengal")),
             ylab = "Ratio of last two 1-week increments in confirmed cases",
             ylim = extendrange(c(0, 3)),
             prepanel = prepanelq,
@@ -353,4 +353,48 @@ getRatioUR(dall, "Karnataka", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
            abline = list(h = 1, lwd = 2, col = "grey"),
            type = "o", pch = ".", cex = 2, grid = TRUE)
 ```
+
+---
+
+# Data quality: estimating death rate
+
+- Kerala and Karnataka seem not to have controlled their growth
+
+- In contrast, most North Indian states seem to be "improving" despite no obvious explanation
+
+- Could this be due to under-reporting, whether due to strain on
+  testing infrastructure or other reasons?
+
+- One way to indirectly check this is to look at deaths vs cases
+
+- The premise is that deaths will be reported more reliably than cases
+
+- To account for lag, we compare new deaths in a 7-day window with new
+  cases in the previous 7-day window
+
+- Unfortunately, this only shows that data quality has been inconsistent
+  throughout in most states
+
+---
+
+# Death rate (with 7-day lag) 
+
+
+```{r}
+pd <- xyplot(x = I(ideaths / icases.lagged) ~ date | where, data = sdf,
+            subset = total >= 1e5 & date > as.Date("2020-08-01"),
+            ylab = "Ratio of new deaths (over 7 days) and new cases (over previous 7 days)",
+            ylim = extendrange(c(0, 0.05)),
+            prepanel = prepanelq,
+            ## abline = list(h = 1, lwd = 2, col = "grey"),
+            type = "l", pch = 16, grid = TRUE)
+N <- dim(pd)
+if (N > 21) message("N > 21, adjust next plot")
+```
+
+
+```{r}
+pd[1:21]
+```
+
 

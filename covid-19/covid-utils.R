@@ -53,7 +53,9 @@ cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
 
 ## India-specific functions: assumes data in format provided by covid19india.org
 
-getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FALSE)
+getRatio <- function(data, state = "Delhi", district = "",
+                     death.lag = 7,
+                     lag = 1, smooth = FALSE)
 {
     ## aggregate over state / district. TODO: Similar function where
     ## state total is broken up into those from specified districts,
@@ -70,6 +72,9 @@ getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FAL
     data.frame(where = where,
                icases = cum2increments(confirmed, lag = lag, smooth = smooth),
                ideaths = cum2increments(deaths, lag = lag, smooth = smooth),
+               icases.lagged = c(rep(NA, death.lag),
+                                 cum2increments(head(confirmed, -death.lag),
+                                                lag = lag, smooth = smooth)),
                rcases = cum2ratio(confirmed, lag = lag, smooth = smooth),
                rdeaths = cum2ratio(deaths, lag = lag, smooth = smooth),
                total = tail(confirmed, 1),
