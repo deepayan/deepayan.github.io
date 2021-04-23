@@ -118,19 +118,22 @@ LAG <- 7
 latestRatio <- function(s, min.cases = 100)
 {
     r <- getRatio(dall, state = s, lag = LAG, smooth = LAMBDA)
-    round(rev(r$rcases)[c(1, 8)], 2)
+    c(round(rev(r$rcases)[c(1, 8)], 2),
+      rev(r$icases)[c(1, 8)])
 }
 states <- unique(dall$State)
 rstates <- as.data.frame(t(sapply(states, latestRatio)))
-names(rstates) <- c("Current", "One week ago")
-kable(rstates[ order(rstates$Current, decreasing = TRUE), ])
+names(rstates) <-
+    c("Current Rate", "Rate One week ago",
+      "Cases in last 7 days", "Cases in previous 7 days")
+kable(rstates[ order(rstates[[3]], decreasing = TRUE), ])
 ```
 
 ]
 
 
 ```{r}
-states <- rownames(rstates)[is.finite(rstates$Current)]
+states <- rownames(rstates)[is.finite(rstates[[1]])]
 states <- setdiff(states, c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))
 LAMBDA <- FALSE
 LAG <- 7

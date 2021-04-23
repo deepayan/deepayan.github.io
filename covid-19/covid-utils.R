@@ -36,17 +36,20 @@ doubling.ts <- function(region, d, min = 50, start = as.Date("2020-01-22"))
     data.frame(region = region, date = t, tdouble = td)
 }
 
-
-cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
+cum2increments <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
 {
     if (smooth)
     {
         x <- exp(tsmoothTS(log(x), lambda = smooth))
     }
-    increments <- c(rep(NA, lag), diff(x, lag = lag))
-    tail(increments, -lag) / head(increments, -lag)
+    diff(x, lag = lag)
 }
 
+cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
+{
+    increments <- c(rep(NA, lag), cum2increments(x, lag = lag, smooth = smooth))
+    tail(increments, -lag) / head(increments, -lag)
+}
 
 ## India-specific functions: assumes data in format provided by covid19india.org
 
@@ -65,6 +68,8 @@ getRatio <- function(data, state = "Delhi", district = "", lag = 1, smooth = FAL
     confirmed <- with(dsub, tapply(Confirmed, Date, sum))
     deaths <- with(dsub, tapply(Deceased, Date, sum))
     data.frame(where = where,
+               icases = cum2increments(confirmed, lag = lag, smooth = smooth),
+               ideaths = cum2increments(deaths, lag = lag, smooth = smooth),
                rcases = cum2ratio(confirmed, lag = lag, smooth = smooth),
                rdeaths = cum2ratio(deaths, lag = lag, smooth = smooth),
                total = tail(confirmed, 1),
