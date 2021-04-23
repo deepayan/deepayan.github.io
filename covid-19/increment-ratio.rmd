@@ -62,7 +62,7 @@ dall <-
 ```
 
 
-Updated: `r {max(dall$Date)}`
+[ Updated: `r {max(dall$Date)}` ]
 
 
 ---
