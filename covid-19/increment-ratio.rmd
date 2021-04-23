@@ -61,6 +61,10 @@ dall <-
     })
 ```
 
+
+Updated: `r {max(dall$Date)}`
+
+
 ---
 
 # Cities: Bengaluru, Chennai, Delhi, Kolkata, Mumbai
