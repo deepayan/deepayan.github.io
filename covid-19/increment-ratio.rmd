@@ -80,7 +80,7 @@ rbind(getRatio(dall, district = "Delhi", lag = LAG),
       getRatio(dall, district = "Chennai", lag = LAG),
       getRatio(dall, district = "Bengaluru Urban", lag = LAG),
       getRatio(dall, district = "Kolkata", lag = LAG)) |>
-         xyplot(x = rcases ~ date | where, 
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
                 ylab = "Ratio of last two 1-week increments in confirmed cases",
                 ylim = extendrange(c(0, 3)), ## prepanel = prepanelq,
                 abline = list(h = 1, lwd = 2, col = "grey"),
@@ -98,7 +98,7 @@ rbind(getRatio(dall, "Delhi", lag = LAG, smooth = LAMBDA),
       getRatio(dall, "Maharashtra", lag = LAG, smooth = LAMBDA),
       getRatio(dall, "Karnataka", lag = LAG, smooth = LAMBDA),
       getRatio(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
-         xyplot(x = rcases ~ date | where, 
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
                 ylab = "Ratio of last two 1-week increments in confirmed cases",
                 ## ylim = extendrange(c(0, 3)),
                 prepanel = prepanelq,
@@ -142,7 +142,8 @@ slist <- lapply(sort(states),
                 function(s) getRatio(dall, s, lag = LAG, smooth = LAMBDA, death.lag = 7))
 sdf <- do.call(rbind, slist)
 p <- xyplot(x = rcases ~ date | where, data = sdf,
-            subset = total >= 1e5 & !(where %in% c("Delhi", "Maharashtra", "Karnataka", "West Bengal")),
+            subset = (total >= 1e5 & date > as.Date("2020-07-01") & 
+                      !(where %in% c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))),
             ylab = "Ratio of last two 1-week increments in confirmed cases",
             ylim = extendrange(c(0, 3)),
             prepanel = prepanelq,
@@ -199,7 +200,7 @@ rbind(getRatio(dall, "Assam", lag = LAG, smooth = LAMBDA),
       ## getRatio(dall, "Puducherry", lag = LAG, smooth = LAMBDA),
       getRatio(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA),
       getRatio(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
-         xyplot(x = rcases ~ date | where, 
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
                 ylab = "Ratio of last two 1-week increments in confirmed cases",
                 ylim = extendrange(c(0, 3)),
                 prepanel = prepanelq,
@@ -231,6 +232,7 @@ LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "West Bengal", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "West Bengal",
+           subset = date > as.Date("2020-07-01"),
            main = "Urban = Kolkata / North 24 Parganas / South 24 Parganas",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
@@ -262,6 +264,7 @@ LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Tamil Nadu",
+           subset = date > as.Date("2020-07-01"),
            main = "Urban = Chennai / Coimbatore / Chengalpattu / Thiruvallur / Salem / Kancheepuram",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
@@ -294,6 +297,7 @@ LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Kerala", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Kerala",
+           subset = date > as.Date("2020-07-01"),
            main = "Urban = Ernakulam / Kozhikode / Malappuram / Thiruvananthapuram / Thrissur",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
@@ -325,6 +329,7 @@ LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Maharashtra", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Maharashtra",
+           subset = date > as.Date("2020-07-01"),
            main = "Urban = Pune / Mumbai / Thane / Nagpur",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
@@ -346,6 +351,7 @@ LAMBDA <- FALSE
 LAG <- 7
 getRatioUR(dall, "Karnataka", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
     xyplot(x = rurban + rrural ~ date, # main = "Karnataka",
+           subset = date > as.Date("2020-07-01"),
            main = "Urban = Bengaluru Urban / Mysuru / Ballari",
            auto.key = list(lines = TRUE, points = FALSE, columns = 2,
                            text = c("Urban", "Rural")),
