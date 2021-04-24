@@ -61,9 +61,11 @@ dall <-
     })
 ```
 
+.center[
 
 [ Updated: `r {max(dall$Date)}` ]
 
+]
 
 ---
 
