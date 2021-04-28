@@ -1,0 +1,179 @@
+---
+layout: remark
+title: Measuring Current Growth Rate of COVID Infections
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+layout: true
+
+# Background
+
+---
+
+<div>
+$$
+\newcommand{\sub}{_}
+$$
+</div>
+
+* Trying to measure growth rate rather than absolute number of cases
+
+* This is related to [this ad hoc measure](increment-ratio.html), but more grounded in theory
+
+* Motivation: 
+
+	- Let $x(t)$ be total number infected at time $t$
+	
+	- Let $a(t)$ be number of active infections at time $t$
+	
+	- Let $\lambda(t)$ be the _number of new infections per active infection per unit time_ at time $t$
+	
+	- Then a reasonable way to model the evolution of $x(t)$ is
+	$$
+	x(t + \delta t) - x(t) \approx \delta t \, a(t) \, \lambda(t)
+	$$
+
+---
+
+- This gives an instantaneous definition of $\lambda(t)$ as
+$$
+\lambda(t) = \frac{ \frac{dx(t)}{dt} }{ a(t) } \approx \frac{ \delta x(t) }{ \delta t \,  a(t) }
+$$
+
+- We do have daily data, but using $\delta t = 1$ without smoothing gives very noisy results
+
+- We instead use  $\delta t = 7$
+
+- In theory, this measure can be compared across time and location
+	
+	- It should not depend on degree of systematic under-reporting
+
+	- It should not be overly affected by daily fluctuations and patterns
+
+- We report $R(t) := 10 * \lambda(t)$ assuming each active person is infectious for 10 days
+
+
+- Any $R(t)$ higher than 1 is bad on a sustained basis
+
+- What is a threhold for it to be _really_ bad?
+
+---
+
+- Calculations based on data from [covid19india.org](https://covid19india.org)
+
+- $x(t) = \text{ Confirmed}$
+
+- $a(t) = x(t) - \text{ Recovered } - \text{ Deceased }$
+
+
+
+
+
+
+
+
+
+.center[
+
+[ Updated: 2021-04-27 ]
+
+]
+
+
+---
+
+layout: false
+
+# Cities: Bengaluru, Chennai, Delhi, Kolkata, Mumbai
+
+
+![plot of chunk unnamed-chunk-2](figures/growth-rate-unnamed-chunk-2-1.png)
+
+---
+
+# States: Delhi, Karnataka, Maharashtra, West Bengal
+
+![plot of chunk unnamed-chunk-3](figures/growth-rate-unnamed-chunk-3-1.png)
+
+
+---
+
+# Current growth rates by state
+
+.scrollable500[
+
+
+|                                         | Current Rate| Rate One week ago| Cases in last 7 days| Cases in previous 7 days|
+|:----------------------------------------|------------:|-----------------:|--------------------:|------------------------:|
+|Maharashtra                              |         0.94|              1.06|               449726|                   441151|
+|Uttar Pradesh                            |         1.56|              2.77|               243692|                   185823|
+|Karnataka                                |         1.81|              2.09|               202131|                   114997|
+|Kerala                                   |         2.25|              2.51|               187719|                    92248|
+|Delhi                                    |         2.78|              5.10|               166524|                   155385|
+|Rajasthan                                |         1.81|              2.24|               108179|                    63693|
+|Chhattisgarh                             |         1.23|              1.34|               108040|                   102305|
+|Tamil Nadu                               |         1.79|              1.89|               100124|                    66249|
+|West Bengal                              |         2.40|              2.65|                98173|                    53948|
+|Gujarat                                  |         1.80|              2.81|                96547|                    67972|
+|Madhya Pradesh                           |         1.67|              2.63|                91703|                    80072|
+|Bihar                                    |         2.18|              3.66|                85942|                    51674|
+|Andhra Pradesh                           |         2.06|              2.44|                77888|                    44095|
+|Haryana                                  |         2.19|              2.78|                76130|                    47080|
+|Telangana                                |         1.69|              1.70|                50546|                    28778|
+|Odisha                                   |         2.34|              3.49|                42665|                    24378|
+|Punjab                                   |         1.63|              1.53|                41966|                    30113|
+|Jharkhand                                |         1.77|              2.31|                41099|                    27721|
+|Uttarakhand                              |         2.01|              2.15|                33357|                    17134|
+|Assam                                    |         2.58|              2.00|                16329|                     5990|
+|Jammu and Kashmir                        |         1.68|              1.58|                15816|                     9588|
+|Goa                                      |         2.18|              1.74|                12596|                     5970|
+|Himachal Pradesh                         |         1.70|              1.82|                11940|                     8016|
+|Puducherry                               |         1.71|              2.04|                 6073|                     4001|
+|Chandigarh                               |         1.88|              1.52|                 5202|                     3584|
+|Dadra and Nagar Haveli and Daman and Diu |         1.72|              2.67|                 1582|                     1049|
+|Meghalaya                                |         1.93|              3.86|                 1155|                      729|
+|Ladakh                                   |         0.86|              2.49|                 1086|                     1486|
+|Lakshadweep                              |         2.92|              7.78|                 1066|                      501|
+|Manipur                                  |         3.24|              3.98|                  873|                      329|
+|Nagaland                                 |         2.55|              0.94|                  795|                      223|
+|Arunachal Pradesh                        |         5.05|              5.48|                  785|                      211|
+|Tripura                                  |         1.73|              1.29|                  644|                      289|
+|Sikkim                                   |         1.41|              1.67|                  630|                      361|
+|Mizoram                                  |         1.79|              2.79|                  518|                      340|
+|Andaman and Nicobar Islands              |         2.68|              3.95|                  298|                      257|
+
+]
+
+
+
+
+---
+
+layout: true
+
+# All other states with at least 100000 confirmed cases
+
+---
+
+![plot of chunk unnamed-chunk-6](figures/growth-rate-unnamed-chunk-6-1.png)
+
+---
+
+![plot of chunk unnamed-chunk-7](figures/growth-rate-unnamed-chunk-7-1.png)
+
+---
+
+![plot of chunk unnamed-chunk-8](figures/growth-rate-unnamed-chunk-8-1.png)
+
+
+
+---
+
+layout: false
+
+# All election states have seen a surge
+
+![plot of chunk unnamed-chunk-10](figures/growth-rate-unnamed-chunk-10-1.png)
+

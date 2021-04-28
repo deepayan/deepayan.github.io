@@ -51,15 +51,22 @@ cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
     tail(increments, -lag) / head(increments, -lag)
 }
 
+growthrate <- function(x, a, lag = 1, smooth = FALSE) # smooth can be a lambda value
+{
+    increments <- c(rep(NA, lag), cum2increments(x, lag = lag, smooth = smooth))
+    (tail(increments, -lag) / head(a, -lag)) / lag # FIXME: smooth a as well
+}
+
+
+
+
 ## India-specific functions: assumes data in format provided by covid19india.org
 
 getRatio <- function(data, state = "Delhi", district = "",
                      death.lag = 7,
                      lag = 1, smooth = FALSE)
 {
-    ## aggregate over state / district. TODO: Similar function where
-    ## state total is broken up into those from specified districts,
-    ## and the rest
+    ## aggregate over state / district. 
     dsub <- if (missing(district)) subset(data, State == state)
             else if (missing(state)) subset(data, District == district)
             else subset(data, State == state & District == district)
@@ -130,6 +137,31 @@ getRatioUR <- function(data, state = "West Bengal",
 }
 
 
+## version where we divide by estimated number of active cases
 
+getRatioActive <- function(data, state = "Delhi", district = "",
+                           death.lag = 7, R.factor = 10,
+                           lag = 1, smooth = FALSE)
+{
+    ## aggregate over state / district.
+    dsub <- if (missing(district)) subset(data, State == state)
+            else if (missing(state)) subset(data, District == district)
+            else subset(data, State == state & District == district)
+    where <- if (missing(district)) state
+             else if (missing(state)) district
+             else paste(state, district, sep = " / ")
+    ## Now get one number per date: use dplyr?
+    confirmed <- with(dsub, tapply(Confirmed, Date, sum))
+    deceased <- with(dsub, tapply(Deceased, Date, sum))
+    recovered <- with(dsub, tapply(Recovered, Date, sum))
+    active <- confirmed - recovered - deceased
+    data.frame(where = where,
+               icases = cum2increments(confirmed, lag = lag, smooth = smooth),
+               ideaths = cum2increments(deceased, lag = lag, smooth = smooth),
+               iactive = tail(active, -lag),
+               rcases = R.factor * growthrate(confirmed, active, lag = lag, smooth = smooth),
+               total = tail(confirmed, 1),
+               date = tail(sort(unique(dsub$Date)), -lag))
+}
 
 

@@ -1,0 +1,255 @@
+---
+layout: remark
+title: Measuring Current Growth Rate of COVID Infections
+author: Deepayan Sarkar
+mathjax: true
+---
+
+
+layout: true
+
+# Background
+
+---
+
+<div>
+$$
+\newcommand{\sub}{_}
+$$
+</div>
+
+* Trying to measure growth rate rather than absolute number of cases
+
+* This is related to [this ad hoc measure](increment-ratio.html), but more grounded in theory
+
+* Motivation: 
+
+	- Let $x(t)$ be total number infected at time $t$
+	
+	- Let $a(t)$ be number of active infections at time $t$
+	
+	- Let $\lambda(t)$ be the _number of new infections per active infection per unit time_ at time $t$
+	
+	- Then a reasonable way to model the evolution of $x(t)$ is
+	$$
+	x(t + \delta t) - x(t) \approx \delta t \, a(t) \, \lambda(t)
+	$$
+
+---
+
+- This gives an instantaneous definition of $\lambda(t)$ as
+$$
+\lambda(t) = \frac{ \frac{dx(t)}{dt} }{ a(t) } \approx \frac{ \delta x(t) }{ \delta t \,  a(t) }
+$$
+
+- We do have daily data, but using $\delta t = 1$ without smoothing gives very noisy results
+
+- We instead use  $\delta t = 7$
+
+- In theory, this measure can be compared across time and location
+	
+	- It should not depend on degree of systematic under-reporting
+
+	- It should not be overly affected by daily fluctuations and patterns
+
+- We report $R(t) := 10 * \lambda(t)$ assuming each active person is infectious for 10 days
+
+
+- Any $R(t)$ higher than 1 is bad on a sustained basis
+
+- What is a threhold for it to be _really_ bad?
+
+---
+
+- Calculations based on data from [covid19india.org](https://covid19india.org)
+
+- $x(t) = \text{ Confirmed}$
+
+- $a(t) = x(t) - \text{ Recovered } - \text{ Deceased }$
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+library(knitr)
+opts_chunk$set(cache = FALSE, autodep = TRUE,
+               comment = "", warning = TRUE, message = FALSE, prompt = FALSE,
+               dev.args = list(pointsize = 16), echo = FALSE, eval = TRUE,
+               fig.width = 15, fig.height = 8, dpi = 96, fig.path='figures/growth-rate-')
+options(warnPartialMatchDollar = FALSE, width = 100)
+library(lattice)
+library(RColorBrewer)
+library(latticeExtra)
+bdark <- RColorBrewer::brewer.pal(n = 8, name = "Dark2")
+ct <- custom.theme(symbol = bdark, fill = adjustcolor(bdark, alpha.f = 0.5))
+ct$strip.background$col <- "grey90"
+ct$strip.border$col <- "grey50"
+ct$axis.line$col <- "grey50"
+lattice.options(default.theme = ct, default.args = list(as.table = TRUE))
+```
+
+
+
+
+```{r}
+## source("tregularize.R")
+source("covid-utils.R")
+TARGET <- "districts.csv"
+## To download the latest version, delete the file and run again
+if (!file.exists(TARGET))
+    download.file("https://api.covid19india.org/csv/latest/districts.csv",
+                  destfile = TARGET)
+dall <- read.csv(TARGET)
+dall <-
+    within(dall,
+    {
+        Date  <- as.Date(Date)
+    })
+LAG <- 7
+```
+
+.center[
+
+[ Updated: `r {max(dall$Date)}` ]
+
+]
+
+
+---
+
+layout: false
+
+# Cities: Bengaluru, Chennai, Delhi, Kolkata, Mumbai
+
+
+```{r}
+LAMBDA <- 0
+rbind(getRatioActive(dall, district = "Delhi", lag = LAG),
+      getRatioActive(dall, district = "Mumbai", lag = LAG),
+      getRatioActive(dall, district = "Chennai", lag = LAG),
+      getRatioActive(dall, district = "Bengaluru Urban", lag = LAG),
+      getRatioActive(dall, district = "Kolkata", lag = LAG)) |>
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ## ylim = extendrange(c(0, 3)),
+                prepanel = prepanelq,
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
+---
+
+# States: Delhi, Karnataka, Maharashtra, West Bengal
+
+```{r}
+LAMBDA <- FALSE
+rbind(getRatioActive(dall, "Delhi", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "Maharashtra", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "Karnataka", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ## ylim = extendrange(c(0, 3)),
+                prepanel = prepanelq,
+                layout = c(NA, 2),
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
+
+---
+
+# Current growth rates by state
+
+.scrollable500[
+
+```{r}
+LAMBDA <- FALSE
+latestRatio <- function(s, min.cases = 100)
+{
+    r <- getRatioActive(dall, state = s, lag = LAG, smooth = LAMBDA)
+    c(round(rev(r$rcases)[c(1, 8)], 2),
+      rev(r$icases)[c(1, 8)])
+}
+states <- unique(dall$State)
+rstates <- as.data.frame(t(sapply(states, latestRatio)))
+names(rstates) <-
+    c("Current Rate", "Rate One week ago",
+      "Cases in last 7 days", "Cases in previous 7 days")
+kable(rstates[ order(rstates[[3]], decreasing = TRUE), ])
+```
+
+]
+
+
+```{r}
+states <- rownames(rstates)[is.finite(rstates[[1]])]
+LAMBDA <- FALSE
+slist <- lapply(sort(states),
+                function(s) getRatioActive(dall, s, lag = LAG, smooth = LAMBDA, death.lag = 7))
+sdf <- do.call(rbind, slist)
+p <- xyplot(x = rcases ~ date | where, data = sdf,
+            subset = (total >= 1e5 & date > as.Date("2020-07-01") & 
+                      !(where %in% c("Delhi", "Maharashtra", "Karnataka", "West Bengal"))),
+            ylab = "Ratio of last two 1-week increments in confirmed cases",
+            ## ylim = extendrange(c(0, 3)),
+            prepanel = prepanelq,
+            abline = list(h = 1, lwd = 2, col = "grey"),
+            type = "l", pch = 16, grid = TRUE)
+N <- dim(p)
+```
+
+---
+
+layout: true
+
+# All other states with at least 100000 confirmed cases
+
+---
+
+```{r}
+if (N > 6) p[1:6] else p
+```
+
+---
+
+```{r}
+if (N > 6) {
+    if (N > 12) p[7:12] else p[7:N]
+}
+```
+
+---
+
+```{r}
+if (N > 12) {
+    if (N > 18) p[13:18] else p[13:N]
+}
+```
+
+```{r}
+if (N > 18) {
+    p[19:N]
+}
+```
+
+---
+
+layout: false
+
+# All election states have seen a surge
+
+```{r}
+LAMBDA <- FALSE
+rbind(getRatioActive(dall, "Assam", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "Kerala", lag = LAG, smooth = LAMBDA),
+      ## getRatioActive(dall, "Puducherry", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "Tamil Nadu", lag = LAG, smooth = LAMBDA),
+      getRatioActive(dall, "West Bengal", lag = LAG, smooth = LAMBDA)) |>
+         xyplot(x = rcases ~ date | where, subset = date > as.Date("2020-07-01"),
+                ylab = "Ratio of last two 1-week increments in confirmed cases",
+                ## ylim = extendrange(c(0, 3)),
+                prepanel = prepanelq,
+                layout = c(NA, 2),
+                abline = list(h = 1, lwd = 2, col = "grey"),
+                type = "l", pch = 16, grid = TRUE)
+```
+
