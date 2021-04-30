@@ -90,7 +90,7 @@ lattice.options(default.theme = ct, default.args = list(as.table = TRUE))
 
 
 ```{r}
-## source("tregularize.R")
+source("smoothing-experiments/tregularize.R")
 source("covid-utils.R")
 TARGET <- "districts.csv"
 ## To download the latest version, delete the file and run again

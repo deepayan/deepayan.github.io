@@ -53,6 +53,7 @@ cum2ratio <- function(x, lag = 1, smooth = FALSE) # smooth can be a lambda value
 
 growthrate <- function(x, a, lag = 1, smooth = FALSE) # smooth can be a lambda value
 {
+    ## x[] <- smoother(as.vector(x))
     increments <- c(rep(NA, lag), cum2increments(x, lag = lag, smooth = smooth))
     (tail(increments, -lag) / head(a, -lag)) / lag # FIXME: smooth a as well
 }
