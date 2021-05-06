@@ -152,7 +152,8 @@ predict.growthrate <-
 
 ## For now: explore with method=active
 
-predictZone <- function(data, ..., lag = 7, mu = 1/10, smooth = FALSE,
+predictZone <- function(data, ..., lag = 7, mu = 1/10, title = NULL,
+                        smooth = FALSE,
                         drop.before = NULL,
                         linear = FALSE,
                         max.predict = 35, # don't predict more than these many days
@@ -166,8 +167,12 @@ predictZone <- function(data, ..., lag = 7, mu = 1/10, smooth = FALSE,
                ylab = expression(lambda(t) - mu),
                abline = list(h = 0, col = "grey", lwd = 3),
                grid = TRUE)
-    MAIN <- paste0(deparse(substitute(list(...))), collapse = " ")
-    MAIN <- substring(MAIN, 6, nchar(MAIN) - 1)
+    if (missing(title))
+    {
+        MAIN <- paste0(deparse(substitute(list(...))), collapse = " ")
+        MAIN <- substring(MAIN, 6, nchar(MAIN) - 1)
+    }
+    else MAIN <- title
     p <- 
         xyplot(active ~ date, data = fm, col = 1, type = "l",
                main = MAIN,
@@ -211,12 +216,15 @@ days2critical <-
     ##   If any(e > target), return which(e > target)[1]
     ##   else return NA
 
-    d <- subset(predict(object, days = days, from = from, ...),
+    d <- subset(predict(object, days = 3 * days, from = from, ...),
                 date > from)
     a <- d$active
-    if (anyNA(a) || all(a < target))
-        NA
-    else which(a >= target)[1]
+    ans <- 
+        if (anyNA(a) || all(a < target))
+            NA
+        else which(a >= target)[1]
+    ans[ans > days] <- days
+    ans
 }
 
 
