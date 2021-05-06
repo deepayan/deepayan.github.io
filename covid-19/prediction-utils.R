@@ -107,10 +107,13 @@ predict.growthrate <-
     past.rates <- object$lambda2[seq(from.index - rate.smooth, from.index)]
     rate <- mean(past.rates[-1])
     slope <-
-        if (linear) mean(diff(past.rates))
+        if (linear) coef(lm(past.rates ~ 1 + seq_along(past.rates)))[2] # mean(diff(past.rates))
         else 0
     ## slope <- max(slope, 0)
-    if (is.na(rate)) stop("rate not available for starting date")
+    if (is.na(rate)) {
+        print(object)
+        stop("rate not available for starting date")
+    }
     message(sprintf("rate parameter: %g, slope parameter: %g", rate, slope))
     d <- 
         within(d,
@@ -146,7 +149,6 @@ predict.growthrate <-
         })
     d
 }
-
 
 ## For now: explore with method=active
 
@@ -195,6 +197,85 @@ predictZone <- function(data, ..., lag = 7, mu = 1/10, smooth = FALSE,
                        y = c(1/6, 2/3)),
            between = list(y = 0.5),
            plot.args = list(panel.height = list(x = c(6, 3), unit = "null")))
+}
+
+
+
+days2critical <- 
+    function(object, target = NULL,
+             days = 100, from = NULL,
+             ...)
+{
+    ## Algorithm: predict from 'from' to next 'days' days.
+    ##   If first estimate > target, return 0
+    ##   If any(e > target), return which(e > target)[1]
+    ##   else return NA
+
+    d <- subset(predict(object, days = days, from = from, ...),
+                date > from)
+    a <- d$active
+    if (anyNA(a) || all(a < target))
+        NA
+    else which(a >= target)[1]
+}
+
+
+
+
+
+
+predictCriticalByZone <-
+    function(data, ..., target, days = 100,
+             lag = 7, mu = 1/10, smooth = FALSE,
+             drop.before = NULL,
+             linear = FALSE,
+             adjust = TRUE,
+             rate.smooth = 7)
+{
+    d <- aggregate.data(dall, ...)
+    fm <- estimate.growth(d, lag = lag, mu = mu, smooth = smooth)
+    fm$days2critical <- NA
+    for (i in tail(seq_len(nrow(fm)), -(2*lag+1)))
+    {
+        if (is.finite(fm$lambda2[i]))
+        {
+            fm$days2critical[i] <-
+                days2critical(fm, target = target,
+                              days = days, from = fm$date[i],
+                              linear = linear,
+                              adjust = adjust,
+                              rate.smooth = rate.smooth,
+                              ...)
+        }
+    }
+    MAIN <- paste0(deparse(substitute(list(...))), collapse = " ")
+    MAIN <- substring(MAIN, 6, nchar(MAIN) - 1)
+    mapcolor <- function(v, ncol = 10) # v between 0 and days
+    {
+        i <- 1 + round((ncol-1) * (v - 0) / days)
+        stopifnot(all(i <= ncol))
+        hcl.colors(10, palette = "Red-Green")[i]
+    }
+    p <- 
+        levelplot(days2critical ~ date + days2critical, data = fm, type = "p", cex = 0.5,
+                  panel = panel.levelplot.points,
+                  subset = if (is.null(drop.before)) TRUE else date >= as.Date(drop.before),
+                  grid = TRUE)
+    q <-
+        xyplot(lambda2 - 0.1 ~ date, data = fm, type = "l",
+               subset = if (is.null(drop.before)) TRUE else date >= as.Date(drop.before),
+               abline = list(h = 0, col = "grey", lwd = 3),
+               grid = TRUE)
+    r <- 
+        xyplot(active ~ date, data = fm, type = "l",
+               subset = if (is.null(drop.before)) TRUE else date >= as.Date(drop.before),
+               scales = list(y = list(rot = 0)),
+               abline = list(h = target, col = adjustcolor("red", alpha.f = 0.2), lwd = 3),
+               grid = TRUE)
+    update(c(r, p, q, x.same = TRUE, layout = c(1, 3)),
+           main = MAIN,
+           ylab = expression(hat(lambda)(t) - mu, "Days to critical", "Active"),
+           between = list(y = 0.5))
 }
 
 
@@ -316,6 +397,11 @@ predictZone(dall, district = "Kolkata", lag = 7, mu = 1/10, drop.before = "2020-
 
 predictZone(dall, state = "Kerala", lag = 7, mu = 1/10, drop.before = "2020-10-01",
             predict.at = c("2021-03-01", "2021-03-15", "2021-04-01", "2021-04-08"))
+
+    predictCriticalByZone(dall, state = "Delhi", lag = 7, mu = 1/10,
+                          drop.before = "2020-06-01", linear = TRUE,
+                          target = 20000)
+
 
 
 }

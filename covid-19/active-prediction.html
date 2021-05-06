@@ -244,13 +244,13 @@ layout: false
 
 	- Start from the last calculated value on date of prediction
 
-	- Linear slope estimated as average of last two changes
+	- Linear slope estimated from the last two changes
 	
-- For robustness, we take average over last 5 values
+- For robustness, we take average over last few values
 
-	- Start from average of last 5 calculated values of $\ractive{t}$ on date of prediction
+	- Start from average of last 4 calculated values of $\ractive{t}$ on date of prediction
 
-	- Linear slope estimated as average of last 4 changes
+	- Linear slope estimated using linear regression of last 5 estimates
 
 --
 
@@ -302,7 +302,7 @@ layout: true
 
 	- Predictions can change dramatically over the course of a few days
 	
-	- Long-range predictions should _not_ be taken too seriously (assumes linear form)
+	- Long-range predictions should _not_ be taken too seriously (linear growth unrealistic)
 	
 	- More important to track $\ractive{t}$
 	
@@ -316,6 +316,31 @@ layout: true
 
 	- Should be considered an exploratory summary measure to guide policy / behaviour
 
+
+---
+
+layout: true
+
+# Early warning: days till "critical" load
+
+---
+
+- A possibly more useful daily summary: number of days to reach critical target
+
+- Needs more information: zonewise medical capacity
+
+- Proxy for illustration: 0.2% of population (1 in 500 active infections)
+
+- E.g., for Delhi, this number is
+  [approximately](https://en.wikipedia.org/wiki/Delhi) $0.002 \times
+  16,787,941 \approx 34000$
+
+- For this calculation, we estimate rate and slope using last 7 values
+
+---
+
+![plot of chunk delhipredcritical](figures/predict-active-delhipredcritical-1.png)
+
 ---
 
 class: center, middle
@@ -324,9 +349,15 @@ layout: false
 
 # Similar predictions in other states / districts
 
+(number of "days to critical" shown only for major cities)
+
 ---
 
 ![plot of chunk delhi](figures/predict-active-delhi-1.png)
+
+---
+
+![plot of chunk delhicritical](figures/predict-active-delhicritical-1.png)
 
 ---
 
@@ -334,7 +365,15 @@ layout: false
 
 ---
 
+![plot of chunk mumbaicritical](figures/predict-active-mumbaicritical-1.png)
+
+---
+
 ![plot of chunk bengaluru](figures/predict-active-bengaluru-1.png)
+
+---
+
+![plot of chunk bengalurucritical](figures/predict-active-bengalurucritical-1.png)
 
 ---
 
@@ -342,7 +381,15 @@ layout: false
 
 ---
 
+![plot of chunk kolkatacritical](figures/predict-active-kolkatacritical-1.png)
+
+---
+
 ![plot of chunk chennai](figures/predict-active-chennai-1.png)
+
+---
+
+![plot of chunk chennaicritical](figures/predict-active-chennaicritical-1.png)
 
 ---
 
