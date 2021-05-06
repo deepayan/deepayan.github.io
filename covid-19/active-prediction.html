@@ -1,0 +1,433 @@
+layout: remark
+title: Thoughts on an Early Warning System for COVID Infections
+author: Siva Athreya, Deepayan Sarkar, Rajesh Sundaresan
+mathjax: true
+
+
+layout: true
+
+# Background
+
+---
+
+<div>
+$$
+\newcommand{\sub}{_}
+\newcommand{\confirmed}[1]{x(#1)}
+\newcommand{\active}[1]{a(#1)}
+\newcommand{\dactive}[1]{a^{\prime}(#1)}
+\newcommand{\dconfirmed}[1]{x^{\prime}(#1)}
+\newcommand{\ractive}[1]{\lambda(#1)}
+\newcommand{\ractivehat}[1]{\hat{\lambda}(#1)}
+\newcommand{\rconfirmed}[1]{\gamma(#1)}
+\newcommand{\rincrement}[1]{\rho(#1)}
+\newcommand{\rinactive}[1]{\mu(#1)}
+$$
+</div>
+
+* Goal: looking at current data, predict time to resource scarcity
+
+* Motivation:
+
+	- Strike balance between normal life and adverse health outcomes
+	
+	- Prevent unnecessary economic slowdown (due to restrictions)
+	
+	- Prevent avoidable deaths (due to lack of basic medical facilities)
+
+	- Obvious strategies: vaccinate, ramp up healthcare facilities
+	
+	- But need to be prepared for surge (new mutations, loss of immunity, unknown factors)
+	
+	- Late reaction leaves lockdown as only solution, cannot prevent deaths
+	
+---
+	
+* Solution: With advance warning, we can deploy graded response
+
+	- Communicate greater need for precautions and stricter social distancing
+	
+	- Stop mass gatherings
+	
+	- Close markets, cinema halls, gyms, etc.
+	
+	- Lockdown as extreme measure
+
+
+---
+
+* Proposal:
+
+	- Simple scheme to predict number of active cases
+	
+	- Warning system based on zonewise ability to handle active cases
+
+
+* Input requirements:
+
+	- Daily number of confirmed / active cases (available from state bulletins)
+	
+	- Critical number of active cases (to be determined policymakers)
+
+<!-- 
+	- Number of active cases may be approximated, if necessary (e.g.,
+      assuming 1% death rate, rest recovered 10 days after
+      confirmation)
+ -->
+
+---
+
+
+layout: true
+
+# Model
+
+---
+
+- $t$ unit of time (in days)
+
+- $\confirmed{t}$ is the total number of confirmed cases upto time $t$
+
+- $\active{t}$ is the total number of active cases upto time $t$
+
+--
+
+- $\ractive{t}$ is the _number of new infections per active infection per unit time_ at time $t$
+
+	- __Changes with time__ [this is a very important point]
+	
+	- Depends on many factors: virus strain, social behaviour, vaccination
+
+	- Can be influenced by policy
+
+--
+
+- $\rinactive{t}$ is the _number of deaths / recoveries
+  per active infection per unit time_ at time $t$
+  
+    - Assumed constant: $\rinactive{t} \equiv 1/10$
+
+--
+
+- A simple evolution model: 
+$$
+\active{t + h} - \active{t} \approx h \cdot \active{t} \cdot [ \ractive{t} - \rinactive{t} ]
+$$
+
+---
+
+- This gives an instantaneous definition of $\ractive{t}$ as
+<div>
+\begin{eqnarray*}
+\ractive{t} &=& \rinactive{t} + \frac{\dactive{t}}{\active{t}} \\
+            &\approx& \rinactive{t} + \frac{ \active{t + h} - \active{t} }{ h \cdot \active{t} }
+\end{eqnarray*}
+</div>
+
+- Smallest possible $h = 1$, but we use $h = 7$ to reduce day-of-the-week patterns
+
+- NOTE: This is unrealistic because assumes susceptible population _does not decrease_, but
+
+	- We are only interested in estimating $\lambda(t)$ locally
+	
+	- The goal is to _warn_ when cases are _low_, when this is a mostly reasonable assumption
+
+<!--  
+
+- Alternative model 1: 
+$$
+\confirmed{t + h} - \confirmed{t} \approx h \cdot \active{t} \cdot \rconfirmed{t}
+$$
+
+- Estimate:
+$$
+\rconfirmed{t} = \frac{ \confirmed{t + h} - \confirmed{t} }{ h \cdot \active{t} }
+$$
+
+- Alternative model 2 (direct estimate from definition):
+$$
+\frac{\confirmed{t + h} - \confirmed{t}}{\confirmed{t} - \confirmed{t-h}} 
+\approx h \cdot \active{t} \cdot \rincrement{t}
+$$
+
+- It turns out that $\ractive{t}$ and $\rincrement{t}$ behave
+  similarly, $\rconfirmed{t}$ is a bit different
+
+-->
+
+---
+
+- Prediction equations:
+
+<div>
+\begin{eqnarray*}
+\active{s} &=& \active{s-h} + h \cdot \active{s-h} \, [ \ractivehat{s-h} - \rinactive{s-h} ] \\
+&=& \active{s-h} \left( 1 + h \cdot [ \ractivehat{s-h} - \rinactive{s-h} ] \right)
+\end{eqnarray*}
+</div>
+
+- Question: How to estimate $\ractive{s-h}$ a function of $h$?
+
+
+---
+
+layout: true
+
+# Results
+
+---
+
+- Calculations based on data from [covid19india.org](https://covid19india.org)
+
+- $\confirmed{t} = \text{ Confirmed (cumulative)}$
+
+- $\active{t} = \confirmed{t} - \text{ Recovered } - \text{ Deceased }$
+
+
+
+
+
+
+
+
+
+
+.center[
+
+[ Updated: 2021-05-05 ]
+
+]
+
+---
+
+layout: true
+
+# Example: How does $\ractive{t}$ behave for Delhi?
+
+---
+
+
+![plot of chunk delhinumbers](figures/predict-active-delhinumbers-1.png)
+
+---
+
+
+
+![plot of chunk delhirates](figures/predict-active-delhirates-1.png)
+
+
+---
+
+- Observations:
+
+	- $\ractive{t}$ is __not__ locally constant (many infection models assume constant) 
+
+	- Shows periodic stretches of growth and decline
+	
+	- No systematic pattern
+	
+	- Likely combination of biological (variants / vaccination) and social (behaviour) factors
+
+	- Difficult to predict
+
+---
+
+layout: false
+
+# Predicting $\ractive{s}$ for future time $s$
+
+- Prediction can be meaningful only for short ranges
+
+- We estimate $\ractive{s-h}$ as a linear function of $h$:
+
+	- Start from the last calculated value on date of prediction
+
+	- Linear slope estimated as average of last two changes
+	
+- For robustness, we take average over last 5 values
+
+	- Start from average of last 5 calculated values of $\ractive{t}$ on date of prediction
+
+	- Linear slope estimated as average of last 4 changes
+
+--
+
+- Note that 
+
+	- $\ractive{s} > 0.1$ implies active cases will _increase_ over time 
+
+	- $\ractive{s} < 0.1$ implies active cases will _decrease_ over time 
+
+
+
+<!-- - Justification: False alarm better than no alarm -->
+
+
+<!--  
+
+- Other models can similarly predict $\active{t}$
+
+- But this seems most stable (TODO: re-check implementations), so only one reported here
+
+-->
+
+
+---
+
+layout: true
+
+# Example: How soon would this have predicted the Delhi wave?
+
+---
+
+![plot of chunk delhipred1](figures/predict-active-delhipred1-1.png)
+
+---
+
+![plot of chunk delhipred2](figures/predict-active-delhipred2-1.png)
+
+---
+
+![plot of chunk delhipred3](figures/predict-active-delhipred3-1.png)
+
+---
+
+![plot of chunk delhipred4](figures/predict-active-delhipred4-1.png)
+
+---
+
+- Things to keep in mind:
+
+	- Predictions can change dramatically over the course of a few days
+	
+	- Long-range predictions should _not_ be taken too seriously (assumes linear form)
+	
+	- More important to track $\ractive{t}$
+	
+- However, local trends in $\ractive{t}$ __can__ give early warning
+	
+	- Can indicate upcoming surge
+	
+	- Can detect upcoming peaks (inflection points)
+	
+	- Trends easier to spot than from plot of raw active counts
+
+
+---
+
+class: center, middle
+
+layout: false
+
+# Similar predictions in other states / districts
+
+---
+
+![plot of chunk delhi](figures/predict-active-delhi-1.png)
+
+---
+
+![plot of chunk mumbai](figures/predict-active-mumbai-1.png)
+
+---
+
+![plot of chunk bengaluru](figures/predict-active-bengaluru-1.png)
+
+---
+
+![plot of chunk kolkata](figures/predict-active-kolkata-1.png)
+
+---
+
+![plot of chunk chennai](figures/predict-active-chennai-1.png)
+
+---
+
+![plot of chunk maharashtra](figures/predict-active-maharashtra-1.png)
+
+---
+
+![plot of chunk karnataka](figures/predict-active-karnataka-1.png)
+
+---
+
+![plot of chunk westbengal](figures/predict-active-westbengal-1.png)
+
+---
+
+![plot of chunk uttarpradesh](figures/predict-active-uttarpradesh-1.png)
+
+
+---
+
+![plot of chunk andhrapradesh](figures/predict-active-andhrapradesh-1.png)
+
+
+---
+
+![plot of chunk assam](figures/predict-active-assam-1.png)
+
+---
+
+![plot of chunk bihar](figures/predict-active-bihar-1.png)
+
+
+---
+
+![plot of chunk chhattisgarh](figures/predict-active-chhattisgarh-1.png)
+
+
+---
+
+![plot of chunk goa](figures/predict-active-goa-1.png)
+
+---
+
+![plot of chunk gujarat](figures/predict-active-gujarat-1.png)
+
+
+---
+
+![plot of chunk haryana](figures/predict-active-haryana-1.png)
+
+---
+
+![plot of chunk jammukashmir](figures/predict-active-jammukashmir-1.png)
+
+
+---
+
+![plot of chunk kerala](figures/predict-active-kerala-1.png)
+
+---
+
+![plot of chunk odisha](figures/predict-active-odisha-1.png)
+
+---
+
+![plot of chunk punjab](figures/predict-active-punjab-1.png)
+
+
+---
+
+![plot of chunk rajasthan](figures/predict-active-rajasthan-1.png)
+
+---
+
+![plot of chunk jharkhand](figures/predict-active-jharkhand-1.png)
+
+
+---
+
+![plot of chunk tamilnadu](figures/predict-active-tamilnadu-1.png)
+
+
+---
+
+![plot of chunk telangana](figures/predict-active-telangana-1.png)
+
+
+---
+
+![plot of chunk uttarakhand](figures/predict-active-uttarakhand-1.png)
+
