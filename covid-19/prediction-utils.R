@@ -124,7 +124,7 @@ predict.growthrate <-
                 ## str(list(from = from, k = k, i = i, lag = lag, rate = rate,
                 ##          confirmed[k-lag], confirmed[k-2*lag]))
                 active[k] <-
-                    active[k - lag] * (1 + lag * (rate - mu))
+                    max(active[k - lag] * (1 + lag * (rate - mu)), 0)
                 ## crude approximation, not important
                 confirmed[k] <- confirmed[k - 1] +
                     active[k] - active[k - 1] + mu * active[round(k - 0.5 * lag)]
