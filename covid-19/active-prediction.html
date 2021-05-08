@@ -159,7 +159,7 @@ $$
 
 ---
 
-- Prediction equations:
+- Prediction equations: Can take $h = 1$ for prediction
 
 <div>
 \begin{eqnarray*}
@@ -196,7 +196,7 @@ layout: true
 
 .center[
 
-[ Updated: 2021-05-05 ]
+[ Updated: 2021-05-07 ]
 
 ]
 
@@ -222,7 +222,7 @@ layout: true
 
 - Observations:
 
-	- $\ractive{t}$ is __not__ locally constant (many infection models assume constant) 
+	- $\ractive{t}$ is __not__ constant (many infection models assume constant) 
 
 	- Shows periodic stretches of growth and decline
 	
@@ -335,8 +335,6 @@ layout: true
   [approximately](https://en.wikipedia.org/wiki/Delhi) $0.002 \times
   16,787,941 \approx 34000$
 
-- For this calculation, we estimate rate and slope using last 7 values
-
 - Number of days is capped at 100 (larger values are plotted as 100)
 
 ---
@@ -344,6 +342,30 @@ layout: true
 ![plot of chunk delhipredcritical](figures/predict-active-delhipredcritical-1.png)
 
 ---
+
+- Gives early warning, but also lots of false positives
+
+- Alternative is to assume that $\ractive{s}$ remains constant in the short run
+
+- More conservative predictions, less false alarms
+
+---
+
+layout: true
+
+# Conservative prediction using constant $\ractive{t}$
+
+---
+
+![plot of chunk delhipred5](figures/predict-active-delhipred5-1.png)
+
+---
+
+
+![plot of chunk delhipredcriticalconst](figures/predict-active-delhipredcriticalconst-1.png)
+
+---
+
 
 class: center, middle
 

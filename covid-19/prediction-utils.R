@@ -78,8 +78,9 @@ predict.growthrate <-
     function(object, days = 100,
              from = NULL, # date of prediction. defaults to latest
              linear = FALSE, # whether rate remains constant (FALSE) or grows linearly (TRUE) 
-             adjust = TRUE, # adjust jump in active counts to account for lag
+             adjust = FALSE, # adjust jump in active counts to account for lag
              rate.smooth = 4, # estimate rate by taking average of estimates over last few days
+             plag = attr(object, "lag"),
              ...)
 {
     ## This version only uses the 'active' method (see prediction-utils-orignal.R) 
@@ -114,34 +115,38 @@ predict.growthrate <-
         print(object)
         stop("rate not available for starting date")
     }
-    message(sprintf("rate parameter: %g, slope parameter: %g", rate, slope))
-    d <- 
+    message(sprintf("rate parameter: %g, slope parameter: %g, prediction lag: %g",
+                    rate, slope, plag))
+    if (plag > lag) stop("'plag' cannot exceed 'lag'")
+    ## if (plag < lag) rate <- rate + (lag - plag) * slope # update rate linearly if necessart
+    ## OR, even if using plag < lag, start with the same lambda
+    d <-
         within(d,
         {
             for (i in (seq_len(days)))
             {
-                k <- i + (2*lag+1)
+                k <- i + (2 * lag + 1)
                 ## str(list(from = from, k = k, i = i, lag = lag, rate = rate,
                 ##          confirmed[k-lag], confirmed[k-2*lag]))
                 active[k] <-
-                    max(active[k - lag] * (1 + lag * (rate - mu)), 0)
+                    max(active[k - plag] * (1 + plag * (rate - mu)), 0)
                 ## crude approximation, not important
                 confirmed[k] <- confirmed[k - 1] +
-                    active[k] - active[k - 1] + mu * active[round(k - 0.5 * lag)]
+                    active[k] - active[k - 1] + mu * active[round(k - 0.5 * plag)]
                 rate <<- rate + slope
-                if (i == 1 && adjust)
+                if (i == 1 && adjust && plag > 1)
                 {
                     message("adjusting active and confirmed counts to ensure smoothness")
                     ## modify confirmed and active to
-                    ## change linearly in last lag days to
-                    ## reduce lag-day jumps in predictions
-                    ii <- seq(k - lag + 1, k) # length = lag
-                    active.lag <- active[k - lag + 1]
+                    ## change linearly in last plag days to
+                    ## reduce plag-day jumps in predictions
+                    ii <- seq(k - plag + 1, k) # length = plag
+                    active.lag <- active[k - plag + 1]
                     active[ii] <- active.lag +
-                        (active[k] - active.lag) * (ii - ii[1]) / (lag - 1)
-                    confirmed.lag <- confirmed[k - lag + 1]
+                        (active[k] - active.lag) * (ii - ii[1]) / (plag - 1)
+                    confirmed.lag <- confirmed[k - plag + 1]
                     confirmed[ii] <- confirmed.lag +
-                        (confirmed[k] - confirmed.lag) * (ii - ii[1]) / (lag - 1)
+                        (confirmed[k] - confirmed.lag) * (ii - ii[1]) / (plag - 1)
                     rm(ii, active.lag, confirmed.lag)
                 }
             }
@@ -152,7 +157,7 @@ predict.growthrate <-
 
 ## For now: explore with method=active
 
-predictZone <- function(data, ..., lag = 7, mu = 1/10, title = NULL,
+predictZone <- function(data, ..., lag = 7, plag = lag, mu = 1/10, title = NULL,
                         smooth = FALSE,
                         drop.before = NULL,
                         linear = FALSE,
@@ -193,6 +198,7 @@ predictZone <- function(data, ..., lag = 7, mu = 1/10, title = NULL,
         at <- predict.at[i]
         pfm <- predict(fm, days = min(as.numeric(TO - at), max.predict),
                        ## method = "active",
+                       plag = plag,
                        from = at, linear = linear)
         p <- p + xyplot(active ~ date, data = pfm, subset = date > at,
                         type = "o", col = i+1, pch = ".", cex = 3)
@@ -238,7 +244,8 @@ predictCriticalByZone <-
              drop.before = NULL,
              linear = FALSE,
              adjust = TRUE,
-             rate.smooth = 7)
+             rate.smooth = 4,
+             plag = lag)
 {
     d <- aggregate.data(dall, ...)
     fm <- estimate.growth(d, lag = lag, mu = mu, smooth = smooth)
@@ -253,6 +260,7 @@ predictCriticalByZone <-
                               linear = linear,
                               adjust = adjust,
                               rate.smooth = rate.smooth,
+                              plag = plag,
                               ...)
         }
     }
