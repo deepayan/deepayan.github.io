@@ -14,9 +14,9 @@ given the need to support legacy devices; however, at least two types
 of interaction can be easily added in principle as _optional_
 features that a device can choose to support:
 
-- tooltips
+- Tooltips
 
-- links
+- Links
 
 This RFC is for a proposal to add API points to the R Graphics engine
 to support these features, and possibly others that we have not
@@ -28,9 +28,10 @@ package which implements these features bypassing the graphics
 device. Having support in the graphics engine will substantially
 simplify the user API. Once the engine support is available, it should
 be fairly easy to implement them at least in the
-[`svglite`](https://cran.r-project.org/package=svglite) package
-(for plots that can then be included in HTML documents) and possibly
-[`httpgd`](https://cran.r-project.org/package=httpgd) (for a cross-platform interactive screen device).
+[`svglite`](https://cran.r-project.org/package=svglite) package (for
+plots that can then be included in HTML documents) and possibly
+[`httpgd`](https://cran.r-project.org/package=httpgd) (for a
+cross-platform interactive screen device).
 
 
 # Proposed extensions to the graphics engine
@@ -60,16 +61,17 @@ corresponding interactive API points with addtional arguments
 `char *hovertext` and `char *linktarget`; e.g.
 
 ```
-dev_Circle(double x, double y, double r, const pGEcontext gc, pDevDesc dev)
+dev_Circle(double x, double y, double r, 
+           const pGEcontext gc, pDevDesc dev)
 ```
 
 would have a corresponding
 
 ```
 dev_InteractiveCircle(double x, double y, double r,
-	                  const char *hovertext,
-				      const char *linktarget,
-				      const pGEcontext gc, pDevDesc dev)
+                      const char *hovertext,
+                      const char *linktarget,
+                      const pGEcontext gc, pDevDesc dev)
 ```
 
 and so on. These functions would be responsible for both drawing
