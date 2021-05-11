@@ -1,4 +1,4 @@
-STATE <- "West Bengal"
+STATE <- "Karnataka"
 
 ## use growth model to make short term predictions for all districts within a state
 
@@ -30,7 +30,8 @@ dall <-
     })
 LAG <- 7
 MU <- 1/10
-START <- "2021-01-01"
+## START <- "2021-01-01"
+START <- "2020-07-01"
 PREDICT.AT <- c("2021-03-03", "2021-03-17", "2021-03-31", "2021-04-06")
 
 predictAndPlot <- function(...)
