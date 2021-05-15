@@ -1,14 +1,26 @@
+## ignore flambda but could be gamma in gam()
 
-
-ns.smoother <- function(y, flambda = 100)
+smoothConfirmed <- function(x, flambda = 1)
 {
-    n <- length(y)
-    x <- y
-    ss <- smooth.spline(seq_len(n), y)
-    ss <- smooth.spline(seq_len(n), y, lambda = flambda * ss$lambda)
-    x[] <- ss$y
-    x
+    require(mgcv)
+    ## x is cumulative confirmed cases
+    xx <- pmax(diff(x), 0)
+    t <- seq_along(xx)
+    fm <- gam(xx ~ 1 + s(t), family = poisson, gamma = flambda)
+    cumsum(c(x[1], predict(fm, type = "response")))
 }
+
+smoothActive <- function(x, flambda = 1)
+{
+    require(mgcv)
+    ## x is active cases, no need to diff. family = posson?
+    t <- seq_along(x)
+    fm <- gam(x ~ 1 + s(t), family = poisson, gamma = flambda)
+    c(predict(fm, type = "response"))
+}
+
+
+
 
 ## estimate growth rate parameter using three different
 ## methods. 'data' should have columns (a) 'confirmed' and (b) 'active',
@@ -32,9 +44,9 @@ estimate.growth <-
     x <- data[[confirmed]]
     a <- data[[active]]
     if (smooth) {
-        ## just do smoothing splines with GCV
-        x <- ns.smoother(x, flambda = as.numeric(smooth))
-        a <- ns.smoother(a, flambda = as.numeric(smooth))
+        ## smooth using mgcv
+        x <- smoothConfirmed(x, flambda = as.numeric(smooth))
+        a <- smoothActive(a, flambda = as.numeric(smooth))
     }
     dx <- diff(x, lag = lag) # loses lag days
     da <- diff(a, lag = lag) # loses lag days
@@ -44,9 +56,9 @@ estimate.growth <-
     lambda1 <- dx / (lag * head(a, -lag))
     ## method 2
     lambda2 <- da / (lag * head(a, -lag)) + mu
-    data$rho <- c(rep(NA_real_, lag), rho, rep(NA_real_, lag))
-    data$lambda1 <- c(lambda1, rep(NA_real_, lag))
-    data$lambda2 <- c(lambda2, rep(NA_real_, lag))
+    data[["rho"]] <- c(rep(NA_real_, lag), rho, rep(NA_real_, lag))
+    data[["lambda1"]] <- c(lambda1, rep(NA_real_, lag))
+    data[["lambda2"]] <- c(lambda2, rep(NA_real_, lag))
     attr(data, "lag") <- lag
     attr(data, "mu") <- mu
     class(data) <- c("growthrate", class(data))
