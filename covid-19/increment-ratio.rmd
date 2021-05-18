@@ -385,7 +385,11 @@ getRatioUR(dall, "Karnataka", lag = LAG, smooth = LAMBDA, cutoff.pc = 50) |>
 
 ---
 
+layout: true
+
 # Death rate (with 7-day lag) 
+
+---
 
 
 ```{r}
