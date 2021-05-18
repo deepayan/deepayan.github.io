@@ -397,12 +397,19 @@ pd <- xyplot(x = I(ideaths / icases.lagged) ~ date | where, data = sdf,
             ## abline = list(h = 1, lwd = 2, col = "grey"),
             type = "l", pch = 16, grid = TRUE)
 N <- dim(pd)
-if (N > 21) message("N > 21, adjust next plot")
+if (N > 24) message("N = ", N, " > 21, adjust next plot")
 ```
 
 
 ```{r}
-pd[1:21]
+update(pd[1:12], layout = c(3, 4))
+```
+
+---
+
+
+```{r}
+update(pd[13:N], layout = c(3, 4))
 ```
 
 
