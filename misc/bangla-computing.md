@@ -26,8 +26,9 @@ for, but in practice, there were many technical challenges.
 
 The time was the early 2000s, and the internet had not yet started
 using Unicode, although it was clear to those technically inclined
-that it was going to be the future. ISCII had never really caught
-on. Popular bengali websites, such as
+that it was going to be the
+future. [ISCII](https://en.wikipedia.org/wiki/Indian_Script_Code_for_Information_Interchange)
+had never really caught on. Popular bengali websites, such as
 [anandabazar.com](http://web.archive.org/web/20010118221900/https://www.anandabazar.com/),
 were using proprietary solutions, often tied to particular browsers
 (making snapshots of their websites taken at the time completely
@@ -94,7 +95,7 @@ tried to fill, in a much more systematic and collaborative way. I
 still try to experiment with my site when I can (especially now that
 Google has essentially perfected OCR), and during the COVID-19
 lockdown in 2020, I [re-designed](https://majantali.github.io) it as
-part of an exercise to learn about Github Pages.
+an exercise to learn about Github Pages.
 
 The font I had designed, and to a lesser extent the Bengali input tool
 I had created, turned out to have more substantial, if short-lived,
@@ -137,17 +138,19 @@ Noto](https://www.google.com/get/noto/) fonts.
 
 Ankur, as bengalinux was eventually rebranded as, was home to some
 interesting software projects as well (such as an English to Bengali
-translator), but eventually the focus turned to internationalizaton
-and localization, or in other words, translating software interfaces
-to Bengali. This was never really a passion of mine. I had no interest
-in the outcome unless the results were something I would use, and the
-initial focus was on translating the GNOME environment, which made
-sense because it was the _de facto_ choice for new users, but it was
-also something I rarely used, because I had by that time settled on
-KDE as my environment of choice (it still is). Secondly, as fun as it
-was to see menu items in Bengali, it didn't really help me in any way
-because I was perfectly comfortable with the original English; without
-any commercial interest, it was difficult to sustain interest in
+translator based on a [part-of-speech
+tagger](https://en.wikipedia.org/wiki/Part-of-speech_tagging)), but
+eventually the focus turned to internationalizaton and localization,
+or in other words, translating software interfaces to Bengali. This
+was never really a passion of mine. I had little interest in the
+outcome unless the results were something I would use, and the initial
+focus was on translating the GNOME environment, which made sense
+because it was the _de facto_ choice for new users, but it was also
+something I rarely used because I had by that time settled on KDE as
+my environment of choice (it still is). Secondly, as fun as it was to
+see menu items in Bengali, it didn't really help me in any way because
+I was perfectly comfortable with the original English.  Without any
+additional incentive, it was difficult to sustain interest in
 something I would not use myself.
 
 Still, I got into it for a while, translating KDE because that way I
