@@ -29,22 +29,12 @@ R packages for image processing:
 - [Using the `rip.recover` package](rip/recover-intro.html)
 
 
-<!-- 
 
-Ramblings:
+Educational Material:
 
-- [Bangla computing and I](misc/bangla-computing.html)
-
-- [Collected Recipes](misc/recipes.html)
-
--->
-
+- [Expository slides on R](r-expository-material.html)
 
 <!-- 
-
-Expository notes and slides:
-
-- Talks related to R
 
 - Lattice
 
@@ -64,5 +54,13 @@ Course material:
 - [Regression Techniques]()
 
 -->
+
+
+Miscellaneous Ramblings:
+
+- [Bangla computing and I](misc/bangla-computing.html)
+
+- [Collected Recipes](misc/recipes.html)
+
 
 
