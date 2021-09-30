@@ -29,5 +29,40 @@ R packages for image processing:
 - [Using the `rip.recover` package](rip/recover-intro.html)
 
 
+<!-- 
+
+Ramblings:
+
+- [Bangla computing and I](misc/bangla-computing.html)
+
+- [Collected Recipes](misc/recipes.html)
+
+-->
+
+
+<!-- 
+
+Expository notes and slides:
+
+- Talks related to R
+
+- Lattice
+
+- R for clininal trial data
+
+- Data visualization
+
+-->
+
+
+<!-- 
+
+Course material:
+
+- [Introductory Computer Programming]() (mostly with R)
+
+- [Regression Techniques]()
+
+-->
 
 
