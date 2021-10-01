@@ -3,12 +3,17 @@ title: Expository material on R
 author: Deepayan Sarkar
 ---
 
+This page gives links to slides of various talks and lectures on R
+that I have given. It is not an exhaustive list, and only the latest
+versions of essentially similar talks are included, although there is
+sometimes substantial overlap.
+
 The first set of slides are from a course on introductory programming
-(mostly with R). The focus is more on the language and less on
-applications.
+(mostly with R), so they proceed somewhat systematically. The focus is
+more on the language and less on applications.
 
 
-- [Introduction and Overview of Concepts](https://deepayan.github.io/courses/introductory-computer-programming/slides/02-introduction-2.html)
+- [Brief Overview of Programming Concepts](https://deepayan.github.io/courses/introductory-computer-programming/slides/02-introduction-2.html)
 
 - An Overview of R
 
@@ -48,7 +53,7 @@ workshops.
 
 - [A High-Level Introduction to R](https://www.isid.ac.in/~deepayan/Mysore-University-2019/roverview.html)
 
-- [The formula interface for model specification](https://www.isid.ac.in/~deepayan/Mysore-University-2019/rformula.html)
+- [The Formula Interface for Model Specification](https://www.isid.ac.in/~deepayan/Mysore-University-2019/rformula.html)
 
 - [Lexical Scope and Evaluation](https://deepayan.github.io/r-talks/r-eval/eval.html)
 
