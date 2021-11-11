@@ -1,3 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Expressions, Evaluation and Scoping in R</title>
+    <link rel="stylesheet" href="https://deepayan.github.io/assets/styles/remark.css">
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Expressions, Evaluation and Scoping in R
+
 ---
 layout: remark
 title: Expressions, Evaluation and Scoping in R
@@ -15,6 +29,17 @@ opts_chunk$set(cache = FALSE, autodep = TRUE,
 options(warnPartialMatchDollar = FALSE, width = 100)
 set.seed(20191105)
 ```
+
+
+<div>
+$$
+\newcommand{\sub}[2]{ {#1}_{#2} }
+\newcommand{\sumlimits}[2]{ \sum\limits_{#1}^{#2} }
+$$
+</div>
+
+
+
 
 ## REPL
 
@@ -36,11 +61,11 @@ set.seed(20191105)
 
 * Useful links:
 
-	* [Source](eval-slides.rmd) of this talk (R + Markdown, similar to Rnw)
+	* [Source](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.rmd) of this talk (R + Markdown, similar to Rnw)
 	
-	* [Makefile](Makefile) containing conversion rules (using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/))
+	* [Makefile](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/Makefile) containing conversion rules (using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/))
 
-	* Extracted [R code](eval-slides.R)
+	* Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
 
 
 ---
@@ -110,7 +135,7 @@ sqrt
 
 * What does `.Primitive()` do?
 
-* Check `help(.Primitive)` (we don't need to understand details)
+	* Check `help(.Primitive)` (but we don't really need to understand details)
 
 ---
 
@@ -146,9 +171,8 @@ find("x")
 find("sqrt")
 ```
 
-
-
-* The "original" `sqrt()` is not overwritten; instead a new one is defined
+* Note that the "original" `sqrt()` is not overwritten; instead a new
+  one is defined
 
 
 ---
@@ -160,8 +184,6 @@ find("sqrt")
 ```{r}
 search()
 ```
-
-
 
 * R searches for symbols sequentially in the "search path"
 
@@ -203,14 +225,14 @@ search() # compare
 
 * `new.env()` explicitly creates environments
 
-* Variables inside environments can be accessed using `$`
+* Variables inside environments can be accessed using `$` (like lists or data frames)
 
 
 ```{r,fig.height = 5}
 e1 <- new.env()
 e1$x <- seq(0, 2 * pi, length.out = 101)
 e1$y <- cos(e1$x)
-plot(y ~ x, data = e1, type = "l", ylim = c(-1, 1))
+plot(y ~ x, data = e1, type = "l", ylim = c(-1, 1)) # Formula interface
 ```
 
 
@@ -272,30 +294,44 @@ environment(hist)
 
 * This is the "evaluation environment" and contains the local variables of the function
 
-* The environment enclosing this "evaluation environment" is the
-  environment of the function
+* The environment of the function is the environment enclosing this "evaluation environment"
+  
 --
 
 * While the function is running, evaluation tries to find symbols as follows:
 
 	* First, in the evaluation environment
 	
-	* Next, in its enclosing environment, the environment of the function
+	* Next, in its enclosing environment, i.e., the environment of the function
 	
 	* Then, in the enclosing environment of that environment, and so on
 
-* This behaviour is called "lexical scoping"
+* This behaviour is called "__lexical scoping__"
 --
 
 * Evaluation in the global environment follows the same rule (hence the search path)
 
+---
 
+## Are these details important to know?
+
+* Depends!
+
+* You can use R productively with only a superficial understanding of evaluation
+
+* However, these details often explain and diagnose many seemingly paranormal behaviour in R
+
+* They can also be a lot of fun
 
 ---
 
-## Why are these details important?
+layout: true
 
-* Depending on scoping rules (for non-local symbols) is often risky
+## Scoping rules can mask errors
+
+---
+
+* Consider the following function which uses an undefined variable `lambda`
 
 
 ```{r}
@@ -314,28 +350,24 @@ b <- function(x) # computes histogram bins given data 'x'
 
 ```{r}
 x <- rlnorm(1000)
-hist(boxcox(x), breaks = b)
+hist(boxcox(x), breaks = b) # error, as it should be
 ```
 
 
 ---
 
-## Why are these details important?
-
-* Works if we define `lambda`
-
+* The same code will "work" if `lambda` happens to be defined
 
 ```{r}
 lambda <- 0
 hist(boxcox(x), breaks = b)  # notice that 'b' is a function! (See ?hist)
 ```
 
-
-
-
 ---
 
-## Why are these details important?
+layout: false
+
+## But sometimes we _want_ to write such functions
 
 * Normally, depending on this kind of scoping behaviour should be unnecessary
 
@@ -350,14 +382,11 @@ hist(boxcox(x), breaks = b)  # notice that 'b' is a function! (See ?hist)
 
 ## Do we need functions that create functions?
 
-* Have you encountered such functions?
---
-
-* Probably not very commonly observed...
+* Probably not very common...
 
 * But only because we are limited in our thinking
 
-* We have already used functions as arguments to other functions
+* We already use functions as arguments to other functions
 
 * Thinking "functionally" opens up many other interesting approaches
 
@@ -398,9 +427,6 @@ par(mfrow = c(1, 2))
 hist(boxcox.sqrt(x), breaks = b)
 hist(boxcox.log(x), breaks = b)
 ```
-
-
-
 
 ---
 
@@ -461,94 +487,102 @@ f <- function(x) {
 f(10)
 ```
 
-
-
 * S, which is similar to R but does not have lexical scoping, would print `123`
 
 
+---
+
+## A more serious example
+
+* Given positive-valued data (say stock returns), one may be interested in "transforming" it to look normal
+
+* The Box-Cox transformation is one family where one might search for an "optimum" choice
+
+* A maximum-likelihood approach: assume $\lambda$-transformed data follow $N(\mu, \sigma^2)$
+
+* A [little mathematics](https://www.isid.ac.in/~deepayan/RT2018/notes/systematic-violations.html#/the-box-cox-transformation-a-likelihood-based-approach) tells us that
+
+	- There is no closed form solution for $\lambda$, but
+	
+	- The optimum (MLE) $\lambda$ can be found by minimizing
+	$$
+    \frac{n}{2} \left( \log 2 \pi + \log \hat{\sigma}^2(\lambda) + 1 \right) - (\lambda - 1) \sum \log \sub{x}{i}
+	$$
+
+	- where $\hat{\sigma}^2(\lambda)$ is the sample variance of the transformed data
 
 ---
 
-## More serious examples
+layout: true
 
-* Functions are actually quite commonly encountered in probability and statistics
-
-* Examples: density function, CDF, likelihood function
+## A quick prototype
 
 ---
 
-## The empirical CDF
+* Suppose we have a general numerical optimizer that can optimize a function of _one_ argument
 
-* Consider the empirical cumulative distribution function (ECDF):
+* Make a function that converts data into a function suitable for optimization:
 
 ```{r}
-ECDF <- function(x)
+negllBoxCox <- function(x)
 {
-	x <- x[is.finite(x)]
-	function(u) {
-	    sum(x <= u) / length(x)
-	}
+    n <- length(x)
+    slx <- sum(log(x))
+    function(lambda) {
+        y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
+        sy <- mean((y - mean(y))^2)
+        n * log(sy) / 2 - (lambda - 1) * slx
+    }
 }
-x <- rlnorm(50)
-F.sqrt <- ECDF(boxcox.sqrt(x))
-F.log <- ECDF(boxcox.log(x))
-```
-
-* Evalute ECDF at certain values
-
-```{r}
-sapply(-5:5, F.sqrt)
-sapply(-5:5, F.log)
 ```
 
 ---
 
-## The empirical CDF
+* We can can now use this function in any optimizer
 
-* Many R tools are designed to work with vectorized functions
+```{r}
+x <- rlnorm(100) # so lambda = 0
+f <- negllBoxCox(x)
+f(0)
+optimize(f, lower = -10, upper = 10)
+## OR optim(par = 1, fn = f) for alternative methods
+```
+
+---
+
+* We can even plot the "likelihood function" — but first we have to "vectorize" our function
 
 * The `Vectorize()` function creates a vectorized function from a non-vectorized one
 
-
 ```{r}
-FF.log <- Vectorize(F.log)
-plot(FF.log, from = -4, to = 4, n = 1000)
+plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
 ```
-
-
 
 ---
 
-## The empirical CDF
-
-* But where is the data `x`?
+* Or we can do a quick simulation study of how well this method estimates $\lambda$ when $\lambda = 1$
 
 ```{r}
-F.log
+lambda.hat <-
+    replicate(1000,
+              optimize(negllBoxCox(rnorm(100, mean = 10)), lower = -10, upper = 10)$minimum)
+hist(lambda.hat, breaks = b)
 ```
-
-
-
-* It is still available in the environment that _created_ `F.log`
-
-```{r}
-environment(F.log)$x
-```
-
-* In fact, R has has a built-in `ecdf()` function that works similarly
-
-
-
 ---
 
-## Objective functions (to be optimized)
+layout: false
+
+## Another example: linear regression with general loss function
 
 * Another common use case: optimization of a loss function
 
-* Consider the following general approach to linear regression given data $(x_i, y_i), i = 1,\dotsc,n$
+* Consider the following general approach to linear regression given data $(\sub{x}{i}, \sub{y}{i}), i = 1,\dotsc,n$
 
 <div>
-$$\hat{\beta} = \arg \min_{\beta} \sum_{i=1}^n L(y_i - \beta_0 - \beta_1 x_i) = \arg \min_{\beta} f(\beta)$$
+$$
+\hat{\beta} = \arg \min_{\beta} \sumlimits{i=1}{n} L(\sub{y}{i} - \sub{\beta}{0} - \sub{\beta}{1} \sub{x}{i}) = 
+\arg \min_{\beta} f(\beta)
+$$
 </div>
 
 * Common choices for $L$ are
@@ -565,7 +599,11 @@ $$\hat{\beta} = \arg \min_{\beta} \sum_{i=1}^n L(y_i - \beta_0 - \beta_1 x_i) = 
 
 ---
 
+layout: true
+
 ## Objective functions (to be optimized)
+
+---
 
 * The following functions takes data and $L$, and creates a suitable objective function
 
@@ -584,8 +622,6 @@ obj.lse <- with(phones, make.objective(year, calls, L = function(u) u*u))
 
 ---
 
-## Objective functions (to be optimized)
-
 
 ```{r}
 obj.lad
@@ -595,8 +631,11 @@ environment(obj.lad)$L
 
 ---
 
-## Objective functions (to be optimized)
+layout: true
 
+## Results of optimization
+
+---
 
 ```{r}
 fm.lad <- optim(obj.lad, par = c(0,0))
@@ -605,22 +644,18 @@ str(fm.lad)
 str(fm.lse)
 ```
 
-
 ---
-
-## Objective functions (to be optimized)
 
 
 ```{r,fig.height=7}
 plot(calls ~ year, phones)
 abline(fm.lad$par, col = "blue")
-abline(fm.lse$par, col = "red")
+abline(fm.lse$par, col = "red") # This is what we would get from lm()
 ```
 
-
-
-
 ---
+
+layout: false
 
 ## A more complex example
 
@@ -708,7 +743,6 @@ ll <- chooseBins(xx, p = 0.125)
 str(ll)
 ```
 
-
 ---
 
 ## Cross validation: implementation
@@ -750,6 +784,84 @@ hist(xx, breaks = breaks)
   [Lexical Scope and Statistical Computing](https://www.stat.auckland.ac.nz/~ihaka/downloads/lexical.pdf)
 
 
+---
+
+## Alternative: Minimize AIC
+
+* A simpler alternative: use a popular model selection criterion such as AIC
+
+* Simple definition: $2k - 2 \log(\hat{L})$ where 
+
+	- $k$ is the number of parameters (here the number of bins)
+	
+	- $\hat{L}$ is the maximum likelihood (here the joint density under the histogram)
+	
+* Similar approach: make function of $k$ from input data
+
+
+---
+
+## Histogram AIC
+
+```{r}
+chooseBinsAIC <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    histAIC <- function(B)
+    {
+        b <- seq(r[1], r[2], length.out = B + 1)
+        h <- hist(x, breaks = b, plot = FALSE)
+        ## likelihood is simply product of density^counts
+        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
+        logL <- with(h, sum(counts[keep] * log(density[keep])))
+        2 * B - 2 * logL
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+}
+ll <- chooseBinsAIC(xx, p = 0.125)
+str(ll)
+```
+
+---
+
+## AIC: implementation
+
+
+```{r}
+with(ll, {
+    plot(AIC ~ B, type = "o")
+    abline(v = B[which.min(AIC)])
+})
+```
+
+
+
+---
+
+## AIC: comparison with other "rules"
+
+
+```{r}
+(nclass.aic <- with(ll, B[which.min(AIC)]))
+nclass.Sturges(xx)
+nclass.FD(xx)
+nclass.scott(xx)
+```
+
+
+---
+
+## AIC: Resulting histogram
+
+
+```{r,fig.height=5.5}
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
+hist(xx, breaks = breaks)
+```
 
 
 ---
@@ -788,7 +900,6 @@ e[[3]]
 
 * A quoted expression can be evaluated using `eval()`
 
-
 ```{r}
 eval(e)
 ```
@@ -809,7 +920,6 @@ ls.str(e2)
 ```{r}
 eval(e, envir = e2)
 ```
-
 
 
 ---
@@ -890,3 +1000,40 @@ with.default
 replicate
 ```
 
+
+    </textarea>
+  </body>
+
+  <script src="https://remarkjs.com/downloads/remark-latest.min.js"
+	  type="text/javascript"></script>
+
+  <script type="text/javascript">
+    var slideshow = remark.create(
+	{
+	    navigation: {scroll: false,},
+	    ratio: '16:9',
+	    countIncrementalSlides: false
+	});
+    
+    // Setup MathJax; unused if mathjax == false
+    MathJax = {
+	tex: {
+	    inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+	    displayMath: [ ['$$', '$$'], ['\\[', '\\]'] ]
+	},
+	svg: {
+	    fontCache: 'global'
+	},
+    };
+
+  </script>
+
+
+  <script type="text/javascript" async
+	  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+  </script>
+
+
+</html>
+
+	

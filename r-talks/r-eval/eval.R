@@ -49,7 +49,7 @@ search() # compare
 e1 <- new.env()
 e1$x <- seq(0, 2 * pi, length.out = 101)
 e1$y <- cos(e1$x)
-plot(y ~ x, data = e1, type = "l", ylim = c(-1, 1))
+plot(y ~ x, data = e1, type = "l", ylim = c(-1, 1)) # Formula interface
 
 e2 <- e1
 range(e1$y)
@@ -76,7 +76,7 @@ b <- function(x) # computes histogram bins given data 'x'
 }
 
 x <- rlnorm(1000)
-hist(boxcox(x), breaks = b)
+hist(boxcox(x), breaks = b) # error, as it should be
 
 lambda <- 0
 hist(boxcox(x), breaks = b)  # notice that 'b' is a function! (See ?hist)
@@ -115,26 +115,29 @@ f <- function(x) {
 }
 f(10)
 
-ECDF <- function(x)
+negllBoxCox <- function(x)
 {
-	x <- x[is.finite(x)]
-	function(u) {
-	    sum(x <= u) / length(x)
-	}
+    n <- length(x)
+    slx <- sum(log(x))
+    function(lambda) {
+        y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
+        sy <- mean((y - mean(y))^2)
+        n * log(sy) / 2 - (lambda - 1) * slx
+    }
 }
-x <- rlnorm(50)
-F.sqrt <- ECDF(boxcox.sqrt(x))
-F.log <- ECDF(boxcox.log(x))
 
-sapply(-5:5, F.sqrt)
-sapply(-5:5, F.log)
+x <- rlnorm(100) # so lambda = 0
+f <- negllBoxCox(x)
+f(0)
+optimize(f, lower = -10, upper = 10)
+## OR optim(par = 1, fn = f) for alternative methods
 
-FF.log <- Vectorize(F.log)
-plot(FF.log, from = -4, to = 4, n = 1000)
+plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
 
-F.log
-
-environment(F.log)$x
+lambda.hat <-
+    replicate(1000,
+              optimize(negllBoxCox(rnorm(100, mean = 10)), lower = -10, upper = 10)$minimum)
+hist(lambda.hat, breaks = b)
 
 make.objective <- function(x, y, L = abs)
 {
@@ -157,7 +160,7 @@ str(fm.lse)
 
 plot(calls ~ year, phones)
 abline(fm.lad$par, col = "blue")
-abline(fm.lse$par, col = "red")
+abline(fm.lse$par, col = "red") # This is what we would get from lm()
 
 chooseBins <- function(x, p = 0.25)
 {
@@ -192,6 +195,40 @@ nclass.FD(xx)
 nclass.scott(xx)
 
 breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
+hist(xx, breaks = breaks)
+
+chooseBinsAIC <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    histAIC <- function(B)
+    {
+        b <- seq(r[1], r[2], length.out = B + 1)
+        h <- hist(x, breaks = b, plot = FALSE)
+        ## likelihood is simply product of density^counts
+        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
+        logL <- with(h, sum(counts[keep] * log(density[keep])))
+        2 * B - 2 * logL
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+}
+ll <- chooseBinsAIC(xx, p = 0.125)
+str(ll)
+
+with(ll, {
+    plot(AIC ~ B, type = "o")
+    abline(v = B[which.min(AIC)])
+})
+
+(nclass.aic <- with(ll, B[which.min(AIC)]))
+nclass.Sturges(xx)
+nclass.FD(xx)
+nclass.scott(xx)
+
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
 hist(xx, breaks = breaks)
 
 rm(list = c("x", "y")) # remove x, y if defined earlier
