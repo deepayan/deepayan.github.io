@@ -118,7 +118,7 @@ f(10)
 negllBoxCox <- function(x)
 {
     n <- length(x)
-    slx <- sum(log(x))
+    slx <- sum(log(x)) # compute only once
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
@@ -129,6 +129,7 @@ negllBoxCox <- function(x)
 x <- rlnorm(100) # so lambda = 0
 f <- negllBoxCox(x)
 f(0)
+
 optimize(f, lower = -10, upper = 10)
 ## OR optim(par = 1, fn = f) for alternative methods
 
@@ -162,41 +163,6 @@ plot(calls ~ year, phones)
 abline(fm.lad$par, col = "blue")
 abline(fm.lse$par, col = "red") # This is what we would get from lm()
 
-chooseBins <- function(x, p = 0.25)
-{
-    x <- x[is.finite(x)]
-    n <- length(x)
-    r <- extendrange(x)
-    d <- r[2] - r[1]
-    CVE <- function(B)
-    {
-        h <- d / B
-        breaks <- seq(r[1], r[2], length.out = B+1)
-        k <- findInterval(x, breaks) # runtime O(n * log(B))
-        counts <- table(factor(k, levels = 1:B))
-        2 / ((n-1)*h) - sum(counts^2) * (n+1) / ((n-1) * n^2 * h)
-    }
-    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, CVE = unname(sapply(Bvec, CVE)))
-}
-
-xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
-ll <- chooseBins(xx, p = 0.125)
-str(ll)
-
-with(ll, {
-    plot(CVE ~ B, type = "o")
-    abline(v = B[which.min(CVE)])
-})
-
-(nclass.cv <- with(ll, B[which.min(CVE)]))
-nclass.Sturges(xx)
-nclass.FD(xx)
-nclass.scott(xx)
-
-breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
-hist(xx, breaks = breaks)
-
 chooseBinsAIC <- function(x, p = 0.25)
 {
     x <- x[is.finite(x)]
@@ -215,6 +181,7 @@ chooseBinsAIC <- function(x, p = 0.25)
     Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
     list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
 }
+xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBinsAIC(xx, p = 0.125)
 str(ll)
 
@@ -229,6 +196,40 @@ nclass.FD(xx)
 nclass.scott(xx)
 
 breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
+hist(xx, breaks = breaks)
+
+chooseBins <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    CVE <- function(B)
+    {
+        h <- d / B
+        breaks <- seq(r[1], r[2], length.out = B+1)
+        k <- findInterval(x, breaks) # runtime O(n * log(B))
+        counts <- table(factor(k, levels = 1:B))
+        2 / ((n-1)*h) - sum(counts^2) * (n+1) / ((n-1) * n^2 * h)
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, CVE = unname(sapply(Bvec, CVE)))
+}
+
+ll <- chooseBins(xx, p = 0.125)
+str(ll)
+
+with(ll, {
+    plot(CVE ~ B, type = "o")
+    abline(v = B[which.min(CVE)])
+})
+
+(nclass.cv <- with(ll, B[which.min(CVE)]))
+nclass.Sturges(xx)
+nclass.FD(xx)
+nclass.scott(xx)
+
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
 hist(xx, breaks = breaks)
 
 rm(list = c("x", "y")) # remove x, y if defined earlier

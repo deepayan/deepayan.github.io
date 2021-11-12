@@ -1,17 +1,3 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Expressions, Evaluation and Scoping in R</title>
-    <link rel="stylesheet" href="https://deepayan.github.io/assets/styles/remark.css">
-  </head>
-  <body>
-    <textarea id="source">
-
-class: center, middle
-
-# Expressions, Evaluation and Scoping in R
-
 ---
 layout: remark
 title: Expressions, Evaluation and Scoping in R
@@ -52,12 +38,10 @@ $$
 --
 
 * Useful links:
-
-	* [Source](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.rmd) of this talk (R + Markdown, similar to Rnw)
-	
-	* [Makefile](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/Makefile) containing conversion rules (using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/))
-
-	* Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
+  [Source](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.rmd) (R + Markdown),
+  [Makefile](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/Makefile)
+  (conversion using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/)), 
+  Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
 
 
 ---
@@ -187,9 +171,7 @@ sqrt
 function (x)  .Primitive("sqrt")
 ```
 
-* What does `.Primitive()` do?
-
-	* Check `help(.Primitive)` (but we don't really need to understand details)
+* What does `.Primitive()` do? See `help(.Primitive)` (but we don't really need to know)
 
 ---
 
@@ -306,7 +288,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x564bba3a3fa8> 
+<environment: 0x55758e08dfa8> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -473,7 +455,7 @@ environment(hist)
 
 * You can use R productively with only a superficial understanding of evaluation
 
-* However, these details often explain and diagnose many seemingly paranormal behaviour in R
+* However, these details often help explain and diagnose seemingly odd behaviour
 
 * They can also be a lot of fun
 
@@ -538,7 +520,7 @@ layout: false
 
 * However, there is one situation where this evaluation rule becomes important
 
-* When a function creates and returns another function!
+* When a function creates and returns or uses another function!
 
 
 ---
@@ -614,7 +596,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x564bbba06f10>
+<environment: 0x55758ee03b40>
 ```
 
 ```r
@@ -627,8 +609,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x564bbbf5e5b0>
-<environment: 0x564bbac7fcb8>
+<bytecode: 0x55758fc45430>
+<environment: 0x55758e7a9af0>
 ```
 
 
@@ -647,7 +629,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x564bbba06f10>
+<environment: 0x55758ee03b40>
 ```
 
 ```r
@@ -655,7 +637,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x564bbac7fcb8>
+<environment: 0x55758e7a9af0>
 ```
 
 
@@ -716,7 +698,7 @@ f(10)
 
 ## A more serious example
 
-* Given positive-valued data (say stock returns), one may be interested in "transforming" it to look normal
+* Given positive-valued (possibly skewed) data, one may want to "transform" them to look normal
 
 * The Box-Cox transformation is one family where one might search for an "optimum" choice
 
@@ -750,7 +732,7 @@ layout: true
 negllBoxCox <- function(x)
 {
     n <- length(x)
-    slx <- sum(log(x))
+    slx <- sum(log(x)) # compute only once
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
@@ -761,7 +743,7 @@ negllBoxCox <- function(x)
 
 ---
 
-* We can can now use this function in any optimizer
+* Let's compute the "negative log likelihood" function for some simulated data
 
 
 ```r
@@ -773,6 +755,9 @@ f(0)
 ```
 [1] -1.304839
 ```
+
+* We can can now use this function in any optimizer
+
 
 ```r
 optimize(f, lower = -10, upper = 10)
@@ -801,7 +786,7 @@ $objective
 plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
 ```
 
-![plot of chunk unnamed-chunk-28](figures/eval-unnamed-chunk-28-1.png)
+![plot of chunk unnamed-chunk-29](figures/eval-unnamed-chunk-29-1.png)
 
 ---
 
@@ -815,7 +800,7 @@ lambda.hat <-
 hist(lambda.hat, breaks = b)
 ```
 
-![plot of chunk unnamed-chunk-29](figures/eval-unnamed-chunk-29-1.png)
+![plot of chunk unnamed-chunk-30](figures/eval-unnamed-chunk-30-1.png)
 ---
 
 layout: false
@@ -881,7 +866,7 @@ obj.lad
 function(beta) {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x564bbac25378>
+<environment: 0x55758e4461d0>
 ```
 
 ```r
@@ -890,7 +875,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x564bba8fb9a0>
+<environment: 0x55758e287aa8>
 ```
 
 ```r
@@ -950,7 +935,7 @@ abline(fm.lad$par, col = "blue")
 abline(fm.lse$par, col = "red") # This is what we would get from lm()
 ```
 
-![plot of chunk unnamed-chunk-33](figures/eval-unnamed-chunk-33-1.png)
+![plot of chunk unnamed-chunk-34](figures/eval-unnamed-chunk-34-1.png)
 
 ---
 
@@ -964,8 +949,133 @@ layout: false
 
 * Fixing starting point, what is an optimal choice?
 
-* One option: [cross validation](http://onlinestatbook.com/stat_sim/histogram/index.html)
+* Maximum Likelihood fails because it "oversmooths", so needs regularization
 
+* Options
+
+	* [AIC](https://en.wikipedia.org/wiki/Akaike_information_criterion)
+
+	* [cross validation](http://onlinestatbook.com/stat_sim/histogram/index.html)
+
+---
+
+## Minimize AIC
+
+* The Akaike Information Criterion is a popular model selection criterion
+
+* Simple definition: $2k - 2 \log(\hat{L})$ where 
+
+	- $k$ is the number of parameters (here the number of bins)
+	
+	- $\hat{L}$ is the maximum likelihood (here the joint density under the histogram)
+	
+* Our prototype: make function of $k$ from input data
+
+
+---
+
+## Histogram AIC
+
+
+```r
+chooseBinsAIC <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    histAIC <- function(B)
+    {
+        b <- seq(r[1], r[2], length.out = B + 1)
+        h <- hist(x, breaks = b, plot = FALSE)
+        ## likelihood is simply product of density^counts
+        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
+        logL <- with(h, sum(counts[keep] * log(density[keep])))
+        2 * B - 2 * logL
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+}
+xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
+ll <- chooseBinsAIC(xx, p = 0.125)
+str(ll)
+```
+
+```
+List of 3
+ $ range: num [1:2] -3.58 11.58
+ $ B    : int [1:225] 3 4 5 6 7 8 9 10 11 12 ...
+ $ AIC  : num [1:225] 4128 4092 3939 3759 3746 ...
+```
+
+---
+
+## AIC: implementation
+
+
+
+```r
+with(ll, {
+    plot(AIC ~ B, type = "o")
+    abline(v = B[which.min(AIC)])
+})
+```
+
+![plot of chunk unnamed-chunk-36](figures/eval-unnamed-chunk-36-1.png)
+
+
+
+---
+
+## AIC: comparison with other "rules"
+
+
+
+```r
+(nclass.aic <- with(ll, B[which.min(AIC)]))
+```
+
+```
+[1] 27
+```
+
+```r
+nclass.Sturges(xx)
+```
+
+```
+[1] 11
+```
+
+```r
+nclass.FD(xx)
+```
+
+```
+[1] 12
+```
+
+```r
+nclass.scott(xx)
+```
+
+```
+[1] 12
+```
+
+
+---
+
+## AIC: Resulting histogram
+
+
+
+```r
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
+hist(xx, breaks = breaks)
+```
+
+![plot of chunk unnamed-chunk-38](figures/eval-unnamed-chunk-38-1.png)
 
 ---
 
@@ -1039,7 +1149,6 @@ chooseBins <- function(x, p = 0.25)
 
 
 ```r
-xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBins(xx, p = 0.125)
 str(ll)
 ```
@@ -1064,7 +1173,7 @@ with(ll, {
 })
 ```
 
-![plot of chunk unnamed-chunk-36](figures/eval-unnamed-chunk-36-1.png)
+![plot of chunk unnamed-chunk-41](figures/eval-unnamed-chunk-41-1.png)
 
 
 
@@ -1118,130 +1227,11 @@ breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
 hist(xx, breaks = breaks)
 ```
 
-![plot of chunk unnamed-chunk-38](figures/eval-unnamed-chunk-38-1.png)
+![plot of chunk unnamed-chunk-43](figures/eval-unnamed-chunk-43-1.png)
 
 * For more interesting examples, see Gentleman and Ihaka,
   [Lexical Scope and Statistical Computing](https://www.stat.auckland.ac.nz/~ihaka/downloads/lexical.pdf)
 
-
----
-
-## Alternative: Minimize AIC
-
-* A simpler alternative: use a popular model selection criterion such as AIC
-
-* Simple definition: $2k - 2 \log(\hat{L})$ where 
-
-	- $k$ is the number of parameters (here the number of bins)
-	
-	- $\hat{L}$ is the maximum likelihood (here the joint density under the histogram)
-	
-* Similar approach: make function of $k$ from input data
-
-
----
-
-## Histogram AIC
-
-
-```r
-chooseBinsAIC <- function(x, p = 0.25)
-{
-    x <- x[is.finite(x)]
-    n <- length(x)
-    r <- extendrange(x)
-    d <- r[2] - r[1]
-    histAIC <- function(B)
-    {
-        b <- seq(r[1], r[2], length.out = B + 1)
-        h <- hist(x, breaks = b, plot = FALSE)
-        ## likelihood is simply product of density^counts
-        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
-        logL <- with(h, sum(counts[keep] * log(density[keep])))
-        2 * B - 2 * logL
-    }
-    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
-}
-ll <- chooseBinsAIC(xx, p = 0.125)
-str(ll)
-```
-
-```
-List of 3
- $ range: num [1:2] -3.58 11.58
- $ B    : int [1:225] 3 4 5 6 7 8 9 10 11 12 ...
- $ AIC  : num [1:225] 4128 4092 3939 3759 3746 ...
-```
-
----
-
-## AIC: implementation
-
-
-
-```r
-with(ll, {
-    plot(AIC ~ B, type = "o")
-    abline(v = B[which.min(AIC)])
-})
-```
-
-![plot of chunk unnamed-chunk-40](figures/eval-unnamed-chunk-40-1.png)
-
-
-
----
-
-## AIC: comparison with other "rules"
-
-
-
-```r
-(nclass.aic <- with(ll, B[which.min(AIC)]))
-```
-
-```
-[1] 27
-```
-
-```r
-nclass.Sturges(xx)
-```
-
-```
-[1] 11
-```
-
-```r
-nclass.FD(xx)
-```
-
-```
-[1] 12
-```
-
-```r
-nclass.scott(xx)
-```
-
-```
-[1] 12
-```
-
-
----
-
-## AIC: Resulting histogram
-
-
-
-```r
-breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
-hist(xx, breaks = breaks)
-```
-
-![plot of chunk unnamed-chunk-42](figures/eval-unnamed-chunk-42-1.png)
 
 
 ---
@@ -1344,7 +1334,7 @@ y :  num [1:101] 1 0.998 0.992 0.982 0.969 ...
 eval(e, envir = e2)
 ```
 
-![plot of chunk unnamed-chunk-47](figures/eval-unnamed-chunk-47-1.png)
+![plot of chunk unnamed-chunk-48](figures/eval-unnamed-chunk-48-1.png)
 
 
 ---
@@ -1463,7 +1453,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x564bbac281b0>
+<bytecode: 0x55758e44c1a8>
 <environment: namespace:base>
 ```
 
@@ -1475,44 +1465,7 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x564bba2ed6e0>
+<bytecode: 0x55758f6af2c8>
 <environment: namespace:base>
 ```
 
-
-    </textarea>
-  </body>
-
-  <script src="https://remarkjs.com/downloads/remark-latest.min.js"
-	  type="text/javascript"></script>
-
-  <script type="text/javascript">
-    var slideshow = remark.create(
-	{
-	    navigation: {scroll: false,},
-	    ratio: '16:9',
-	    countIncrementalSlides: false
-	});
-    
-    // Setup MathJax; unused if mathjax == false
-    MathJax = {
-	tex: {
-	    inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-	    displayMath: [ ['$$', '$$'], ['\\[', '\\]'] ]
-	},
-	svg: {
-	    fontCache: 'global'
-	},
-    };
-
-  </script>
-
-
-  <script type="text/javascript" async
-	  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-  </script>
-
-
-</html>
-
-	

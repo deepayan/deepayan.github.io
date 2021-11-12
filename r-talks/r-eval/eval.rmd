@@ -1,17 +1,3 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Expressions, Evaluation and Scoping in R</title>
-    <link rel="stylesheet" href="https://deepayan.github.io/assets/styles/remark.css">
-  </head>
-  <body>
-    <textarea id="source">
-
-class: center, middle
-
-# Expressions, Evaluation and Scoping in R
-
 ---
 layout: remark
 title: Expressions, Evaluation and Scoping in R
@@ -60,12 +46,10 @@ $$
 --
 
 * Useful links:
-
-	* [Source](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.rmd) of this talk (R + Markdown, similar to Rnw)
-	
-	* [Makefile](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/Makefile) containing conversion rules (using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/))
-
-	* Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
+  [Source](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.rmd) (R + Markdown),
+  [Makefile](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/Makefile)
+  (conversion using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/)), 
+  Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
 
 
 ---
@@ -133,9 +117,7 @@ find("x")
 sqrt
 ```
 
-* What does `.Primitive()` do?
-
-	* Check `help(.Primitive)` (but we don't really need to understand details)
+* What does `.Primitive()` do? See `help(.Primitive)` (but we don't really need to know)
 
 ---
 
@@ -319,7 +301,7 @@ environment(hist)
 
 * You can use R productively with only a superficial understanding of evaluation
 
-* However, these details often explain and diagnose many seemingly paranormal behaviour in R
+* However, these details often help explain and diagnose seemingly odd behaviour
 
 * They can also be a lot of fun
 
@@ -375,7 +357,7 @@ layout: false
 
 * However, there is one situation where this evaluation rule becomes important
 
-* When a function creates and returns another function!
+* When a function creates and returns or uses another function!
 
 
 ---
@@ -494,7 +476,7 @@ f(10)
 
 ## A more serious example
 
-* Given positive-valued data (say stock returns), one may be interested in "transforming" it to look normal
+* Given positive-valued (possibly skewed) data, one may want to "transform" them to look normal
 
 * The Box-Cox transformation is one family where one might search for an "optimum" choice
 
@@ -527,7 +509,7 @@ layout: true
 negllBoxCox <- function(x)
 {
     n <- length(x)
-    slx <- sum(log(x))
+    slx <- sum(log(x)) # compute only once
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
@@ -538,12 +520,17 @@ negllBoxCox <- function(x)
 
 ---
 
-* We can can now use this function in any optimizer
+* Let's compute the "negative log likelihood" function for some simulated data
 
 ```{r}
 x <- rlnorm(100) # so lambda = 0
 f <- negllBoxCox(x)
 f(0)
+```
+
+* We can can now use this function in any optimizer
+
+```{r}
 optimize(f, lower = -10, upper = 10)
 ## OR optim(par = 1, fn = f) for alternative methods
 ```
@@ -665,8 +652,93 @@ layout: false
 
 * Fixing starting point, what is an optimal choice?
 
-* One option: [cross validation](http://onlinestatbook.com/stat_sim/histogram/index.html)
+* Maximum Likelihood fails because it "oversmooths", so needs regularization
 
+* Options
+
+	* [AIC](https://en.wikipedia.org/wiki/Akaike_information_criterion)
+
+	* [cross validation](http://onlinestatbook.com/stat_sim/histogram/index.html)
+
+---
+
+## Minimize AIC
+
+* The Akaike Information Criterion is a popular model selection criterion
+
+* Simple definition: $2k - 2 \log(\hat{L})$ where 
+
+	- $k$ is the number of parameters (here the number of bins)
+	
+	- $\hat{L}$ is the maximum likelihood (here the joint density under the histogram)
+	
+* Our prototype: make function of $k$ from input data
+
+
+---
+
+## Histogram AIC
+
+```{r}
+chooseBinsAIC <- function(x, p = 0.25)
+{
+    x <- x[is.finite(x)]
+    n <- length(x)
+    r <- extendrange(x)
+    d <- r[2] - r[1]
+    histAIC <- function(B)
+    {
+        b <- seq(r[1], r[2], length.out = B + 1)
+        h <- hist(x, breaks = b, plot = FALSE)
+        ## likelihood is simply product of density^counts
+        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
+        logL <- with(h, sum(counts[keep] * log(density[keep])))
+        2 * B - 2 * logL
+    }
+    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
+    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+}
+xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
+ll <- chooseBinsAIC(xx, p = 0.125)
+str(ll)
+```
+
+---
+
+## AIC: implementation
+
+
+```{r}
+with(ll, {
+    plot(AIC ~ B, type = "o")
+    abline(v = B[which.min(AIC)])
+})
+```
+
+
+
+---
+
+## AIC: comparison with other "rules"
+
+
+```{r}
+(nclass.aic <- with(ll, B[which.min(AIC)]))
+nclass.Sturges(xx)
+nclass.FD(xx)
+nclass.scott(xx)
+```
+
+
+---
+
+## AIC: Resulting histogram
+
+
+```{r,fig.height=5.5}
+breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
+hist(xx, breaks = breaks)
+```
 
 ---
 
@@ -738,7 +810,6 @@ chooseBins <- function(x, p = 0.25)
 
 
 ```{r}
-xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBins(xx, p = 0.125)
 str(ll)
 ```
@@ -783,85 +854,6 @@ hist(xx, breaks = breaks)
 * For more interesting examples, see Gentleman and Ihaka,
   [Lexical Scope and Statistical Computing](https://www.stat.auckland.ac.nz/~ihaka/downloads/lexical.pdf)
 
-
----
-
-## Alternative: Minimize AIC
-
-* A simpler alternative: use a popular model selection criterion such as AIC
-
-* Simple definition: $2k - 2 \log(\hat{L})$ where 
-
-	- $k$ is the number of parameters (here the number of bins)
-	
-	- $\hat{L}$ is the maximum likelihood (here the joint density under the histogram)
-	
-* Similar approach: make function of $k$ from input data
-
-
----
-
-## Histogram AIC
-
-```{r}
-chooseBinsAIC <- function(x, p = 0.25)
-{
-    x <- x[is.finite(x)]
-    n <- length(x)
-    r <- extendrange(x)
-    d <- r[2] - r[1]
-    histAIC <- function(B)
-    {
-        b <- seq(r[1], r[2], length.out = B + 1)
-        h <- hist(x, breaks = b, plot = FALSE)
-        ## likelihood is simply product of density^counts
-        keep <- h$counts > 0 # skip 0 counts (by convention 0 log 0 == 0)
-        logL <- with(h, sum(counts[keep] * log(density[keep])))
-        2 * B - 2 * logL
-    }
-    Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
-}
-ll <- chooseBinsAIC(xx, p = 0.125)
-str(ll)
-```
-
----
-
-## AIC: implementation
-
-
-```{r}
-with(ll, {
-    plot(AIC ~ B, type = "o")
-    abline(v = B[which.min(AIC)])
-})
-```
-
-
-
----
-
-## AIC: comparison with other "rules"
-
-
-```{r}
-(nclass.aic <- with(ll, B[which.min(AIC)]))
-nclass.Sturges(xx)
-nclass.FD(xx)
-nclass.scott(xx)
-```
-
-
----
-
-## AIC: Resulting histogram
-
-
-```{r,fig.height=5.5}
-breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
-hist(xx, breaks = breaks)
-```
 
 
 ---
@@ -1000,40 +992,3 @@ with.default
 replicate
 ```
 
-
-    </textarea>
-  </body>
-
-  <script src="https://remarkjs.com/downloads/remark-latest.min.js"
-	  type="text/javascript"></script>
-
-  <script type="text/javascript">
-    var slideshow = remark.create(
-	{
-	    navigation: {scroll: false,},
-	    ratio: '16:9',
-	    countIncrementalSlides: false
-	});
-    
-    // Setup MathJax; unused if mathjax == false
-    MathJax = {
-	tex: {
-	    inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-	    displayMath: [ ['$$', '$$'], ['\\[', '\\]'] ]
-	},
-	svg: {
-	    fontCache: 'global'
-	},
-    };
-
-  </script>
-
-
-  <script type="text/javascript" async
-	  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
-  </script>
-
-
-</html>
-
-	
