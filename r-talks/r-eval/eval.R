@@ -4,7 +4,7 @@ opts_chunk$set(cache = FALSE, autodep = TRUE,
                dev.args = list(pointsize = 16),
                fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/eval-')
 options(warnPartialMatchDollar = FALSE, width = 100)
-set.seed(20191105)
+set.seed(20211114)
 
 sqrt(x)
 
@@ -72,7 +72,7 @@ b <- function(x) # computes histogram bins given data 'x'
 {
     n <- sum(is.finite(x))
     r <- extendrange(x)
-    seq(r[1], r[2], length.out = round(sqrt(n))+1)
+    seq(r[1], r[2], length.out = round(sqrt(n)) + 1)
 }
 
 x <- rlnorm(1000)
@@ -95,8 +95,8 @@ boxcox.sqrt <- fboxcox(0.5)
 boxcox.log <- fboxcox(0)
 
 par(mfrow = c(1, 2))
-hist(boxcox.sqrt(x), breaks = b)
-hist(boxcox.log(x), breaks = b)
+hist(boxcox.sqrt(x), breaks = b) # equivalently, hist(fboxcox(0.5)(x), breaks = b)
+hist(boxcox.log(x), breaks = b)  #               hist(fboxcox(0)(x), breaks = b)
 
 boxcox.sqrt
 boxcox.log
@@ -122,27 +122,28 @@ negllBoxCox <- function(x)
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
-        n * log(sy) / 2 - (lambda - 1) * slx
+        n * log(sy) / 2 - (lambda - 1) * slx # ignoring constant terms
     }
 }
 
-x <- rlnorm(100) # so lambda = 0
+x <- rlnorm(100) # log-normal, so true lambda = 0
 f <- negllBoxCox(x)
 f(0)
 
 optimize(f, lower = -10, upper = 10)
 ## OR optim(par = 1, fn = f) for alternative methods
 
-plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
+plot(Vectorize(f), from = -2, to = 2, n = 1000, las = 1)
 
 lambda.hat <-
     replicate(1000,
               optimize(negllBoxCox(rnorm(100, mean = 10)), lower = -10, upper = 10)$minimum)
-hist(lambda.hat, breaks = b)
+hist(lambda.hat, breaks = b, las = 1)
 
 make.objective <- function(x, y, L = abs)
 {
-	function(beta) {
+	function(beta)
+    {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
 }
@@ -179,8 +180,10 @@ chooseBinsAIC <- function(x, p = 0.25)
         2 * B - 2 * logL
     }
     Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+    list(range = r, B = Bvec,
+         AIC = unname(sapply(Bvec, histAIC)))
 }
+
 xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBinsAIC(xx, p = 0.125)
 str(ll)
@@ -216,6 +219,7 @@ chooseBins <- function(x, p = 0.25)
     list(range = r, B = Bvec, CVE = unname(sapply(Bvec, CVE)))
 }
 
+## xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBins(xx, p = 0.125)
 str(ll)
 
@@ -266,12 +270,13 @@ my.replicate <- function(N, e)
 }
 str(x <- my.replicate(1000, max(rnorm(20))))
 
-set.seed(20191105)
+set.seed(123)
 rm(sqrt) # remove the sqrt() we defined earlier
 chooseOne <- function(a, b, u = runif(1))
 {
     if (u < 0.5) a else b
 }
+
 chooseOne(sqrt(2), sqrt(-2)) # no warning message
 chooseOne(sqrt(2), sqrt(-2)) # warning message
 

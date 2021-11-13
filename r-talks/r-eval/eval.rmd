@@ -13,7 +13,7 @@ opts_chunk$set(cache = FALSE, autodep = TRUE,
                dev.args = list(pointsize = 16),
                fig.width = 15, fig.height = 6, dpi = 96, fig.path='figures/eval-')
 options(warnPartialMatchDollar = FALSE, width = 100)
-set.seed(20191105)
+set.seed(20211114)
 ```
 
 
@@ -51,6 +51,24 @@ $$
   (conversion using [knitr](https://cran.r-project.org/package=knitr) and [pandoc](https://pandoc.org/)), 
   Extracted [R code](https://github.com/deepayan/deepayan.github.io/blob/master/r-talks/r-eval/eval.R)
 
+
+---
+
+## Prerequisites
+
+- Basic R programming
+
+	- You should be comfortable with writing functions
+	
+	- If you know how to use `eval()` and `quote()`, you already know too much
+
+- Statistical concepts used for illustration
+
+	- Maximum likelihood, regularization
+	
+	- Probability density, histograms
+	
+	- Linear regression
 
 ---
 
@@ -121,7 +139,7 @@ sqrt
 
 ---
 
-* define a "smart" `sqrt()` as follows:
+* Define a "smart" `sqrt()` as follows:
 
 ```{r}
 sqrt <- function(x)
@@ -307,13 +325,33 @@ environment(hist)
 
 ---
 
+## Example: The Box-Cox transformation
+
+* Given positive-valued (possibly skewed) data, one may want to transform them to look Normal
+
+* The Box-Cox transformation conveniently combines power transforms and log in a single family
+
+* Parameterized by a single parameter $\lambda$
+
+<div>
+$$
+g_\lambda(x) = 
+\begin{cases}
+  \frac{x^\lambda - 1}{\lambda} & \lambda \neq 0 \\
+  \log x                        & \lambda = 0
+\end{cases}
+$$
+</div>
+
+---
+
 layout: true
 
 ## Scoping rules can mask errors
 
 ---
 
-* Consider the following function which uses an undefined variable `lambda`
+* Consider the following function (which uses an undefined variable `lambda`)
 
 
 ```{r}
@@ -326,7 +364,7 @@ b <- function(x) # computes histogram bins given data 'x'
 {
     n <- sum(is.finite(x))
     r <- extendrange(x)
-    seq(r[1], r[2], length.out = round(sqrt(n))+1)
+    seq(r[1], r[2], length.out = round(sqrt(n)) + 1)
 }
 ```
 
@@ -406,8 +444,8 @@ boxcox.log <- fboxcox(0)
 
 ```{r}
 par(mfrow = c(1, 2))
-hist(boxcox.sqrt(x), breaks = b)
-hist(boxcox.log(x), breaks = b)
+hist(boxcox.sqrt(x), breaks = b) # equivalently, hist(fboxcox(0.5)(x), breaks = b)
+hist(boxcox.log(x), breaks = b)  #               hist(fboxcox(0)(x), breaks = b)
 ```
 
 ---
@@ -476,11 +514,16 @@ f(10)
 
 ## A more serious example
 
-* Given positive-valued (possibly skewed) data, one may want to "transform" them to look normal
+* Suppose we want to transform (positive-valued) data $x_1, x_2, \dotsc, x_n$
+--
 
-* The Box-Cox transformation is one family where one might search for an "optimum" choice
+* ... to look as Normal as possible, but we don't know what the correct
+  transformation should be
+
+* A standard textbook solution is to look for an "optimum" choice within the Box-Cox family
 
 * A maximum-likelihood approach: assume $\lambda$-transformed data follow $N(\mu, \sigma^2)$
+--
 
 * A [little mathematics](https://www.isid.ac.in/~deepayan/RT2018/notes/systematic-violations.html#/the-box-cox-transformation-a-likelihood-based-approach) tells us that
 
@@ -488,10 +531,13 @@ f(10)
 	
 	- The optimum (MLE) $\lambda$ can be found by minimizing
 	$$
-    \frac{n}{2} \left( \log 2 \pi + \log \hat{\sigma}^2(\lambda) + 1 \right) - (\lambda - 1) \sum \log \sub{x}{i}
+    f(\lambda) = \frac{n}{2} \left( \log 2 \pi + \log \hat{\sigma}^2(\lambda) + 1 \right) - (\lambda - 1) \sum \log \sub{x}{i}
 	$$
 
 	- where $\hat{\sigma}^2(\lambda)$ is the sample variance of the transformed data
+--
+
+* Here $f$ is a function, which is itself a function of data $x_1, x_2, \dotsc, x_n$
 
 ---
 
@@ -513,7 +559,7 @@ negllBoxCox <- function(x)
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
-        n * log(sy) / 2 - (lambda - 1) * slx
+        n * log(sy) / 2 - (lambda - 1) * slx # ignoring constant terms
     }
 }
 ```
@@ -523,7 +569,7 @@ negllBoxCox <- function(x)
 * Let's compute the "negative log likelihood" function for some simulated data
 
 ```{r}
-x <- rlnorm(100) # so lambda = 0
+x <- rlnorm(100) # log-normal, so true lambda = 0
 f <- negllBoxCox(x)
 f(0)
 ```
@@ -537,23 +583,23 @@ optimize(f, lower = -10, upper = 10)
 
 ---
 
-* We can even plot the "likelihood function" — but first we have to "vectorize" our function
+* We can even plot $f$ — but first we have to "vectorize" our function
 
 * The `Vectorize()` function creates a vectorized function from a non-vectorized one
 
 ```{r}
-plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
+plot(Vectorize(f), from = -2, to = 2, n = 1000, las = 1)
 ```
 
 ---
 
-* Or we can do a quick simulation study of how well this method estimates $\lambda$ when $\lambda = 1$
+* We can also do a quick simulation study of how well this method estimates $\lambda$ when the true $\lambda = 1$
 
 ```{r}
 lambda.hat <-
     replicate(1000,
               optimize(negllBoxCox(rnorm(100, mean = 10)), lower = -10, upper = 10)$minimum)
-hist(lambda.hat, breaks = b)
+hist(lambda.hat, breaks = b, las = 1)
 ```
 ---
 
@@ -597,7 +643,8 @@ layout: true
 ```{r}
 make.objective <- function(x, y, L = abs)
 {
-	function(beta) {
+	function(beta)
+    {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
 }
@@ -677,7 +724,7 @@ layout: false
 
 ---
 
-## Histogram AIC
+## AIC for histograms
 
 ```{r}
 chooseBinsAIC <- function(x, p = 0.25)
@@ -696,8 +743,16 @@ chooseBinsAIC <- function(x, p = 0.25)
         2 * B - 2 * logL
     }
     Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+    list(range = r, B = Bvec,
+         AIC = unname(sapply(Bvec, histAIC)))
 }
+```
+
+---
+
+## AIC: implementation
+
+```{r}
 xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBinsAIC(xx, p = 0.125)
 str(ll)
@@ -810,6 +865,7 @@ chooseBins <- function(x, p = 0.25)
 
 
 ```{r}
+## xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBins(xx, p = 0.125)
 str(ll)
 ```
@@ -962,12 +1018,17 @@ str(x <- my.replicate(1000, max(rnorm(20))))
 
 
 ```{r}
-set.seed(20191105)
+set.seed(123)
 rm(sqrt) # remove the sqrt() we defined earlier
 chooseOne <- function(a, b, u = runif(1))
 {
     if (u < 0.5) a else b
 }
+```
+
+* Only one of `a` and `b` is evaluated in any particular execution
+
+```{r}
 chooseOne(sqrt(2), sqrt(-2)) # no warning message
 chooseOne(sqrt(2), sqrt(-2)) # warning message
 ```
@@ -991,4 +1052,5 @@ chooseOne(sqrt(2), sqrt(-2)) # warning message
 with.default
 replicate
 ```
+
 

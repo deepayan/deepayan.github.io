@@ -46,6 +46,24 @@ $$
 
 ---
 
+## Prerequisites
+
+- Basic R programming
+
+	- You should be comfortable with writing functions
+	
+	- If you know how to use `eval()` and `quote()`, you already know too much
+
+- Statistical concepts used for illustration
+
+	- Maximum likelihood, regularization
+	
+	- Probability density, histograms
+	
+	- Linear regression
+
+---
+
 layout: true
 
 ## Evaluation
@@ -175,7 +193,7 @@ function (x)  .Primitive("sqrt")
 
 ---
 
-* define a "smart" `sqrt()` as follows:
+* Define a "smart" `sqrt()` as follows:
 
 
 ```r
@@ -288,7 +306,7 @@ while (TRUE) { str(e, give.attr = FALSE); e <- parent.env(e) }
 <environment: package:utils> 
 <environment: package:datasets> 
 <environment: package:methods> 
-<environment: 0x55758e08dfa8> 
+<environment: 0x7f9063aa8bb8> 
 <environment: base> 
 <environment: R_EmptyEnv> 
 ```
@@ -461,13 +479,33 @@ environment(hist)
 
 ---
 
+## Example: The Box-Cox transformation
+
+* Given positive-valued (possibly skewed) data, one may want to transform them to look Normal
+
+* The Box-Cox transformation conveniently combines power transforms and log in a single family
+
+* Parameterized by a single parameter $\lambda$
+
+<div>
+$$
+g_\lambda(x) = 
+\begin{cases}
+  \frac{x^\lambda - 1}{\lambda} & \lambda \neq 0 \\
+  \log x                        & \lambda = 0
+\end{cases}
+$$
+</div>
+
+---
+
 layout: true
 
 ## Scoping rules can mask errors
 
 ---
 
-* Consider the following function which uses an undefined variable `lambda`
+* Consider the following function (which uses an undefined variable `lambda`)
 
 
 
@@ -481,7 +519,7 @@ b <- function(x) # computes histogram bins given data 'x'
 {
     n <- sum(is.finite(x))
     r <- extendrange(x)
-    seq(r[1], r[2], length.out = round(sqrt(n))+1)
+    seq(r[1], r[2], length.out = round(sqrt(n)) + 1)
 }
 ```
 
@@ -572,8 +610,8 @@ boxcox.log <- fboxcox(0)
 
 ```r
 par(mfrow = c(1, 2))
-hist(boxcox.sqrt(x), breaks = b)
-hist(boxcox.log(x), breaks = b)
+hist(boxcox.sqrt(x), breaks = b) # equivalently, hist(fboxcox(0.5)(x), breaks = b)
+hist(boxcox.log(x), breaks = b)  #               hist(fboxcox(0)(x), breaks = b)
 ```
 
 ![plot of chunk unnamed-chunk-21](figures/eval-unnamed-chunk-21-1.png)
@@ -596,7 +634,7 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<environment: 0x55758ee03b40>
+<environment: 0x7f90676098a8>
 ```
 
 ```r
@@ -609,8 +647,8 @@ function(x)
 		if (lambda == 0) log(x)
 		else (x^lambda - 1) / lambda
 	}
-<bytecode: 0x55758fc45430>
-<environment: 0x55758e7a9af0>
+<bytecode: 0x7f90636851f0>
+<environment: 0x7f9067669b98>
 ```
 
 
@@ -629,7 +667,7 @@ environment(boxcox.sqrt)
 ```
 
 ```
-<environment: 0x55758ee03b40>
+<environment: 0x7f90676098a8>
 ```
 
 ```r
@@ -637,7 +675,7 @@ environment(boxcox.log)
 ```
 
 ```
-<environment: 0x55758e7a9af0>
+<environment: 0x7f9067669b98>
 ```
 
 
@@ -698,11 +736,16 @@ f(10)
 
 ## A more serious example
 
-* Given positive-valued (possibly skewed) data, one may want to "transform" them to look normal
+* Suppose we want to transform (positive-valued) data $x_1, x_2, \dotsc, x_n$
+--
 
-* The Box-Cox transformation is one family where one might search for an "optimum" choice
+* ... to look as Normal as possible, but we don't know what the correct
+  transformation should be
+
+* A standard textbook solution is to look for an "optimum" choice within the Box-Cox family
 
 * A maximum-likelihood approach: assume $\lambda$-transformed data follow $N(\mu, \sigma^2)$
+--
 
 * A [little mathematics](https://www.isid.ac.in/~deepayan/RT2018/notes/systematic-violations.html#/the-box-cox-transformation-a-likelihood-based-approach) tells us that
 
@@ -710,10 +753,13 @@ f(10)
 	
 	- The optimum (MLE) $\lambda$ can be found by minimizing
 	$$
-    \frac{n}{2} \left( \log 2 \pi + \log \hat{\sigma}^2(\lambda) + 1 \right) - (\lambda - 1) \sum \log \sub{x}{i}
+    f(\lambda) = \frac{n}{2} \left( \log 2 \pi + \log \hat{\sigma}^2(\lambda) + 1 \right) - (\lambda - 1) \sum \log \sub{x}{i}
 	$$
 
 	- where $\hat{\sigma}^2(\lambda)$ is the sample variance of the transformed data
+--
+
+* Here $f$ is a function, which is itself a function of data $x_1, x_2, \dotsc, x_n$
 
 ---
 
@@ -736,7 +782,7 @@ negllBoxCox <- function(x)
     function(lambda) {
         y <- fboxcox(lambda)(x) # Note use of fboxcox() defined earlier
         sy <- mean((y - mean(y))^2)
-        n * log(sy) / 2 - (lambda - 1) * slx
+        n * log(sy) / 2 - (lambda - 1) * slx # ignoring constant terms
     }
 }
 ```
@@ -747,13 +793,13 @@ negllBoxCox <- function(x)
 
 
 ```r
-x <- rlnorm(100) # so lambda = 0
+x <- rlnorm(100) # log-normal, so true lambda = 0
 f <- negllBoxCox(x)
 f(0)
 ```
 
 ```
-[1] -1.304839
+[1] 4.311438
 ```
 
 * We can can now use this function in any optimizer
@@ -765,10 +811,10 @@ optimize(f, lower = -10, upper = 10)
 
 ```
 $minimum
-[1] 0.1822288
+[1] -0.1608655
 
 $objective
-[1] -3.327372
+[1] 2.230694
 ```
 
 ```r
@@ -777,27 +823,27 @@ $objective
 
 ---
 
-* We can even plot the "likelihood function" — but first we have to "vectorize" our function
+* We can even plot $f$ — but first we have to "vectorize" our function
 
 * The `Vectorize()` function creates a vectorized function from a non-vectorized one
 
 
 ```r
-plot(Vectorize(negllBoxCox(x)), from = -4, to = 4, n = 1000)
+plot(Vectorize(f), from = -2, to = 2, n = 1000, las = 1)
 ```
 
 ![plot of chunk unnamed-chunk-29](figures/eval-unnamed-chunk-29-1.png)
 
 ---
 
-* Or we can do a quick simulation study of how well this method estimates $\lambda$ when $\lambda = 1$
+* We can also do a quick simulation study of how well this method estimates $\lambda$ when the true $\lambda = 1$
 
 
 ```r
 lambda.hat <-
     replicate(1000,
               optimize(negllBoxCox(rnorm(100, mean = 10)), lower = -10, upper = 10)$minimum)
-hist(lambda.hat, breaks = b)
+hist(lambda.hat, breaks = b, las = 1)
 ```
 
 ![plot of chunk unnamed-chunk-30](figures/eval-unnamed-chunk-30-1.png)
@@ -844,7 +890,8 @@ layout: true
 ```r
 make.objective <- function(x, y, L = abs)
 {
-	function(beta) {
+	function(beta)
+    {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
 }
@@ -863,10 +910,11 @@ obj.lad
 ```
 
 ```
-function(beta) {
+function(beta)
+    {
 	    sum(L(y - beta[1] - beta[2] * x))
 	}
-<environment: 0x55758e4461d0>
+<environment: 0x7f9061b191e8>
 ```
 
 ```r
@@ -875,7 +923,7 @@ environment(obj.lse)$L
 
 ```
 function(u) u*u
-<environment: 0x55758e287aa8>
+<environment: 0x7f9061bad478>
 ```
 
 ```r
@@ -974,7 +1022,7 @@ layout: false
 
 ---
 
-## Histogram AIC
+## AIC for histograms
 
 
 ```r
@@ -994,8 +1042,17 @@ chooseBinsAIC <- function(x, p = 0.25)
         2 * B - 2 * logL
     }
     Bvec <- seq(floor(sqrt(n)*p), ceiling(sqrt(n)/p))
-    list(range = r, B = Bvec, AIC = unname(sapply(Bvec, histAIC)))
+    list(range = r, B = Bvec,
+         AIC = unname(sapply(Bvec, histAIC)))
 }
+```
+
+---
+
+## AIC: implementation
+
+
+```r
 xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBinsAIC(xx, p = 0.125)
 str(ll)
@@ -1003,9 +1060,9 @@ str(ll)
 
 ```
 List of 3
- $ range: num [1:2] -3.58 11.58
+ $ range: num [1:2] -3.79 11.35
  $ B    : int [1:225] 3 4 5 6 7 8 9 10 11 12 ...
- $ AIC  : num [1:225] 4128 4092 3939 3759 3746 ...
+ $ AIC  : num [1:225] 4146 4115 3876 3736 3723 ...
 ```
 
 ---
@@ -1021,7 +1078,7 @@ with(ll, {
 })
 ```
 
-![plot of chunk unnamed-chunk-36](figures/eval-unnamed-chunk-36-1.png)
+![plot of chunk unnamed-chunk-37](figures/eval-unnamed-chunk-37-1.png)
 
 
 
@@ -1036,7 +1093,7 @@ with(ll, {
 ```
 
 ```
-[1] 27
+[1] 26
 ```
 
 ```r
@@ -1075,7 +1132,7 @@ breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.aic + 1)
 hist(xx, breaks = breaks)
 ```
 
-![plot of chunk unnamed-chunk-38](figures/eval-unnamed-chunk-38-1.png)
+![plot of chunk unnamed-chunk-39](figures/eval-unnamed-chunk-39-1.png)
 
 ---
 
@@ -1149,15 +1206,16 @@ chooseBins <- function(x, p = 0.25)
 
 
 ```r
+## xx <- c(rnorm(500), rnorm(300, mean = 6, sd = 1.5))
 ll <- chooseBins(xx, p = 0.125)
 str(ll)
 ```
 
 ```
 List of 3
- $ range: num [1:2] -3.58 11.58
+ $ range: num [1:2] -3.79 11.35
  $ B    : int [1:225] 3 4 5 6 7 8 9 10 11 12 ...
- $ CVE  : num [1:225] -0.0847 -0.0817 -0.0965 -0.119 -0.1205 ...
+ $ CVE  : num [1:225] -0.0831 -0.0802 -0.1034 -0.1207 -0.1195 ...
 ```
 
 ---
@@ -1173,7 +1231,7 @@ with(ll, {
 })
 ```
 
-![plot of chunk unnamed-chunk-41](figures/eval-unnamed-chunk-41-1.png)
+![plot of chunk unnamed-chunk-42](figures/eval-unnamed-chunk-42-1.png)
 
 
 
@@ -1188,7 +1246,7 @@ with(ll, {
 ```
 
 ```
-[1] 45
+[1] 20
 ```
 
 ```r
@@ -1227,7 +1285,7 @@ breaks <- seq(ll$range[1], ll$range[2], length.out = nclass.cv + 1)
 hist(xx, breaks = breaks)
 ```
 
-![plot of chunk unnamed-chunk-43](figures/eval-unnamed-chunk-43-1.png)
+![plot of chunk unnamed-chunk-44](figures/eval-unnamed-chunk-44-1.png)
 
 * For more interesting examples, see Gentleman and Ihaka,
   [Lexical Scope and Statistical Computing](https://www.stat.auckland.ac.nz/~ihaka/downloads/lexical.pdf)
@@ -1334,7 +1392,7 @@ y :  num [1:101] 1 0.998 0.992 0.982 0.969 ...
 eval(e, envir = e2)
 ```
 
-![plot of chunk unnamed-chunk-48](figures/eval-unnamed-chunk-48-1.png)
+![plot of chunk unnamed-chunk-49](figures/eval-unnamed-chunk-49-1.png)
 
 
 ---
@@ -1362,7 +1420,7 @@ my.replicate(5, max(rnorm(10))) # not what we wanted
 ```
 
 ```
-[1] 2.075908 2.075908 2.075908 2.075908 2.075908
+[1] 2.1574 2.1574 2.1574 2.1574 2.1574
 ```
 
 ```r
@@ -1370,7 +1428,7 @@ my.replicate(5, quote(max(rnorm(10))))
 ```
 
 ```
-[1] 1.063761 1.280337 1.456035 1.122466 1.335361
+[1] 0.5284321 0.6858938 1.3573033 0.8895072 1.6434051
 ```
 
 ---
@@ -1392,7 +1450,7 @@ str(x <- my.replicate(1000, max(rnorm(20))))
 ```
 
 ```
- num [1:1000] 1.933 1.494 1.859 1.466 0.854 ...
+ num [1:1000] 1.648 2.524 1.636 1.346 0.729 ...
 ```
 
 ---
@@ -1404,12 +1462,18 @@ str(x <- my.replicate(1000, max(rnorm(20))))
 
 
 ```r
-set.seed(20191105)
+set.seed(123)
 rm(sqrt) # remove the sqrt() we defined earlier
 chooseOne <- function(a, b, u = runif(1))
 {
     if (u < 0.5) a else b
 }
+```
+
+* Only one of `a` and `b` is evaluated in any particular execution
+
+
+```r
 chooseOne(sqrt(2), sqrt(-2)) # no warning message
 ```
 
@@ -1453,7 +1517,7 @@ with.default
 ```
 function (data, expr, ...) 
 eval(substitute(expr), data, enclos = parent.frame())
-<bytecode: 0x55758e44c1a8>
+<bytecode: 0x7f9061b19fb0>
 <environment: namespace:base>
 ```
 
@@ -1465,7 +1529,8 @@ replicate
 function (n, expr, simplify = "array") 
 sapply(integer(n), eval.parent(substitute(function(...) expr)), 
     simplify = simplify)
-<bytecode: 0x55758f6af2c8>
+<bytecode: 0x7f9061ac9e08>
 <environment: namespace:base>
 ```
+
 
