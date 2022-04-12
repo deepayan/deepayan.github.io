@@ -502,7 +502,7 @@ The following recipes are my adaptations of something similar.
 # Stir-fried chicken
 
 
-Cut boneless chicken into small slices. Marinate with yoghurt, ginger
+Cut boneless chicken into small slices. Marinate with yogurt, ginger
 garlic paste, salt, and garam masala powder. I usually marinate for a
 few hours.
 
@@ -533,5 +533,20 @@ Cook for 5 more minutes. Don't overcook.
 
 
 
+# Chicken curry
 
+- Chop / grate onion
+
+- Heat oil, and add
+
+	- onion
+	- salt
+	- red chilli powder
+	- ground pepper
+
+- Add chicken
+
+- Add water if required
+
+- At the end, add a cap of vinegar
 
