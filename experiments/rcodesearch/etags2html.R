@@ -185,15 +185,16 @@ $(document).ready(function() {
 
 etags2json <-
     function(infile, outfile,
-             src_prefix = "/Users/deepayan/svn/all/r-project/R/trunk/src",
-             dest_prefix = "https://github.com/wch/r-source/blob/trunk/src",
+             src_prefix = "/Users/deepayan/svn/all/r-project/R/trunk/src/",
+             dest_prefix = "https://github.com/wch/r-source/blob/trunk/src/",
              limit = 1000)
 {
     tsvfile <- "taginfo.csv" # tempfile("taginfo", fileext = ".tsv")
     on.exit(unlink(tsvfile))
     etags2table(infile, tsvfile, src_prefix = src_prefix)
     cat("Done: ", infile, " -> ", tsvfile, "\n")
-    table2json(tsvfile, outfile = "taginfo.json", limit = 0)
+    table2json(tsvfile, outfile = "taginfo.json",
+               dest_prefix = dest_prefix, limit = limit)
     cat("Done: ", tsvfile, " -> taginfo.json\n")
     ## table2html(tsvfile, outfile = "rcodesearch.html",
     ##            dest_prefix = dest_prefix,
@@ -202,7 +203,9 @@ etags2json <-
     invisible()
 }
 
-etags2json("TAGS", limit = 0)
+## use <base> tag instead of full prefix for smaller JSON
+
+etags2json("TAGS", dest_prefix = "", limit = 0)
 
 ## table2json("taginfo.csv", outfile = "taginfo.json", limit = 0)
 

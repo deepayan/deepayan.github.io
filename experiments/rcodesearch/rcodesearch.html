@@ -2,7 +2,8 @@
 <html>
 <head>
 <meta charset='utf-8' />
-<title>R Code Search</title>
+<title>Regexp Search for R Functions</title>
+<base href="https://github.com/wch/r-source/blob/trunk/src/">
 <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes' />
 <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh' crossorigin='anonymous'>
 <link rel='stylesheet' href='https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap4.min.css'>
@@ -14,11 +15,9 @@
 </head>
 <body>
 <div class='container'>
-<h1>R Code Search</h1>
-
+<h1>Regexp Search for R Functions</h1>
 
 <table class='table table-striped table-bordered' id='ftable'>
-
 
 <thead>
 <tr>
@@ -29,9 +28,6 @@
 </table>
 
 </div>
-
-
-
 
 <script src='https://code.jquery.com/jquery-3.4.1.min.js'
         integrity='sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo='
@@ -53,23 +49,28 @@
 
 <script type='text/javascript'>
 
-$(document).ready(function() {
-    $('#ftable').DataTable({
-        'paging': true,
-	'ordering': false,
-	'ajax': 'taginfo.json',
-	'deferRender': true,
-	'columns': [
-	    { 'searchable': true },
-	    { 'searchable': false },
-	    { 'searchable': false },
-	],
-	'search': {
-	    'regex': true,
-	    'smart': false,
-	}
-    });
-} );
+  $(document).ready(function() {
+
+      var loc = window.location.href;
+      var PAGE_BASE = loc.substring(0, loc.lastIndexOf('/'));
+      console.log(PAGE_BASE);
+
+      $('#ftable').DataTable({
+          'paging': true,
+	  'ordering': false,
+	  'ajax': PAGE_BASE + '/taginfo.json',
+	  'deferRender': true,
+	  'columns': [
+	      { 'searchable': true },
+	      { 'searchable': false },
+	      { 'searchable': false },
+	  ],
+	  'search': {
+	      'regex': true,
+	      'smart': false,
+	  }
+      });
+  } );
 
 </script>
 
