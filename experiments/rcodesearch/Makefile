@@ -7,6 +7,6 @@ TAGS:
 
 
 taginfo.json: TAGS
-	R --vanilla < etags2html.R
+	R --vanilla < etags2json.R
 
 

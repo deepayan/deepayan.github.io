@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>Display R source file</title>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes' />
+<link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh' crossorigin='anonymous'>
+
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-coy.min.css" integrity="sha512-LOT5F67SMZVdXMrvQe4S1ZHu5l6xk3CST2qqno9kY329OsJBBpybnq+fM9qG4ZSaNzPOjoGzHAeBamSSJyyuZg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-highlight/prism-line-highlight.min.css" integrity="sha512-nXlJLUeqPMp1Q3+Bd8Qds8tXeRVQscMscwysJm821C++9w6WtsFbJjPenZ8cQVMXyqSAismveQJc0C1splFDCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style type='text/css'>
+  body { padding-top: 10px; }
+</style>
+</head>
+<body onload = 'init();'>
+<div class='container line-numbers linkable-line-numbers'>
+
+<div class="input-group">
+  <input type="text" class="form-control"
+	 id="filename"
+	 placeholder="library/tools/R/code2html.R"
+	 value='library/tools/R/code2html.R'>
+	 <span class="input-group-text">#L</span>
+	 <input type="text" class="form-control" id="linenum"
+		placeholder="Line number">  
+  <button class="btn btn-outline-secondary" type="button"
+	  onclick='displayFileFromURL();'>Display file</button>
+</div>
+
+<pre id="line"></pre>
+
+</div>
+
+<script src='https://code.jquery.com/jquery-3.4.1.min.js'
+	integrity='sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo='
+	crossorigin='anonymous'>
+</script>
+
+<script type='text/javascript'>
+
+  function init() {
+      // Prism.hooks.add("after-tokenize", function(tkn) { console.log(tkn); });
+      let params = (new URL(document.location)).searchParams;
+      let fname = params.get('file');
+      let lnum = params.get('line');
+      if (fname != null) {
+	  console.log(fname + '#' + lnum);
+	  document.querySelector('#filename').value = fname;
+	  if (lnum != null) document.querySelector('#linenum').value = lnum;
+	  displayFileFromURL();
+      }
+  }
+
+  function displayFileFromURL() {
+      // let mysrc = 'https://svn.r-project.org/R/trunk/src/' + ... // doesn't work (CORS? + not text)
+      let mysrc = 'https://raw.githubusercontent.com/wch/r-source/trunk/src/' +
+	  document.querySelector('#filename').value; // Yes! Because Github proactively sets CORS something?
+      let myline = document.querySelector('#linenum').value;
+      let e = document.querySelector('#line');
+      e.innerHTML = '';
+      // e.dataset.src = mysrc; // this is what MDN recommends, but Prism uses the get|setAttribute()
+      e.setAttribute('data-src', mysrc);
+      // e.setAttribute('data-line', myline);
+      e.setAttribute('data-src-status', null); // hack becayse fileHighlight will not highlight() already loaded elements
+      Prism.plugins.fileHighlight.highlight(document);
+      // scroll to display desired line number
+      if (myline != '') {
+	  // see https://stackoverflow.com/questions/13735912/anchor-jumping-by-using-javascript
+	  // document.getElementById('#line.' + myline).scrollIntoView(); // doesn't work because anchors are fake?
+	  let oldloc = window.location.href;
+	  window.location.href = '#line.' + myline;
+	  // history.replaceState(null, null, oldloc); // doesn't work either
+	  // so can't remove anchor from URL
+      }
+  }
+
+  // disable automatic highlight
+  window.Prism = window.Prism || {};
+  Prism.manual = true;
+
+</script>
+
+
+<!-- prism and necessary plugins -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js" integrity="sha512-/Swpp6aCQ0smuZ+zpklJqMClcUlvxhpLf9aAcM7JjJrj2waCU4dikm3biOtMVAflOOeniW9qzaNXNrbOAOWFCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-clike.min.js" integrity="sha512-/Rynaa6ehLZJO9fdk+EUsgiOdJqFSFUB4Qgy+gP4vU4U1DrmPJWypfXe1CgyaV7rRdZjGxdpLe9djxhx1ZHvqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-r.min.js" integrity="sha512-RQ0HgkZNAWBAoL3DQOK5fac8U0Xt9eD/hXusL6YBgMXPQE7pjFjVtsO/embtTiv/PDpjRCVRGagbwXj7oQUPDg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha512-dubtf8xMHSQlExGRQ5R7toxHLgSDZ0K7AunqPWHXmJQ8XyVIG19S1T95gBxlAeGOK02P4Da2RTnQz0Za0H0ebQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-highlight/prism-line-highlight.min.js" integrity="sha512-93uCmm0q+qO5Lb1huDqr7tywS8A2TFA+1/WHvyiWaK6/pvsFl6USnILagntBx8JnVbQH5s3n0vQZY6xNthNfKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/file-highlight/prism-file-highlight.min.js" integrity="sha512-4Ai0S7jLFLds1jo1P19R/kDoiXpiK8qwlo4K1LHsfp1Iu9IAg7+MFQn5N6uq9PNYAbMtmdCYtDIjIajsYdI3eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</body>
+</html>
+
+
