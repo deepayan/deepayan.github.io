@@ -60,11 +60,11 @@
 	  document.querySelector('#filename').value; // Yes! Because Github proactively sets CORS something?
       let myline = document.querySelector('#linenum').value;
       let e = document.querySelector('#line');
-      e.innerHTML = '';
+      e.innerHTML = ''; // needed; otherwise appended if updated
       // e.dataset.src = mysrc; // this is what MDN recommends, but Prism uses the get|setAttribute()
       e.setAttribute('data-src', mysrc);
       // e.setAttribute('data-line', myline);
-      e.setAttribute('data-src-status', null); // hack becayse fileHighlight will not highlight() already loaded elements
+      e.setAttribute('data-src-status', null); // hack because fileHighlight will not highlight() already loaded elements
       Prism.plugins.fileHighlight.highlight(document);
       // scroll to display desired line number
       if (myline != '') {
