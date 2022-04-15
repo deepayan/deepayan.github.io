@@ -77,7 +77,7 @@ table2taginfo <-
     ## str(tag_data)
     HREF <- with(tag_data,
                  sprintf("<a href='display.html?file=%s#line.%s' target='_blank'>%s</a>",
-                         URLencode(srcfile, reserved = TRUE), startline, srcfile))
+                         URLencode(srcfile), startline, srcfile))
     ans <- list(data = vector(mode = "list", length = nrow(tag_data)))
     for (i in seq_len(nrow(tag_data)))
     {

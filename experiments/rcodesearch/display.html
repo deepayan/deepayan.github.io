@@ -47,13 +47,31 @@
   var globalInfo;
   
   function global2link(env) {
-      if (env.type === 'binding') {
+      if (env.type === 'closure') {
 	  let sinfo = globalInfo[env.content];
 	  if (sinfo !== undefined) {
 	      env.tag = 'a';
 	      env.attributes.href = 'display.html?' + sinfo[0];
 	  }
       }
+  }
+
+  // This is optional: change type=binding to type=closure if followed
+  // by "(". Either way is imperfect, but this is probably more in
+  // line with expectations. If present, link 'closure'-s, otherwise
+  // 'bindings'-s.
+
+  function identifyClosures(env) {
+      let i;
+      let tokens = env.tokens;
+      for (i = 0; i < tokens.length; i++)
+	  if (tokens[i].type === 'binding') {
+	      // identify next non-string token
+	      let j = i + 1;
+	      while (j < tokens.length && typeof tokens[j] === 'string') j++;
+	      if (j < tokens.length && tokens[j].content === '(')
+		  tokens[i].type = 'closure';
+	  }
   }
   
   // load pre-generated global bindings info. This could in
@@ -83,6 +101,7 @@
   
   async function init() {
       await loadGlobalDefs('globals.json');
+      Prism.hooks.add('after-tokenize', identifyClosures);
       Prism.hooks.add('wrap', global2link);
       let params = (new URL(document.location)).searchParams;
       let fname = params.get('file');
