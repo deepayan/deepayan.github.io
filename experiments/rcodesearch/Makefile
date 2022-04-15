@@ -1,5 +1,5 @@
 
-all: taginfo.json
+all: taginfo.json globals.json
 
 
 TAGS:
@@ -7,6 +7,9 @@ TAGS:
 
 
 taginfo.json: TAGS
+	R --vanilla < etags2json.R
+
+globals.json: TAGS
 	R --vanilla < etags2json.R
 
 

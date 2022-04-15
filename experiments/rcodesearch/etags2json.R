@@ -61,7 +61,7 @@ etags2table <-
 
 
 
-table2json <- 
+table2taginfo <- 
     function(infile, outfile = "",
              limit = 500)
 {
@@ -87,8 +87,42 @@ table2json <-
 }
     
 
+## Another potentially useful form is to have a dictionary keyed by
+## function names, giving details of where the function is to be
+## found. This could be useful for linking globals from R code  files.
+
+## Needs to be restructured to be useful beyond just base R
+
+table2globals <- 
+    function(infile, outfile = "",
+             limit = 500)
+{
+    require(jsonlite)
+    tag_data <- read.table(infile, header = FALSE,
+                           quote = "", sep = "\t", comment.char = "")
+    colnames(tag_data) <- c("srcfile", "token", "startline")
+    tag_data <- within(tag_data,
+    {
+        startline <- sapply(strsplit(startline, ",", fixed = TRUE), "[[", 1L)
+    })
+    ## only consider R files - C files need more thought to be linked
+    ## as globals.
+    tag_data <- subset(tag_data, toupper(tools::file_ext(srcfile)) == "R")
+    dups <- subset(tag_data, duplicated(token))
+    save(dups, file = "dup_tokens.rda") # for later analysis
+    tag_data <- subset(tag_data, !duplicated(token))
+    ## We might as well save it in the form we will need
+    lglobal <- with(tag_data,
+                    structure(sprintf("file=%s#line.%s",
+                                      URLencode(srcfile),
+                                      startline),
+                              names = token))
+    write_json(as.list(lglobal), outfile, pretty = TRUE)
+}
+
+
 ## We don't actually use this any more; instead create a JSON file
-## using table2json() and load it via ajax for (substantially) better
+## using table2taginfo() and load it via ajax for (substantially) better
 ## load time. The HTML can remain unchanged. Retained for reference.
 
 table2html <- 
@@ -190,12 +224,15 @@ etags2json <-
 {
     tsvfile <- "taginfo.csv" # tempfile("taginfo", fileext = ".tsv")
     on.exit(unlink(tsvfile))
+    cat("Processing: ", infile, " -> ", tsvfile, "\n")
     etags2table(infile, tsvfile, src_prefix = src_prefix)
-    cat("Done: ", infile, " -> ", tsvfile, "\n")
-    table2json(tsvfile, outfile = "taginfo.json",
-               ## dest_prefix = dest_prefix,
-               limit = limit)
-    cat("Done: ", tsvfile, " -> taginfo.json\n")
+    cat("Processing: ", tsvfile, " -> taginfo.json\n")
+    table2taginfo(tsvfile, outfile = "taginfo.json",
+                  ## dest_prefix = dest_prefix,
+                  limit = limit)
+    cat("Processing: ", tsvfile, " -> globals.json\n")
+    table2globals(tsvfile, outfile = "globals.json",
+                  limit = limit)
     ## table2html(tsvfile, outfile = "rcodesearch.html",
     ##            dest_prefix = dest_prefix,
     ##            limit = limit)
@@ -205,5 +242,5 @@ etags2json <-
 
 etags2json("TAGS", limit = 0)
 
-## table2json("taginfo.csv", outfile = "taginfo.json", limit = 0)
+## table2taginfo("taginfo.csv", outfile = "taginfo.json", limit = 0)
 
