@@ -366,8 +366,6 @@ replicate(100, haveCommon())
 
 ---
 
-# Law of Large Numbers
-
 ```{r}
 plot(cumsum(replicate(1000, haveCommon())) / 1:1000, type = "l", ylim = c(0.5, 1))
 lines(cumsum(replicate(1000, haveCommon())) / 1:1000, col = "red")
@@ -375,6 +373,8 @@ lines(cumsum(replicate(1000, haveCommon())) / 1:1000, col = "blue")
 ```
 
 ---
+
+layout: false
 
 # R gives access to an extensive toolset
 
