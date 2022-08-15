@@ -69,6 +69,47 @@ Mix well, but not for too long (~2 minutes), as otherwise rice will
 become dry.
 
 
+# Pasta
+
+This is not exactly traditional, and may seem overcooked to some, but
+works well with the pasta we get.
+
+- Boil water (in final non-stick cooking pot), adding salt
+
+- Add pasta, boil for 10 minutes
+
+- Add carrots diced into small pieces - 2 mins
+
+- Add cut broccoli florets - 4 mins
+
+- Drain water, but keep a little in
+
+- Add olive oil, pasta sauce
+
+- Optional: add other pre-cooked inredients (minced meat, mushroom, etc.)
+
+- Stir for a few more minutes, adding water if necessary
+
+- Optional: add vinegar, barbecue sauce, oregano flakes
+
+
+# Brown rice
+
+- Use a non-stick pan with a tight lid
+
+- 1 cup rice - rinse well - put in pan and add slightly less than 2 cups water
+
+- Bring to a boil, and then immediately put on simmer and close lid tightly
+
+- Set timer to 35 minutes. DO NOT open lid in between.
+
+- When done, open the lid to check (should have steam holes). If done, remove
+  excess water if present, otherwise, cook longer.
+
+- Turn off heat, but keep rice covered for 10 more minutes to steam
+
+
+
 
 # Chicken stew
 
@@ -104,6 +145,56 @@ Step 2: prepare stew
 	- boiled chicken
 
 - Simmer around 30 minutes
+
+
+# Mutton stew
+
+- Requires
+  - 500gm mutton
+  - garlic
+  - carrots diced
+  - tomato puree
+  - vinegar
+  - salt, pepper
+  - potatoes
+
+- Heat oil in pressure cooker
+
+- Add
+  - sliced onion
+  - garlic paste / crushed
+  - carrots
+  - spring onion
+  - tofu
+  - But not yet potatoes / tomatoes
+  
+- Cook for ~5 mins
+
+- Add mutton and stir fry till all sides slightly fried
+
+- Add
+  - vinegar or wine
+  - tomato sliced / pureed
+  - a little water
+
+- Cook for ~10 mins
+
+- Add 
+  - water 1 to 1.5 liter
+  - 2 tsp salt
+  - maybe one small potato diced (for the stew)
+
+- Pressure cook on low heat for one hour
+
+- Let cool, take off lid, add diced potatoes and optionally ground pepper
+
+- Cook on low heat for 20 mins
+
+- Add butter at end
+
+
+
+
 
 
 # Paneer
@@ -151,7 +242,6 @@ For approx 250g chicken keema
 - Mix and stir for a minute and turn off heat
 
 
-
 # Spinach
 
 - Cut spinach. Rinse well and boil for five minutes.
@@ -186,7 +276,7 @@ Ingredients
 
 - garam masala 1.5 tsp
 
-- ground corainder 1.5 tsp
+- ground coriander 1.5 tsp
 
 - cumin powder 0.75 tsp
 
@@ -207,8 +297,6 @@ Heat oil, add
 - tomato puree
 
 Raise heat to medium heat and add chana. Cook on low for at least 10 mins.
-
-
 
 
 # Mushroom
@@ -414,6 +502,13 @@ with crushed garlic fried in olive oil + butter.
 
 
 
+
+
+
+
+
+
+
 * * *
 
 
@@ -549,4 +644,23 @@ Cook for 5 more minutes. Don't overcook.
 - Add water if required
 
 - At the end, add a cap of vinegar
+
+
+# Baked chicken keema
+
+Preheat oven to 200C.
+
+Mix the following:
+
+- 400 gm minced chicken keema
+- two onions grated
+- ginger garlic paste
+- coriander leaves
+- capsicum thinly sliced
+- garam masala powder
+- one egg
+- bread crumbs (one toasted bread) or biscuit crumbs
+- soya sauce 2 tbsp
+- salt
+
 

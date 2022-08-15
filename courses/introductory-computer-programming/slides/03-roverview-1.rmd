@@ -295,7 +295,5 @@ for (i in 1:20) {
 	* Treatment of _functions_ at par with other object types
 
 
-* We will see a few examples to illustrate what I mean by this in the next class
-
-* First, a demo of using R using an [R script](https://github.com/deepayan/deepayan.github.io/blob/master/courses/introductory-computer-programming/slides/03-roverview-1.R) and an [R Markdown](https://github.com/deepayan/deepayan.github.io/blob/master/courses/introductory-computer-programming/slides/03-roverview-1.rmd) file 
+* We will next see a few examples to illustrate what I mean by this
 

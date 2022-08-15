@@ -301,6 +301,78 @@ htmlwidgets::saveWidget(w, "davis-plotly.html", selfcontained = FALSE,
 
 
 
+---
+
+# Test for slope
+
+* Natural follow up question: Is slope non-zero?
+
+* Need a test statistic
+
+	* Null distribution should not depend on $\sigma^2$
+
+	* How can we find one?
+
+--
+
+* Suppose we somehow obtain a test statistic
+
+* How can we obtain the corresponding $p$-value?
+
+---
+
+# Simulation
+
+* R can be used to simulate random events
+
+* Example: how likely is a common birthday in a group of 20 people?
+
+```{r}
+N <- 28
+days <- sample(365, N, rep = TRUE)
+days
+length(unique(days))
+```
+
+---
+
+layout: true
+
+# Law of Large Numbers
+
+* With enough replications, sample proportion should converge to probability (consistency)
+
+---
+
+```{r}
+haveCommon <- function()
+{
+    days = sample(365, N, rep = TRUE)
+    length(unique(days)) < N
+}
+haveCommon()
+haveCommon()
+haveCommon()
+haveCommon()
+```
+
+---
+
+* Do this sytematically:
+
+```{r}
+replicate(100, haveCommon())
+```
+
+---
+
+# Law of Large Numbers
+
+```{r}
+plot(cumsum(replicate(1000, haveCommon())) / 1:1000, type = "l", ylim = c(0.5, 1))
+lines(cumsum(replicate(1000, haveCommon())) / 1:1000, col = "red")
+lines(cumsum(replicate(1000, haveCommon())) / 1:1000, col = "blue")
+```
 
 ---
 
@@ -325,7 +397,6 @@ htmlwidgets::saveWidget(w, "davis-plotly.html", selfcontained = FALSE,
 * Command-line interface
 
 
-
 ---
 
 # Good practices
@@ -335,4 +406,6 @@ htmlwidgets::saveWidget(w, "davis-plotly.html", selfcontained = FALSE,
 * Save your code in a script file (makes it easier to reproduce later)
 
 * Use "literate programming" approaches (notebooks, R Markdown, etc.)
+
+* Demo using R using [R script](https://github.com/deepayan/deepayan.github.io/blob/master/courses/introductory-computer-programming/slides/03-roverview-2.R) and an [R Markdown](https://github.com/deepayan/deepayan.github.io/blob/master/courses/introductory-computer-programming/slides/03-roverview-2.rmd) file 
 
