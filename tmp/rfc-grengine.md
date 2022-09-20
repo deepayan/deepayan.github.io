@@ -18,7 +18,7 @@ that a device can choose to support:
 
 - Tooltips
 
-- Links
+- Hyperlinks
 
 This RFC is for a proposal to add API points to the R Graphics engine
 to support these features, and possibly others that we have not
@@ -53,7 +53,7 @@ Specifically, we propose new API entry points
 - `dev->endHyperlink()`
 
 In principle, any graphical elements drawn between a
-`dev->beginTooltip()` and a `dev->endTooltip()` should get an
+`dev->beginTooltip()` and a `dev->endTooltip()` should get the
 associated tooltip, and similarly for hyperlinks.
 
 For example, a user-level call might end up looking like
@@ -73,9 +73,10 @@ for (i = 0; i < 12; i++) {
 ```
 
 It would be up to the device to store the "current" tooltip or href
-info and make use of it in whatever gets drawn while it is
-active. Devices that are not going to support these features can
-simply ignore these new calls by implementing them as no-ops.
+info and make use of it in whatever gets drawn while it is active
+(e.g., inside `dev->circle()` in the example above). Devices that are
+not going to support these features can simply ignore these new calls
+by implementing them as no-ops.
 
 
 # R level API
