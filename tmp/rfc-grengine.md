@@ -66,9 +66,9 @@ which would end up calling
 
 ```c
 for (i = 0; i < 12; i++) {
-    dev->beginTooltip(month.name[i]);
-	dev->circle(x[i], y[i]);
-	dev->endTooltip();
+  dev->beginTooltip(month.name[i]);
+  dev->circle(x[i], y[i]);
+  dev->endTooltip();
 }
 ```
 
