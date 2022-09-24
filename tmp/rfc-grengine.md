@@ -42,7 +42,9 @@ The proposal is to extend the graphics engine API to allow interactive
 elements to be specified. So far, we are only thinking of tooltips and
 links, but there may be others we haven't thought of.
 
-Specifically, we propose new API entry points
+## Option 1
+
+We propose new API entry points
 
 - `dev->beginTooltip(const char *tooltip)`
 
@@ -78,6 +80,25 @@ info and make use of it in whatever gets drawn while it is active
 not going to support these features can simply ignore these new calls
 by implementing them as no-ops.
 
+## Option 2
+
+A more general approach would be to define a single entry point that
+encapsulates both tooltips and hyperlinks. This could loook like
+
+- `dev->beginTag(const char *name, SEXP value)`
+
+- `dev->endTag(const char *name)`
+
+where valid values of `name` are pre-specified as part of the API. It
+can initially be one of `"tooltip"` and `"hyperlink"`, with possible
+additions further down the line. The possible structure of `value`,
+possibly as a named list, will also need to be specified as part of
+the API.
+
+This approach would allow subsequent extensions without changing the
+device API. Devices should be written to ignore unrecognized `names`-s
+rather than throw an error.
+
 
 # R level API
 
@@ -90,13 +111,15 @@ to add new arguments to `points()`, `grid.points()`, etc.
 Before we move forward with an implementation, it would be useful to
 have a discussion on what the final API should look like. Specifically,
 
-- Are there any potential downsides to this approach? From our initial
-  discussions, this should be sufficiently orthogonal to the existing
-  API to keep any disruption minimal.
+- Are there any potential downsides to these extensions? From our
+  initial discussions, this should be sufficiently orthogonal to the
+  existing API to keep any disruption minimal.
 
-- Are there any other kinds of interaction it might be possible to
-  support? Note that it's probably not realistic to have features that
-  require calling back into R in response to an interaction event.
+- Are there any other kinds of interaction that might be useful and
+  possible to support? Note that it's probably not realistic to have
+  features that require calling back into R in response to an
+  interaction event.
 
-
+- Related to the previous question: Should we go with option 1 or
+  option 2?
 
