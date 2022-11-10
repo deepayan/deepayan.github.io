@@ -99,6 +99,10 @@ This approach would allow subsequent extensions without changing the
 device API. Devices should be written to ignore unrecognized `names`-s
 rather than throw an error.
 
+The drawback of option 2 is that it is likely to make implementation
+code more complicated and error-prone. Our initial preference is to go
+with option 1 unless someone has a good use case for option 2.
+
 
 # R level API
 
