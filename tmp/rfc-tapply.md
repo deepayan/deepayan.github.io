@@ -337,13 +337,14 @@ columns will be truncated or padded with NAs
 
 # tapply
 
-Currently doesn't work for data frame, but with check removed:
+Currently doesn't work for data frame, but with check modified:
 
 ```
      nI <- length(INDEX)  # now, 'INDEX' is not classed
      if (!nI) stop("'INDEX' is of length zero")
 -    if (!all(lengths(INDEX) == length(X)))
--        stop("arguments must have same length")
++    if (!is.object(X) && !all(lengths(INDEX) == length(X)))
+         stop("arguments must have same length")
      namelist <- lapply(INDEX, levels)#- all of them, yes !
      extent <- lengths(namelist, use.names = FALSE)
      cumextent <- cumprod(extent)
