@@ -1,0 +1,295 @@
+---
+title: RFC - Enhancing tapply
+author: Deepayan Sarkar
+---
+
+
+```{r opts, echo = FALSE, results = "hide", warning = FALSE, message = FALSE}
+library(knitr)
+opts_chunk$set(cache = FALSE, autodep = TRUE,
+               comment = "", warning = TRUE, message = FALSE, prompt = FALSE)
+options(warnPartialMatchDollar = FALSE, width = 100)
+suppressMessages(library(dplyr))
+```
+
+
+# Motivation
+
+For group-wise summaries of a data frame, `dplyr` can do the following.
+
+- Several scalar-valued functions
+
+```{r}
+ToothGrowth |> group_by(supp, dose) |>
+    summarize(m = mean(len), s = sd(len), n = length(len))
+```
+
+- Scalar valued functions with vector input
+
+```{r}
+ToothGrowth |> group_by(supp) |>
+    summarize(mlen = mean(len), mdose = mean(dose),
+              slope = coef(lm(len ~ log(dose)))[[2]])
+```
+
+- Vector valued functions with scalar / vector input
+
+```{r}
+ToothGrowth |> group_by(supp) |>
+    summarize(data.frame(mlen = mean(len), slen = sd(dose)),
+              as.data.frame(as.list(coef(lm(len ~ log(dose))))))
+```
+
+But this means that we have to have convoluted code for something like
+
+```{r}
+ToothGrowth |> group_by(supp, dose) |>
+    summarize(data.frame(as.list(quantile(len))))
+```
+
+because the simpler option doesn't work.
+
+```{r}
+ToothGrowth |> group_by(supp, dose) |> summarize(quantile(len))
+```
+
+Another interesting example is where the input data frame is
+summarized in some way, but not to scalars. Let's say order by first
+column and then take first 3 rows.
+
+
+```{r}
+mySummary <- function(d)
+{
+    ## could also use dplyr::rearrange() instead
+    o <- order(d[[1]])
+    head(d[o, ], 3)
+}
+```
+
+
+```{r}
+ToothGrowth |> group_by(supp) |>
+    summarize(mlen = mean(len), 
+              mySummary(data.frame(len = len, dose = dose)))
+```
+
+This was OK with `dplyr_1.0.2`, but deprecated in `dplyr_1.1.0`.
+
+What are closest equivalents with base R?
+
+# split
+
+Very general, but needs manual post-processing
+
+```{r}
+s1 <- split(ToothGrowth, ~ supp + dose)
+lapply(s1, with, data.frame(supp = unique(supp),
+                            dose = unique(dose),
+                            m = mean(len),
+                            s = sd(len),
+                            n = length(len))) |>
+    do.call(what = rbind)
+
+s2 <- split(ToothGrowth, ~ supp)
+lapply(s2, with, data.frame(supp = unique(supp),
+                            mlen = mean(len),
+                            mdose = mean(dose),
+                            slope = coef(lm(len ~ log(dose)))[[2]])) |>
+    do.call(what = rbind)
+
+lapply(s2, with, data.frame(supp = unique(supp),
+                            mlen = mean(len),
+                            slen = sd(dose),
+                            as.list(coef(lm(len ~ log(dose)))))) |>
+    do.call(what = rbind)
+
+lapply(s2, with, data.frame(supp = unique(supp),
+                            mlen = mean(len),
+                            mySummary(data.frame(len = len, dose = dose)))) |>
+    do.call(what = rbind)
+```
+
+
+
+# aggregate
+
+- Several scalar-valued functions
+
+Can only do one at a time (and merge 2 at a time). Not ideal.
+
+```{r}
+merge(aggregate(len ~ supp + dose, ToothGrowth, mean),
+      aggregate(len ~ supp + dose, ToothGrowth, sd),
+      by = c("supp", "dose"))
+
+## can't name unless more than one result
+aggregate(len ~ supp + dose, ToothGrowth,
+          function(x) c(m = mean(x), foo = 1))
+```
+
+
+- Scalar valued functions with vector input: not possible using `aggregate()`
+
+- Vector valued functions with scalar / vector input
+
+Scalar input OK, vector not possible.
+
+```{r}
+aggregate(len ~ supp, ToothGrowth,
+          function(x) c(m = mean(x), s = sd(x)))
+```
+
+On the other hand, can do nice things for scalar input like
+
+```{r}
+aggregate(len ~ supp + dose, ToothGrowth, quantile)
+```
+
+One limitation is that `aggregate()` doesn't seem to be able to handle
+non-atomic vector output; e.g.,
+
+```{r}
+aggregate(len ~ supp, ToothGrowth,
+          function(x) data.frame(m = mean(x), s = sd(x)))
+```
+
+
+# tapply
+
+Currently doesn't work for data frame, but with check modified:
+
+```
+     nI <- length(INDEX)  # now, 'INDEX' is not classed
+     if (!nI) stop("'INDEX' is of length zero")
+-    if (!all(lengths(INDEX) == length(X)))
++    if (!is.object(X) && !all(lengths(INDEX) == length(X)))
+         stop("arguments must have same length")
+     namelist <- lapply(INDEX, levels)#- all of them, yes !
+     extent <- lengths(namelist, use.names = FALSE)
+     cumextent <- cumprod(extent)
+```
+
+
+```{r}
+tapply(ToothGrowth, with(ToothGrowth, list(supp)),
+       function(d) with(d, data.frame(supp = unique(supp),
+                                      mlen = mean(len),
+                                      as.list(coef(lm(len ~ log(dose)))))))
+
+s <- 
+tapply(ToothGrowth, with(ToothGrowth, list(supp, dose)),
+       function(d) with(d, data.frame(supp = unique(supp),
+                                      dose = unique(dose),
+                                      mlen = mean(len),
+                                      mdose = mean(log(dose)))))
+
+do.call(rbind, s)
+```
+
+We could actually avoid the function definition and use NSE instead if we use `FUN = with`.
+
+```{r}
+s <- 
+    tapply(ToothGrowth, with(ToothGrowth, list(supp, dose)),
+           with, data.frame(supp = unique(supp),
+                            dose = unique(dose),
+                            mlen = mean(len),
+                            mdose = mean(log(dose))))
+do.call(rbind, s)
+```
+
+This also works with multi-row functions.
+
+```{r}
+tapply(ToothGrowth, ToothGrowth$supp,
+       with, data.frame(supp = unique(supp),
+                        mySummary(data.frame(len = len, dose = dose)))) |>
+    do.call(what = rbind)
+```
+
+
+This is already quite nice, except that we need to include the unique
+values of the splitting factors in the summary function.
+
+
+# Possible extensions
+
+## `aggregate`
+
+We could extend `aggregate` so that
+
+```r
+aggregate( ~ supp + dose, ToothGrowth, FUN)
+```
+
+applies `FUN` on the components of `split(ToothGrowth, ~ supp +
+dose)`. This is currently an error, so should be OK.
+
+But I am not sure when and how to allow arbitrary functions that
+operate on the sub-dataframes.
+
+
+## `tapply`
+
+`tapply` has more immediate promise. We can support formulas fairly
+easily, similar to split:
+
+```
+tapply <- function (X, INDEX, FUN = NULL, ..., default = NA, simplify = TRUE)
+ {
+     FUN <- if (!is.null(FUN)) match.fun(FUN)
++    if (inherits(INDEX, "formula")) INDEX <- formula2varlist(INDEX, X)
+     if (!is.list(INDEX)) INDEX <- list(INDEX)
+```
+
+with a new `formula2varlist()`, a version of which is already used in
+`split()` without the checks:
+
+```r
+formula2varlist <- function(formula, data, warnLHS = TRUE, ignoreLHS = warnLHS)
+{
+    if (!inherits(formula, "formula")) stop("'formula' must be a formula")
+    if (length(formula) == 3) {
+        if (warnLHS) {
+            if (ignoreLHS)
+                warning("Unexpected LHS in 'formula' has been ignored.")
+            else
+                warning("Unexpected LHS in 'formula' has been combined with RHS.")
+        }
+        if (ignoreLHS) formula <- formula[-2]
+    }
+    fterms <- stats::terms(formula)
+    ans <- eval(attr(fterms, "variables"), data, environment(formula))
+    names(ans) <- attr(fterms, "term.labels")
+    ans
+}
+```
+
+With this, we have
+
+```{r}
+tapply(ToothGrowth, ~ supp + dose, with, mean(len))
+tt <- tapply(ToothGrowth, ~ supp + dose,
+             with, data.frame(m = mean(len), s = sd(len)),
+             simplify = FALSE)
+tt
+tt[2,2][[1]]
+do.call(rbind, tt)
+```
+
+All we need now is a enhanced version of rbind which adds the margins
+as columns, as `as.data.frame.table()` does.
+
+## Reversing `tapply()`
+
+We basically want something that reverses `tapply()`. For scalar
+output and a single factor, `lattice::make.groups()` works.
+
+```{r}
+tapply(ToothGrowth, ~ supp, with, mean(len), simplify = FALSE) |>
+    do.call(what = lattice::make.groups)
+```
+
+Should we think of something like that but more general?
+
