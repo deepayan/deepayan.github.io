@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=yes' />
+    <link rel='stylesheet' href='https://deepayan.github.io/experiments/browser-repl/assets/style.css'>
+    <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css' integrity='sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh' crossorigin='anonymous'>
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism.min.css" integrity="sha512-tN7Ec6zAFaVSG3TpNAKtk4DOHNpSwKHxxrsiw4GHKESGPs5njn/0sMCUMl2svV4wo4BK/rCP7juYz+zx+l6oeQ==" crossorigin="anonymous" referrerpolicy="no-referrer" /> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-coy.min.css" integrity="sha512-LOT5F67SMZVdXMrvQe4S1ZHu5l6xk3CST2qqno9kY329OsJBBpybnq+fM9qG4ZSaNzPOjoGzHAeBamSSJyyuZg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.css" integrity="sha512-cbQXwDFK7lj2Fqfkuxbo5iD1dSbLlJGXGpfTDqbggqjHJeyzx88I3rfwjS38WJag/ihH7lzuGlGHpDBymLirZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-highlight/prism-line-highlight.min.css" integrity="sha512-nXlJLUeqPMp1Q3+Bd8Qds8tXeRVQscMscwysJm821C++9w6WtsFbJjPenZ8cQVMXyqSAismveQJc0C1splFDCA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/autolinker/prism-autolinker.min.css" integrity="sha512-4ZmAB2UXPu3Rgy5ZClpqnJ/zXXZBdulFXY1eWMLgIjp2HWgkHGIpr1b7kmCK+rdD5NYfivTp47UR+bQ4oTBllQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script>
+var ws = new WebSocket(%s);
+    </script>
+
+    <script src="https://deepayan.github.io/experiments/browser-repl/assets/IO.js"></script>
+
+    
+  </head>
+  <body>
+    <div class="container">
+      <div id="logmessages"><h3>Messages</h3></div>
+      <div id="rconsole"><pre>Welcome to R REPL!</pre></div>
+
+      <!-- <h3>Enter R code to run</h3> -->
+
+
+      <!-- <textarea id="input" class="form-control"></textarea> -->
+      <!-- <button type="button" class="btn btn-dark" onclick="sendInput();">Evaluate</button> -->
+
+      <pre id="input">1 + nchar(x)</pre>
+      <button type="button" class="btn btn-dark" onclick="sendInputACE();">Evaluate</button>
+
+    </div>
+
+    <!-- prism and necessary plugins -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/prism.min.js" data-manual integrity="sha512-/Swpp6aCQ0smuZ+zpklJqMClcUlvxhpLf9aAcM7JjJrj2waCU4dikm3biOtMVAflOOeniW9qzaNXNrbOAOWFCw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-clike.min.js" integrity="sha512-/Rynaa6ehLZJO9fdk+EUsgiOdJqFSFUB4Qgy+gP4vU4U1DrmPJWypfXe1CgyaV7rRdZjGxdpLe9djxhx1ZHvqQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Needs to be modified to tag bindings -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-r.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-numbers/prism-line-numbers.min.js" integrity="sha512-dubtf8xMHSQlExGRQ5R7toxHLgSDZ0K7AunqPWHXmJQ8XyVIG19S1T95gBxlAeGOK02P4Da2RTnQz0Za0H0ebQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/line-highlight/prism-line-highlight.min.js" integrity="sha512-93uCmm0q+qO5Lb1huDqr7tywS8A2TFA+1/WHvyiWaK6/pvsFl6USnILagntBx8JnVbQH5s3n0vQZY6xNthNfKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/file-highlight/prism-file-highlight.min.js" integrity="sha512-4Ai0S7jLFLds1jo1P19R/kDoiXpiK8qwlo4K1LHsfp1Iu9IAg7+MFQn5N6uq9PNYAbMtmdCYtDIjIajsYdI3eQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/autolinker/prism-autolinker.min.js" integrity="sha512-PaneznVpkV74O5FWaHuGG2Pa9aVgbrnDwLFbcebZikYcFVPUYimvlZUAX6AElPKDJsSDTBl7aN6V1WxFDi24aw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
+
+    <!-- ACE code editor for input area -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.23.1/ace.min.js" integrity="sha512-Jvb+MTAHCHRq5MfeTXL4V7bdkKG5ybsUbjyjHaNEKUFby4qEs8Id3mVcb2S5ft+v/SV00r+/hTOyzmJ0Rif0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://deepayan.github.io/experiments/browser-repl/assets/editor.js"></script>
+    
+
+  </body>
+</html>
