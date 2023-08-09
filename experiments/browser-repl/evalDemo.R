@@ -217,7 +217,7 @@ app <- list(
            headers = list('Content-Type' = 'text/html'),
            body = sprintf(template, wsUrl))
   },
-  staticPaths = list("/assets" = staticPath("assets", indexhtml = FALSE)),
+  ## staticPaths = list("/assets" = staticPath("assets", indexhtml = FALSE)),
   onWSOpen = function(ws) {
       ws$onMessage(function(binary, message) {
           ## str(message)
