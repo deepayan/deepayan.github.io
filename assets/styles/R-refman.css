@@ -151,7 +151,7 @@ nav h1 {
 .dropdown-menu ul li
 {
     /* line-height: 1.8em; */
-    padding: 5px;
+    /* padding: 5px; */
 }
 
 .dropdown-menu a
@@ -163,7 +163,7 @@ nav h1 {
 
 @media (max-width: 1199px) {
 
-    .header-right { display: none }
+    header.right { display: none }
 
 }
 
@@ -171,7 +171,7 @@ nav h1 {
 
 @media (min-width: 1220px) {
 
-    .header-top { display: none }
+    header.top { display: none }
     
     .container {
 	padding-right: 10px;
