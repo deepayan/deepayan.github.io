@@ -237,7 +237,7 @@ options(help_type = "html")
 help.start()
 
 ## s <- runServer("0.0.0.0", 9454, app)
-s <- startServer("0.0.0.0", 9454, app, FALSE)
+s <- startServer("127.0.0.1", 9454, app, FALSE)
 
 browseURL("http://localhost:9454/")
 
