@@ -157,60 +157,157 @@ aggregate(len ~ supp, ToothGrowth,
 
 # tapply
 
-Currently doesn't work for data frame, but with check modified:
-
-```
-     nI <- length(INDEX)  # now, 'INDEX' is not classed
-     if (!nI) stop("'INDEX' is of length zero")
--    if (!all(lengths(INDEX) == length(X)))
-+    if (!is.object(X) && !all(lengths(INDEX) == length(X)))
-         stop("arguments must have same length")
-     namelist <- lapply(INDEX, levels)#- all of them, yes !
-     extent <- lengths(namelist, use.names = FALSE)
-     cumextent <- cumprod(extent)
-```
-
+From R 4.3.0, `tapply()` can handle data frame input. `tapply()` does
+not do NSE, but we can avoid the function form and use NSE if we use
+`FUN = with`. For example,
 
 ```{r}
-tapply(ToothGrowth, with(ToothGrowth, list(supp)),
-       function(d) with(d, data.frame(supp = unique(supp),
-                                      mlen = mean(len),
-                                      as.list(coef(lm(len ~ log(dose)))))))
-
-s <- 
-tapply(ToothGrowth, with(ToothGrowth, list(supp, dose)),
-       function(d) with(d, data.frame(supp = unique(supp),
-                                      dose = unique(dose),
-                                      mlen = mean(len),
-                                      mdose = mean(log(dose)))))
-
-do.call(rbind, s)
+tvec <- 
+    tapply(ToothGrowth, ~ supp, with,
+           c(supp = unique(supp),
+             mlen = mean(len),
+             coef(lm(len ~ log(dose)))))
+tdf <- 
+    tapply(ToothGrowth, ~ supp, with,
+           data.frame(supp = unique(supp),
+                      mlen = mean(len),
+                      what = c("int", "slope"),
+                      coefs = coef(lm(len ~ log(dose)))))
 ```
 
-We could actually avoid the function definition and use NSE instead if we use `FUN = with`.
+The second one returns multi-row data frames.
+
+The result is usually a list matrix. 
 
 ```{r}
-s <- 
-    tapply(ToothGrowth, with(ToothGrowth, list(supp, dose)),
-           with, data.frame(supp = unique(supp),
-                            dose = unique(dose),
-                            mlen = mean(len),
-                            mdose = mean(log(dose))))
-do.call(rbind, s)
+str(tdf)
+dimnames(tdf)
 ```
 
-This also works with multi-row functions.
+
+
+In both the examples above, `rbind()` will give a reasonable matrix or
+data frame that one can work with.
 
 ```{r}
-tapply(ToothGrowth, ToothGrowth$supp,
-       with, data.frame(supp = unique(supp),
-                        mySummary(data.frame(len = len, dose = dose)))) |>
-    do.call(what = rbind)
+do.call(rbind, tvec)
+do.call(rbind, tdf)
 ```
-
 
 This is already quite nice, except that we need to include the unique
-values of the splitting factors in the summary function.
+values of the splitting factors in the summary function. Usually one
+will not do so, and a conversion to data frame should include those.
+
+```{r}
+tvec0 <- 
+    tapply(ToothGrowth, ~ supp, with,
+           c(mlen = mean(len),
+             coef(lm(len ~ log(dose)))))
+tdf0 <- 
+    tapply(ToothGrowth, ~ supp, with,
+           data.frame(mlen = mean(len),
+                      what = c("int", "slope"),
+                      coefs = coef(lm(len ~ log(dose)))))
+## conventional example
+qvec0 <- with(ToothGrowth,
+              tapply(len, list(s = supp, d = dose),
+                     quantile, prob = c(1/4, 2/4, 3/4)))
+do.call(rbind, tdf0)
+```
+
+
+The following function proposes to do this.
+
+
+```{r}
+array2DF <- function (x, responseName = "Value", sep = "",
+                      base = list(LETTERS), simplify = FALSE)
+{
+    keys <-
+        do.call("expand.grid",
+                c(dimnames(provideDimnames(x, sep = sep, base = base)),
+                  KEEP.OUT.ATTRS = FALSE, stringsAsFactors = FALSE))
+    vals <- NULL
+    if(simplify) {
+        dfrows <- .compatibleDFs(x)
+        if (length(dfrows))
+            return(cbind(keys[ rep(seq_along(dfrows), dfrows), , drop = FALSE],
+                         do.call(rbind, x)))
+        x <- simplify2array(c(x))
+        str(x)
+        if(is.array(x)) {
+            print(sapply(x, length))
+            vals <- asplit(x, 1L)
+            if(is.null(names(vals)))
+                names(vals) <-
+                    paste0(responseName, sep, seq_along(vals))
+        }
+    }
+    if(is.null(vals)) {
+        vals <- list(c(x))
+        names(vals) <- responseName
+    }
+    cbind(keys, list2DF(vals))
+}
+
+
+.compatibleDFs <- function(x)
+{
+    ## check whether all components of list array 'x' 
+    ## - are data frames
+    ## - have same column names
+    ## If TRUE, return value is a vector of corresponding nrow()-s 
+    ## If FALSE, return value is integer(0)
+    if (!all(sapply(x, inherits, "data.frame"))) return(integer(0))
+    if (length(unique(sapply(x, ncol))) > 1L) return(integer(0))
+    if (length(unique(lapply(x, colnames))) > 1L) return(integer(0))
+    return(sapply(x, nrow))
+}
+    
+```
+
+In action: without simplification.
+
+```{r}
+array2DF(tvec0, simplify = FALSE) |> str()
+array2DF(tdf0, simplify = FALSE) |> str()
+array2DF(qvec0, simplify = FALSE) |> str()
+```
+
+With simplification.
+
+```{r}
+## OK except for unnecessary dimnames
+array2DF(qvec0, simplify = TRUE) |> str()
+array2DF(tvec0, simplify = TRUE) |> str()
+
+array2DF(tdf0, simplify = TRUE)
+```
+
+What about unnamed results? Say we want within group bootstrap.
+
+Make unbalanced to see how that affects result.
+
+```{r}
+b <- 
+    tapply(ToothGrowth[-1,], ~ supp + dose, with,
+           sample(len, replace = TRUE))
+array2DF(b, simplify = TRUE)
+```
+
+I think it would be better to `c()` here.
+
+
+Something silly: 
+
+```{r}
+x <- 
+    tapply(ToothGrowth, ~ supp + dose, with,
+           if (runif(1) < 0.5) mean(len) else quantile(len))
+array2DF(x, simplify = TRUE)
+```
+
+Looks OK.
 
 
 # Possible extensions

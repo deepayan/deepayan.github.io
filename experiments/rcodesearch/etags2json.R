@@ -218,7 +218,7 @@ $(document).ready(function() {
 
 etags2json <-
     function(infile, outfile,
-             src_prefix = "/Users/deepayan/svn/all/r-project/R/trunk/src/",
+             src_prefix = "/Users/deepayan/svn/all/r-project/R/clean-checkout/trunk/src/",
              ## dest_prefix = "https://github.com/wch/r-source/blob/trunk/src/",
              limit = 1000)
 {

@@ -4,7 +4,8 @@ RPROG=R
 
 # etags (emacs-style)
 
-${RPROG} CMD rtags --verbose --no-Rd ${HOME}/svn/all/r-project/R/trunk/src
+${RPROG} CMD rtags --verbose --no-Rd ${HOME}/svn/all/r-project/R/clean-checkout/trunk/src
+
 
 ## Format:
 
